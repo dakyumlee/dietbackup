@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            background: #f8f9fa;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected {
+            background: #28a745;
+        }
+        
+        .status-disconnected {
+            background: #dc3545;
+        }
+        
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 15px;
+            background: white;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: 20%;
+        }
+        
+        .ai-message {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin-right: 20%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Claude AI 연결 테스트</h1>
+        
+        <!-- 상태 확인 섹션 -->
+        <div class="test-section">
+            <h3>1️⃣ 연결 상태 확인</h3>
+            <button onclick="checkStatus()">상태 확인</button>
+            <div id="status-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- 간단한 질문 테스트 -->
+        <div class="test-section">
+            <h3>2️⃣ 간단한 질문 테스트</h3>
+            <div class="input-group">
+                <label>질문:</label>
+                <input type="text" id="simple-question" value="안녕하세요! 자기소개 부탁드립니다." />
+            </div>
+            <button onclick="testSimpleQuestion()">질문 보내기</button>
+            <div id="simple-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- 기존 API 테스트 -->
+        <div class="test-section">
+            <h3>3️⃣ 기존 /api/ai/ask 테스트</h3>
+            <div class="input-group">
+                <label>질문:</label>
+                <input type="text" id="existing-question" value="오늘 기분이 좋아요!" />
+            </div>
+            <button onclick="testExistingAPI()">기존 API 테스트</button>
+            <div id="existing-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- 채팅 인터페이스 -->
+        <div class="test-section">
+            <h3>4️⃣ 실시간 채팅 테스트</h3>
+            <div id="chat-container" class="chat-container">
+                <div class="message ai-message">
+                    🤖 안녕하세요! Claude AI 테스트 모드입니다. 무엇이든 물어보세요!
+                </div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." onkeypress="handleChatEnter(event)" />
+                <button onclick="sendChatMessage()">전송</button>
+                <button onclick="clearChat()">채팅 지우기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 상태 확인
+        async function checkStatus() {
+            const resultDiv = document.getElementById('status-result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '연결 상태 확인 중...';
+            
+            try {
+                const response = await fetch('/api/simple-ai/status');
+                const data = await response.json();
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                
+                // 상태 표시
+                const status = data.status === 'connected' ? '연결됨' : '연결 안됨';
+                const indicator = data.status === 'connected' ? 'status-connected' : 'status-disconnected';
+                
+                resultDiv.innerHTML = `
+                    <div><span class="status-indicator ${indicator}"></span>${status}</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `오류: ${error.message}`;
+            }
+        }
+        
+        // 2. 간단한 질문 테스트
+        async function testSimpleQuestion() {
+            const question = document.getElementById('simple-question').value;
+            const resultDiv = document.getElementById('simple-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = 'Claude에게 질문하는 중...';
+            
+            try {
+                const response = await fetch('/api/simple-ai/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>질문:</strong> ${data.question}<br><br>
+                        <strong>Claude 답변:</strong><br>${data.answer}
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `오류: ${data.error}`;
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `네트워크 오류: ${error.message}`;
+            }
+        }
+        
+        // 3. 기존 API 테스트
+        async function testExistingAPI() {
+            const question = document.getElementById('existing-question').value;
+            const resultDiv = document.getElementById('existing-result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.textContent = '기존 API 테스트 중...';
+            
+            try {
+                const response = await fetch('/api/ai/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        question: question,
+                        userId: 1
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `HTTP ${response.status}: ${errorText}`;
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `오류: ${error.message}`;
+            }
+        }
+        
+        // 4. 채팅 기능
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const chatContainer = document.getElementById('chat-container');
+            
+            // 사용자 메시지 추가
+            chatContainer.innerHTML += `
+                <div class="message user-message">
+                    👤 ${message}
+                </div>
+            `;
+            
+            input.value = '';
+            
+            // 로딩 메시지 추가
+            const loadingId = 'loading-' + Date.now();
+            chatContainer.innerHTML += `
+                <div class="message ai-message" id="${loadingId}">
+                    🤖 생각하는 중...
+                </div>
+            `;
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/simple-ai/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: message })
+                });
+                
+                const data = await response.json();
+                
+                // 로딩 메시지 제거
+                document.getElementById(loadingId).remove();
+                
+                // AI 응답 추가
+                chatContainer.innerHTML += `
+                    <div class="message ai-message">
+                        🤖 ${data.success ? data.answer : '오류: ' + data.error}
+                    </div>
+                `;
+                
+            } catch (error) {
+                // 로딩 메시지 제거
+                document.getElementById(loadingId).remove();
+                
+                // 오류 메시지 추가
+                chatContainer.innerHTML += `
+                    <div class="message ai-message" style="background: #f8d7da; color: #721c24;">
+                        🤖 오류가 발생했습니다: ${error.message}
+                    </div>
+                `;
+            }
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function clearChat() {
+            document.getElementById('chat-container').innerHTML = `
+                <div class="message ai-message">
+                    🤖 채팅이 초기화되었습니다. 다시 대화해보세요!
+                </div>
+            `;
+        }
+        
+        // 페이지 로드 시 자동으로 상태 확인
+        window.onload = function() {
+            checkStatus();
+        };
+    </script>
+</body>
+</html>
