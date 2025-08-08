@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 로그인</title>
+    <style>
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'S-CoreDream-3Light', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .auth-layout {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .auth-sidebar {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        body.dark .auth-sidebar {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .auth-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: white;
+            position: relative;
+        }
+
+        body.dark .auth-main {
+            background: #1e293b;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 24px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        body.dark .theme-toggle {
+            background: rgba(255,255,255,0.1);
+        }
+
+        body.dark .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(26px);
+            background: #334155;
+        }
+
+        .admin-shortcut {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-shortcut:hover {
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        body.dark .admin-shortcut {
+            background: rgba(102, 126, 234, 0.15);
+            color: #a5b4fc;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark .admin-shortcut:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        body.dark .auth-header h1 {
+            color: #f1f5f9;
+        }
+
+        .auth-header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        body.dark .auth-header p {
+            color: #94a3b8;
+        }
+
+        .form-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+
+        body.dark .form-tabs {
+            background: #334155;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #64748b;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .tab-btn.active {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        body.dark .tab-btn {
+            color: #94a3b8;
+        }
+
+        .form-container {
+            position: relative;
+            min-height: 320px;
+        }
+
+        .auth-form {
+            position: absolute;
+            width: 100%;
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.3s ease;
+        }
+
+        .auth-form.hidden {
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        body.dark .form-group label {
+            color: #d1d5db;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        body.dark .form-input {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        body.dark .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: #667eea;
+        }
+
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            color: #5a67d8;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .submit-btn:hover {
+            background: #5a67d8;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        body.dark .divider::before,
+        body.dark .divider::after {
+            background: #475569;
+        }
+
+        .divider-text {
+            padding: 0 16px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .social-btn {
+            background: #334155;
+            border-color: #475569;
+            color: #d1d5db;
+        }
+
+        .social-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        body.dark .social-btn:hover {
+            background: #475569;
+        }
+
+        .social-btn span {
+            margin-right: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-layout {
+                flex-direction: column;
+            }
+
+            .auth-sidebar {
+                flex: none;
+                min-height: 200px;
+                padding: 30px 20px;
+            }
+
+            .sidebar-title {
+                font-size: 24px;
+            }
+
+            .sidebar-subtitle {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+
+            .feature-list {
+                display: none;
+            }
+
+            .auth-main {
+                padding: 30px 20px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+
+            .admin-shortcut {
+                top: 10px;
+                left: 10px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" onclick="toggleTheme()"></div>
+    <a href="admin-login.html" class="admin-shortcut">
+        <span>🛡️</span>
+        관리자
+    </a>
+
+    <div class="auth-layout">
+        <div class="auth-sidebar">
+            <div class="sidebar-content">
+                <div class="sidebar-logo">🍎</div>
+                <h1 class="sidebar-title">MyDiet</h1>
+                <p class="sidebar-subtitle">AI와 함께하는<br>스마트한 건강 관리</p>
+                
+                <ul class="feature-list">
+                    <li>개인 맞춤형 AI 코칭</li>
+                    <li>실시간 칼로리 추적</li>
+                    <li>감정 기반 식단 분석</li>
+                    <li>운동 루틴 자동 추천</li>
+                    <li>진행상황 시각화</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="auth-main">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h1>시작하기</h1>
+                    <p>계정에 로그인하거나 새로 만드세요</p>
+                </div>
+
+                <div class="form-tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">로그인</button>
+                    <button class="tab-btn" onclick="switchTab('signup')">회원가입</button>
+                </div>
+
+                <div class="form-container">
+                    <form class="auth-form" id="login-form">
+                        <div class="form-group">
+                            <label>이메일</label>
+                            <input type="email" class="form-input" placeholder="name@company.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>비밀번호</label>
+                            <div class="password-container">
+                                <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('login-password')">👁️</button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">로그인 유지</label>
+                            </div>
+                            <a href="#" class="forgot-link">비밀번호 찾기</a>
+                        </div>
+
+                        <button type="submit" class="submit-btn">로그인</button>
+                    </form>
+
+                    <form class="auth-form hidden" id="signup-form">
+                        <div class="form-group">
+                            <label>이름</label>
+                            <input type="text" class="form-input" placeholder="김핑핑" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>이메일</label>
+                            <input type="email" class="form-input" placeholder="name@company.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>비밀번호</label>
+                            <div class="password-container">
+                                <input type="password" id="signup-password" class="form-input" placeholder="8자 이상" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">👁️</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>비밀번호 확인</label>
+                            <div class="password-container">
+                                <input type="password" id="confirm-password" class="form-input" placeholder="비밀번호 재입력" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirm-password')">👁️</button>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-group" style="margin-bottom: 24px;">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms" style="font-size:12px;">이용약관에 동의합니다</label>
+                        </div>
+                        <button type="submit" class="submit-btn">계정 만들기</button>
+                    </form>
+                </div>
+                <div class="divider">
+                    <span class="divider-text">또는</span>
+                </div>
+                <div class="social-buttons">
+                    <a href="/oauth2/authorization/google" class="social-btn">
+                        <span>🔍</span>
+                        Google
+                    </a>
+                    <a href="/oauth2/authorization/kakao" class="social-btn">
+                        <span>💬</span>
+                        Kakao
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            } else {
+                tabs[1].classList.add('active');
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const btn = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = this.querySelector('.submit-btn');
+                btn.textContent = '로그인 중...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            });
+            
+            document.getElementById('signup-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = this.querySelector('.submit-btn');
+                btn.textContent = '계정 생성 중...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    alert('계정이 생성되었습니다!');
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('.submit-btn');
+            btn.textContent = '계정 생성 중...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('계정이 생성되었습니다!');
+                switchTab('login');
+                btn.textContent = '계정 만들기';
+                btn.disabled = false;
+            }, 1500);
+        });
+ 
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+    </script>
+</body>
+</html>

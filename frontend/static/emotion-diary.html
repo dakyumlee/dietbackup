@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 감정 일기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            margin-right: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        body.dark .theme-toggle {
+            background: #475569;
+        }
+
+        body.dark .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(20px);
+            background: #334155;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .back-btn {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(-2px);
+        }
+
+        body.dark .back-btn:hover {
+            background: #475569;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a202c;
+        }
+
+        body.dark .page-title {
+            color: #f1f5f9;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        body.dark .page-subtitle {
+            color: #94a3b8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        .diary-timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .diary-timeline {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .timeline-title {
+            color: #f1f5f9;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        body.dark .date-selector {
+            background: #334155;
+        }
+
+        .date-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        body.dark .date-btn {
+            color: #94a3b8;
+        }
+
+        .date-btn:hover {
+            color: #1a202c;
+        }
+
+        body.dark .date-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .current-date {
+            font-weight: 600;
+            color: #1a202c;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        body.dark .current-date {
+            color: #f1f5f9;
+        }
+
+        .mood-tracker {
+            margin-bottom: 32px;
+        }
+
+        .mood-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark .mood-title {
+            color: #f1f5f9;
+        }
+
+        .mood-selector {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .mood-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        body.dark .mood-option {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .mood-option:hover {
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .mood-option.selected {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            transform: translateY(-2px);
+        }
+
+        body.dark .mood-option.selected {
+            background: #451a03;
+            border-color: #f59e0b;
+        }
+
+        .mood-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .mood-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            text-align: center;
+        }
+
+        body.dark .mood-label {
+            color: #94a3b8;
+        }
+
+        .mood-option.selected .mood-label {
+            color: #d97706;
+        }
+
+        body.dark .mood-option.selected .mood-label {
+            color: #fbbf24;
+        }
+
+        .stress-level {
+            margin-bottom: 20px;
+        }
+
+        .stress-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        body.dark .stress-title {
+            color: #94a3b8;
+        }
+
+        .stress-slider {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .stress-input {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        body.dark .stress-input {
+            background: #475569;
+        }
+
+        .stress-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ef4444;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stress-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ef4444;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .add-entry-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-entry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .diary-entries {
+            margin-top: 32px;
+        }
+
+        .entries-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+
+        body.dark .entries-title {
+            color: #f1f5f9;
+        }
+
+        .entry-item {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body.dark .entry-item {
+            background: #334155;
+        }
+
+        .entry-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark .entry-item:hover {
+            background: #475569;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .entry-mood {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .entry-emoji {
+            font-size: 24px;
+        }
+
+        .entry-mood-text {
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .entry-mood-text {
+            color: #f1f5f9;
+        }
+
+        .entry-time {
+            color: #64748b;
+            font-size: 12px;
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        body.dark .entry-time {
+            background: #475569;
+            color: #94a3b8;
+        }
+
+        .entry-content {
+            margin-bottom: 12px;
+        }
+
+        .entry-text {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        body.dark .entry-text {
+            color: #d1d5db;
+        }
+
+        .entry-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            background: #e0f2fe;
+            color: #0891b2;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        body.dark .tag {
+            background: #164e63;
+            color: #67e8f9;
+        }
+
+        .entry-stress {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        body.dark .entry-stress {
+            color: #94a3b8;
+        }
+
+        .entry-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            color: #64748b;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: #1a202c;
+        }
+
+        body.dark .action-btn:hover {
+            background: #475569;
+            color: #f1f5f9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #64748b;
+        }
+
+        body.dark .empty-state h3 {
+            color: #94a3b8;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .card {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark .card-title {
+            color: #f1f5f9;
+        }
+
+        .mood-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            height: 100px;
+            padding: 0 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        body.dark .mood-chart {
+            border-bottom-color: #475569;
+        }
+
+        .mood-bar {
+            flex: 1;
+            margin: 0 2px;
+            background: #e2e8f0;
+            border-radius: 4px 4px 0 0;
+            min-height: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .mood-bar {
+            background: #475569;
+        }
+
+        .mood-bar:hover {
+            transform: translateY(-2px);
+        }
+
+        .mood-bar.very-bad { background: #dc2626; }
+        .mood-bar.bad { background: #f59e0b; }
+        .mood-bar.neutral { background: #6b7280; }
+        .mood-bar.good { background: #10b981; }
+        .mood-bar.very-good { background: #3b82f6; }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .insights-list {
+            list-style: none;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        body.dark .insight-item {
+            border-bottom-color: #334155;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-icon {
+            font-size: 20px;
+            width: 32px;
+            text-align: center;
+        }
+
+        .insight-text {
+            flex: 1;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        body.dark .insight-text {
+            color: #d1d5db;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        body.dark .modal-content {
+            background: #1e293b;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark .modal-header {
+            border-bottom-color: #475569;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .modal-title {
+            color: #f1f5f9;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .close-btn {
+            color: #94a3b8;
+        }
+
+        .close-btn:hover {
+            color: #1a202c;
+            transform: rotate(90deg);
+        }
+
+        body.dark .close-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        body.dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        body.dark .form-input,
+        body.dark .form-textarea {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag-input {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .tag-input {
+            background: #334155;
+            border-color: #475569;
+            color: #d1d5db;
+        }
+
+        .tag-input:hover {
+            background: #e2e8f0;
+        }
+
+        body.dark .tag-input:hover {
+            background: #475569;
+        }
+
+        .tag-input.selected {
+            background: #0891b2;
+            color: white;
+            border-color: #0891b2;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        body.dark .btn-secondary {
+            background: #475569;
+            color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .mood-selector {
+                flex-wrap: wrap;
+            }
+
+            .mood-option {
+                flex: 1 1 calc(20% - 8px);
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .mood-emoji {
+                font-size: 24px;
+            }
+
+            .mood-label {
+                font-size: 11px;
+            }
+
+            .mood-chart {
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="back-btn">
+                    ← 대시보드로
+                </a>
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">💖 감정 일기</h1>
+            <p class="page-subtitle">오늘의 감정과 기분을 기록하고 패턴을 분석해보세요</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="diary-timeline">
+                <div class="timeline-header">
+                    <h2 class="timeline-title">오늘의 감정</h2>
+                    <div class="date-selector">
+                        <button class="date-btn" onclick="changeDate(-1)">◀</button>
+                        <span class="current-date" id="current-date">2025년 8월 1일</span>
+                        <button class="date-btn" onclick="changeDate(1)">▶</button>
+                    </div>
+                </div>
+
+                <div class="mood-tracker">
+                    <h3 class="mood-title">😊 지금 기분은 어때요?</h3>
+                    <div class="mood-selector">
+                        <div class="mood-option" data-mood="매우나쁨" onclick="selectMood(this)">
+                            <div class="mood-emoji">😭</div>
+                            <div class="mood-label">매우<br>나쁨</div>
+                        </div>
+                        <div class="mood-option" data-mood="나쁨" onclick="selectMood(this)">
+                            <div class="mood-emoji">😔</div>
+                            <div class="mood-label">나쁨</div>
+                        </div>
+                        <div class="mood-option" data-mood="보통" onclick="selectMood(this)">
+                            <div class="mood-emoji">😐</div>
+                            <div class="mood-label">보통</div>
+                        </div>
+                        <div class="mood-option" data-mood="좋음" onclick="selectMood(this)">
+                            <div class="mood-emoji">😊</div>
+                            <div class="mood-label">좋음</div>
+                        </div>
+                        <div class="mood-option" data-mood="매우좋음" onclick="selectMood(this)">
+                            <div class="mood-emoji">😍</div>
+                            <div class="mood-label">매우<br>좋음</div>
+                        </div>
+                    </div>
+
+                    <div class="stress-level">
+                        <div class="stress-title">스트레스 레벨: <span id="stress-value">5</span>/10</div>
+                        <div class="stress-slider">
+                            <input type="range" id="stress-input" class="stress-input" min="1" max="10" value="5" oninput="updateStressValue(this.value)">
+                        </div>
+                        <div class="stress-labels">
+                            <span>😌 편안함</span>
+                            <span>😰 매우 스트레스</span>
+                        </div>
+                    </div>
+
+                    <button class="add-entry-btn" onclick="openEntryModal()">
+                        <span>✍️</span>
+                        오늘의 감정 기록하기
+                    </button>
+                </div>
+
+                <div class="diary-entries">
+                    <h3 class="entries-title">📖 감정 기록</h3>
+                    <div id="entries-container">
+                        <div class="empty-state">
+                            <div class="icon">📝</div>
+                            <h3>아직 기록된 감정이 없어요</h3>
+                            <p>오늘 하루 어땠는지<br>첫 번째 감정을 기록해보세요!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">📊 감정 통계</h3>
+                    <div class="mood-chart" id="mood-chart">
+                        <div class="mood-bar" style="height: 20px;"></div>
+                        <div class="mood-bar" style="height: 35px;"></div>
+                        <div class="mood-bar" style="height: 60px;"></div>
+                        <div class="mood-bar" style="height: 45px;"></div>
+                        <div class="mood-bar" style="height: 25px;"></div>
+                        <div class="mood-bar" style="height: 40px;"></div>
+                        <div class="mood-bar" style="height: 15px;"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <span>월</span>
+                        <span>화</span>
+                        <span>수</span>
+                        <span>목</span>
+                        <span>금</span>
+                        <span>토</span>
+                        <span>일</span>
+                    </div>
+                    <div style="text-align: center; margin-top: 16px; color: #64748b; font-size: 14px;">
+                        이번 주 평균 기분: <strong>😊 좋음</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">🔍 인사이트</h3>
+                    <ul class="insights-list">
+                        <li class="insight-item">
+                            <div class="insight-icon">🌟</div>
+                            <div class="insight-text">운동한 날 기분이 더 좋아요!</div>
+                        </li>
+                        <li class="insight-item">
+                            <div class="insight-icon">🥗</div>
+                            <div class="insight-text">건강한 식단과 좋은 감정의 연관성</div>
+                        </li>
+                        <li class="insight-item">
+                            <div class="insight-icon">😴</div>
+                            <div class="insight-text">충분한 수면이 스트레스를 줄여줘요</div>
+                        </li>
+                        <li class="insight-item">
+                            <div class="insight-icon">📱</div>
+                            <div class="insight-text">규칙적인 기록이 감정 관리에 도움</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">🎯 감정 목표</h3>
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #64748b;">긍정적인 하루</span>
+                            <span style="font-size: 14px; font-weight: 600;">5/7일</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; background: #10b981; width: 71%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #64748b;">스트레스 관리</span>
+                            <span style="font-size: 14px; font-weight: 600;">6/7일</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; background: #3b82f6; width: 86%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="entry-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✍️ 감정 기록</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="entry-form" onsubmit="addEntry(event)">
+                    <div class="form-group">
+                        <label class="form-label">오늘 어떤 일이 있었나요? *</label>
+                        <textarea id="entry-content" class="form-textarea" placeholder="오늘 하루 있었던 일들을 자유롭게 적어보세요. 좋았던 일, 힘들었던 일, 감정의 변화 등..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">다이어트 관련 느낌</label>
+                        <textarea id="diet-feeling" class="form-textarea" placeholder="식단 관리, 운동, 체중 변화 등 다이어트와 관련된 느낌을 적어보세요" style="min-height: 80px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">오늘의 키워드</label>
+                        <div class="tags-input">
+                            <div class="tag-input" data-tag="행복" onclick="toggleTag(this)">행복</div>
+                            <div class="tag-input" data-tag="감사" onclick="toggleTag(this)">감사</div>
+                            <div class="tag-input" data-tag="성취감" onclick="toggleTag(this)">성취감</div>
+                            <div class="tag-input" data-tag="피곤함" onclick="toggleTag(this)">피곤함</div>
+                            <div class="tag-input" data-tag="스트레스" onclick="toggleTag(this)">스트레스</div>
+                            <div class="tag-input" data-tag="불안" onclick="toggleTag(this)">불안</div>
+                            <div class="tag-input" data-tag="우울" onclick="toggleTag(this)">우울</div>
+                            <div class="tag-input" data-tag="동기부여" onclick="toggleTag(this)">동기부여</div>
+                            <div class="tag-input" data-tag="만족" onclick="toggleTag(this)">만족</div>
+                            <div class="tag-input" data-tag="후회" onclick="toggleTag(this)">후회</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">기록하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let selectedMood = '';
+        let selectedTags = [];
+        let currentStressLevel = 5;
+
+        const moodEmojis = {
+            '매우나쁨': '😭',
+            '나쁨': '😔',
+            '보통': '😐',
+            '좋음': '😊',
+            '매우좋음': '😍'
+        };
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function changeDate(direction) {
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateDateDisplay();
+            loadEmotionData();
+        }
+
+        function updateDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = 
+                currentDate.toLocaleDateString('ko-KR', options);
+        }
+
+        function selectMood(element) {
+            document.querySelectorAll('.mood-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedMood = element.dataset.mood;
+        }
+
+        function updateStressValue(value) {
+            document.getElementById('stress-value').textContent = value;
+            currentStressLevel = parseInt(value);
+            
+            const slider = document.getElementById('stress-input');
+            const percentage = (value - 1) / 9;
+            slider.style.background = `linear-gradient(to right, #ef4444 0%, #f59e0b ${percentage * 50}%, #10b981 ${percentage * 100}%, #e2e8f0 ${percentage * 100}%)`;
+        }
+
+        function openEntryModal() {
+            if (!selectedMood) {
+                alert('먼저 기분을 선택해주세요! 😊');
+                return;
+            }
+            document.getElementById('entry-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('entry-content').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('entry-modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            document.getElementById('entry-form').reset();
+            selectedTags = [];
+            updateTagDisplay();
+        }
+
+        function toggleTag(element) {
+            const tag = element.dataset.tag;
+            if (selectedTags.includes(tag)) {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                element.classList.remove('selected');
+            } else {
+                selectedTags.push(tag);
+                element.classList.add('selected');
+            }
+        }
+
+        function updateTagDisplay() {
+            document.querySelectorAll('.tag-input').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+        }
+
+        function addEntry(event) {
+            event.preventDefault();
+            
+            const entryData = {
+                mood: selectedMood,
+                stress: currentStressLevel,
+                content: document.getElementById('entry-content').value,
+                dietFeeling: document.getElementById('diet-feeling').value || '',
+                tags: [...selectedTags],
+                timestamp: new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute:'2-digit'}),
+                date: currentDate.toDateString()
+            };
+            
+            addEntryToUI(entryData, true);
+            saveEmotionData();
+            closeModal();
+             
+            document.querySelectorAll('.mood-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            selectedMood = '';
+             
+            document.getElementById('stress-input').value = 5;
+            updateStressValue(5);
+            
+            setTimeout(() => {
+                const container = document.getElementById('entries-container');
+                const newEntry = container.firstChild;
+                if (newEntry && !newEntry.classList.contains('empty-state')) {
+                    newEntry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+
+        function addEntryToUI(entryData, animate = false) {
+            const container = document.getElementById('entries-container');
+             
+            const emptyState = container.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            const entryItem = document.createElement('div');
+            entryItem.className = 'entry-item';
+            entryItem.dataset.entry = JSON.stringify(entryData);
+            
+            if (animate) {
+                entryItem.style.animation = 'slideIn 0.3s ease';
+            }
+            
+            const emoji = moodEmojis[entryData.mood];
+            const tagsHtml = entryData.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+            const dietFeelingHtml = entryData.dietFeeling ? 
+                `<div class="entry-text" style="border-left: 3px solid #10b981; padding-left: 12px; margin-top: 12px; opacity: 0.9;">
+                    <strong>다이어트 관련:</strong> ${entryData.dietFeeling}
+                </div>` : '';
+            
+            entryItem.innerHTML = `
+                <div class="entry-header">
+                    <div class="entry-mood">
+                        <div class="entry-emoji">${emoji}</div>
+                        <div class="entry-mood-text">${entryData.mood}</div>
+                    </div>
+                    <div class="entry-time">${entryData.timestamp}</div>
+                </div>
+                <div class="entry-content">
+                    <div class="entry-text">${entryData.content}</div>
+                    ${dietFeelingHtml}
+                    <div class="entry-tags">${tagsHtml}</div>
+                    <div class="entry-stress">스트레스 레벨: ${entryData.stress}/10</div>
+                </div>
+                <div class="entry-actions">
+                    <button class="action-btn" onclick="editEntry(this)" title="수정">✏️</button>
+                    <button class="action-btn" onclick="deleteEntry(this)" title="삭제">🗑️</button>
+                </div>
+            `;
+            
+            container.insertBefore(entryItem, container.firstChild);
+        }
+
+        function deleteEntry(btn) {
+            if (confirm('이 감정 기록을 삭제하시겠습니까?')) {
+                const entryItem = btn.closest('.entry-item');
+                entryItem.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    entryItem.remove();
+                    saveEmotionData();
+                     
+                    const container = document.getElementById('entries-container');
+                    if (container.children.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">📝</div>
+                                <h3>아직 기록된 감정이 없어요</h3>
+                                <p>오늘 하루 어땠는지<br>첫 번째 감정을 기록해보세요!</p>
+                            </div>
+                        `;
+                    }
+                }, 300);
+            }
+        }
+
+        function editEntry(btn) {
+            const entryItem = btn.closest('.entry-item');
+            const entryData = JSON.parse(entryItem.dataset.entry);
+             
+            selectedMood = entryData.mood;
+            document.querySelectorAll('.mood-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.mood === selectedMood);
+            });
+             
+            document.getElementById('stress-input').value = entryData.stress;
+            updateStressValue(entryData.stress);
+             
+            document.getElementById('entry-content').value = entryData.content;
+            document.getElementById('diet-feeling').value = entryData.dietFeeling;
+             
+            selectedTags = [...entryData.tags];
+            document.querySelectorAll('.tag-input').forEach(tag => {
+                tag.classList.toggle('selected', selectedTags.includes(tag.dataset.tag));
+            });
+             
+            deleteEntry(btn);
+             
+            document.getElementById('entry-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function loadEmotionData() {
+            const dateKey = currentDate.toDateString();
+            const savedData = localStorage.getItem(`emotions-${dateKey}`);
+            
+            const container = document.getElementById('entries-container');
+            container.innerHTML = '';
+            
+            if (savedData) {
+                const emotions = JSON.parse(savedData);
+                if (emotions.length > 0) {
+                    emotions.forEach(emotion => {
+                        addEntryToUI(emotion, false);
+                    });
+                } else {
+                    showEmptyState();
+                }
+            } else {
+                showEmptyState();
+            }
+        }
+
+        function showEmptyState() {
+            const container = document.getElementById('entries-container');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📝</div>
+                    <h3>아직 기록된 감정이 없어요</h3>
+                    <p>오늘 하루 어땠는지<br>첫 번째 감정을 기록해보세요!</p>
+                </div>
+            `;
+        }
+
+        function saveEmotionData() {
+            const dateKey = currentDate.toDateString();
+            const container = document.getElementById('entries-container');
+            const entries = [];
+            
+            Array.from(container.children).forEach(item => {
+                if (item.dataset.entry) {
+                    entries.push(JSON.parse(item.dataset.entry));
+                }
+            });
+            
+            localStorage.setItem(`emotions-${dateKey}`, JSON.stringify(entries));
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('entry-modal').classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        updateDateDisplay();
+        loadEmotionData();
+        updateStressValue(5);
+    </script>
+</body>
+</html>

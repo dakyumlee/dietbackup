@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 프로필 설정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            margin-right: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        body.dark .theme-toggle {
+            background: #475569;
+        }
+
+        body.dark .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(20px);
+            background: #334155;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .back-btn {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(-2px);
+        }
+
+        body.dark .back-btn:hover {
+            background: #475569;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a202c;
+        }
+
+        body.dark .page-title {
+            color: #f1f5f9;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        body.dark .page-subtitle {
+            color: #94a3b8;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        .settings-nav {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .nav-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .nav-section {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 16px;
+        }
+
+        body.dark .nav-title {
+            color: #f1f5f9;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        body.dark .nav-link {
+            color: #94a3b8;
+        }
+
+        .nav-link:hover {
+            background: #f8fafc;
+            color: #1a202c;
+        }
+
+        body.dark .nav-link:hover {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .setting-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark .setting-section {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .setting-section.hidden {
+            display: none;
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        body.dark .section-header {
+            border-bottom-color: #334155;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        body.dark .section-title {
+            color: #f1f5f9;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        body.dark .section-description {
+            color: #94a3b8;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .profile-avatar {
+            position: relative;
+        }
+
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            border: 3px solid white;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .avatar-upload {
+            border-color: #1e293b;
+        }
+
+        .avatar-upload:hover {
+            background: #5a67d8;
+            transform: scale(1.1);
+        }
+
+        .profile-info h2 {
+            color: #1a202c;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        body.dark .profile-info h2 {
+            color: #f1f5f9;
+        }
+
+        .profile-info p {
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+
+        body.dark .profile-info p {
+            color: #94a3b8;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark .stat-label {
+            color: #94a3b8;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        body.dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        body.dark .form-input,
+        body.dark .form-select,
+        body.dark .form-textarea {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        body.dark .form-input::placeholder,
+        body.dark .form-textarea::placeholder {
+            color: #6b7280;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        body.dark .form-help {
+            color: #94a3b8;
+        }
+
+        .ai-personality {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .personality-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        body.dark .personality-card {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .personality-card:hover {
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        body.dark .personality-card:hover {
+            border-color: #64748b;
+        }
+
+        .personality-card.selected {
+            border-color: #667eea;
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        body.dark .personality-card.selected {
+            background: #475569;
+        }
+
+        .personality-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .personality-name {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        body.dark .personality-name {
+            color: #f1f5f9;
+        }
+
+        .personality-desc {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        body.dark .personality-desc {
+            color: #94a3b8;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        body.dark .toggle-slider {
+            background-color: #475569;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        .toggle-input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        body.dark .setting-item {
+            border-bottom-color: #334155;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h4 {
+            color: #1a202c;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        body.dark .setting-info h4 {
+            color: #f1f5f9;
+        }
+
+        .setting-info p {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        body.dark .setting-info p {
+            color: #94a3b8;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        body.dark .btn-secondary {
+            background: #475569;
+            color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .danger-zone {
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 24px;
+            background: #fef2f2;
+            margin-top: 32px;
+        }
+
+        body.dark .danger-zone {
+            border-color: #7f1d1d;
+            background: #1f1018;
+        }
+
+        .danger-title {
+            color: #dc2626;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .danger-description {
+            color: #991b1b;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        body.dark .danger-description {
+            color: #fca5a5;
+        }
+
+        .save-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 16px;
+            transform: translateY(100%);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        body.dark .save-bar {
+            background: #1e293b;
+            border-top-color: #475569;
+        }
+
+        .save-bar.show {
+            transform: translateY(0);
+        }
+
+        .save-bar-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-info {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        body.dark .save-info {
+            color: #94a3b8;
+        }
+
+        .save-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .settings-nav {
+                position: static;
+                order: -1;
+            }
+
+            .nav-section {
+                padding: 20px;
+            }
+
+            .nav-menu {
+                display: flex;
+                overflow-x: auto;
+                gap: 8px;
+                padding-bottom: 8px;
+            }
+
+            .nav-item {
+                flex-shrink: 0;
+                margin-bottom: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .ai-personality {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="back-btn">
+                    ← 대시보드로
+                </a>
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">⚙️ 프로필 설정</h1>
+            <p class="page-subtitle">개인 정보와 앱 환경을 맞춤 설정하세요</p>
+        </div>
+
+        <div class="settings-layout">
+            <div class="settings-nav">
+                <div class="nav-section">
+                    <h3 class="nav-title">설정 메뉴</h3>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a class="nav-link active" onclick="showSection('profile')">
+                                <span class="nav-icon">👤</span>
+                                프로필
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showSection('goals')">
+                                <span class="nav-icon">🎯</span>
+                                목표 설정
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showSection('ai')">
+                                <span class="nav-icon">🤖</span>
+                                AI 코치
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showSection('notifications')">
+                                <span class="nav-icon">🔔</span>
+                                알림
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showSection('privacy')">
+                                <span class="nav-icon">🔒</span>
+                                개인정보
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="showSection('account')">
+                                <span class="nav-icon">⚠️</span>
+                                계정 관리
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="settings-content">
+                <div class="setting-section" id="profile-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>👤</span>
+                            개인 프로필
+                        </h2>
+                        <p class="section-description">기본 정보와 신체 정보를 관리하세요</p>
+                    </div>
+
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <div class="avatar-img" id="avatar-display">👤</div>
+                            <div class="avatar-upload" onclick="uploadAvatar()">📷</div>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name">사용자</h2>
+                            <p id="profile-email">user@example.com</p>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="streak-days">0일</div>
+                                    <div class="stat-label">연속 기록</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="weight-change">0kg</div>
+                                    <div class="stat-label">체중 변화</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="goal-progress">0%</div>
+                                    <div class="stat-label">목표 달성</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form class="form-grid" onsubmit="saveProfile(event)">
+                        <div class="form-group">
+                            <label class="form-label">이름</label>
+                            <input type="text" class="form-input" id="name" placeholder="이름을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-input" id="email" placeholder="이메일을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">생년월일</label>
+                            <input type="date" class="form-input" id="birthdate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">성별</label>
+                            <select class="form-select" id="gender">
+                                <option value="">선택하세요</option>
+                                <option value="female">여성</option>
+                                <option value="male">남성</option>
+                                <option value="other">기타</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">키 (cm)</label>
+                            <input type="number" class="form-input" id="height" min="100" max="250">
+                            <div class="form-help">정확한 칼로리 계산을 위해 필요해요</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">현재 체중 (kg)</label>
+                            <input type="number" class="form-input" id="weight" min="30" max="200" step="0.1">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">자기소개</label>
+                            <textarea class="form-textarea" id="bio" placeholder="간단한 자기소개를 적어보세요"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="setting-section hidden" id="goals-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>🎯</span>
+                            목표 설정
+                        </h2>
+                        <p class="section-description">개인 맞춤형 건강 목표를 설정하세요</p>
+                    </div>
+
+                    <form class="form-grid" onsubmit="saveGoals(event)">
+                        <div class="form-group">
+                            <label class="form-label">목표 체중 (kg)</label>
+                            <input type="number" class="form-input" id="target-weight" min="30" max="200" step="0.1" placeholder="목표 체중">
+                            <div class="form-help" id="weight-difference"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">목표 달성 기간</label>
+                            <select class="form-select" id="target-period">
+                                <option value="">선택하세요</option>
+                                <option value="1month">1개월</option>
+                                <option value="3months">3개월</option>
+                                <option value="6months">6개월</option>
+                                <option value="1year">1년</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">일일 칼로리 목표</label>
+                            <input type="number" class="form-input" id="daily-calories" min="1000" max="3000" placeholder="예: 1500">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">주간 운동 목표 (회)</label>
+                            <input type="number" class="form-input" id="weekly-workouts" min="1" max="7" placeholder="예: 3">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">일일 단백질 목표 (g)</label>
+                            <input type="number" class="form-input" id="daily-protein" min="30" max="200" placeholder="예: 80">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">일일 수분 섭취 목표 (잔)</label>
+                            <input type="number" class="form-input" id="daily-water" min="4" max="15" placeholder="예: 8">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">활동 수준</label>
+                            <select class="form-select" id="activity-level">
+                                <option value="">선택하세요</option>
+                                <option value="sedentary">좌식 생활 (운동 거의 없음)</option>
+                                <option value="light">가벼운 활동 (주 1-3회 운동)</option>
+                                <option value="moderate">보통 활동 (주 3-5회 운동)</option>
+                                <option value="active">활발한 활동 (주 6-7회 운동)</option>
+                                <option value="very-active">매우 활발함 (하루 2회 운동)</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="setting-section hidden" id="ai-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>🤖</span>
+                            AI 코치 설정
+                        </h2>
+                        <p class="section-description">Claude AI 코치의 성격과 조언 스타일을 선택하세요</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">AI 코치 성격</label>
+                        <div class="ai-personality">
+                            <div class="personality-card" data-personality="gentle" onclick="selectPersonality(this)">
+                                <div class="personality-emoji">💕</div>
+                                <div class="personality-name">다정한 코치</div>
+                                <div class="personality-desc">"정말 잘하고 있어요!"</div>
+                            </div>
+                            <div class="personality-card" data-personality="tsundere" onclick="selectPersonality(this)">
+                                <div class="personality-emoji">😤</div>
+                                <div class="personality-name">츤데레 코치</div>
+                                <div class="personality-desc">"별로지만... 잘했네"</div>
+                            </div>
+                            <div class="personality-card" data-personality="strict" onclick="selectPersonality(this)">
+                                <div class="personality-emoji">🔥</div>
+                                <div class="personality-name">무자비한 코치</div>
+                                <div class="personality-desc">"이것도 못해? 더 해!"</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">조언 빈도</label>
+                        <select class="form-select" id="advice-frequency">
+                            <option value="">선택하세요</option>
+                            <option value="low">가끔 (주요 변화시만)</option>
+                            <option value="medium">보통 (하루 1-2회)</option>
+                            <option value="high">자주 (매 기록시마다)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">조언 유형</label>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="advice-diet"> 식단 개선 제안
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="advice-workout"> 운동 추천
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="advice-emotion"> 감정 관리 조언
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="checkbox" id="advice-motivation"> 동기부여 메시지
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-section hidden" id="notifications-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>🔔</span>
+                            알림 설정
+                        </h2>
+                        <p class="section-description">원하는 알림을 선택하고 시간을 설정하세요</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>식사 알림</h4>
+                            <p>식사 시간에 기록 알림을 받으세요</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="meal-notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>운동 알림</h4>
+                            <p>운동 계획된 시간에 알림을 받으세요</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="workout-notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>수분 섭취 알림</h4>
+                            <p>정기적으로 물 마시기 알림을 받으세요</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="water-notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>목표 달성 알림</h4>
+                            <p>일일/주간 목표 달성 시 축하 메시지를 받으세요</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="goal-notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>AI 조언 알림</h4>
+                            <p>Claude의 개인화된 조언을 푸시 알림으로 받으세요</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="ai-notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label class="form-label">알림 시간대</label>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 12px; color: #64748b;">아침 식사</label>
+                                <input type="time" class="form-input" id="breakfast-time">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 12px; color: #64748b;">점심 식사</label>
+                                <input type="time" class="form-input" id="lunch-time">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 12px; color: #64748b;">저녁 식사</label>
+                                <input type="time" class="form-input" id="dinner-time">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 12px; color: #64748b;">운동 시간</label>
+                                <input type="time" class="form-input" id="workout-time">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-section hidden" id="privacy-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>🔒</span>
+                            개인정보 보호
+                        </h2>
+                        <p class="section-description">데이터 보호 및 개인정보 설정을 관리하세요</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>데이터 분석 허용</h4>
+                            <p>서비스 개선을 위한 익명화된 데이터 분석에 동의</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="data-analysis">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>맞춤형 광고</h4>
+                            <p>개인화된 건강 관련 광고 수신에 동의</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="personalized-ads">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>데이터 공유</h4>
+                            <p>연동된 건강 앱과 데이터 공유 허용</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="toggle-input" id="data-sharing">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="margin-top: 32px;">
+                        <h4 style="margin-bottom: 16px; color: #1a202c; font-weight: 600;">데이터 관리</h4>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="exportData()">📥 데이터 내보내기</button>
+                            <button class="btn btn-secondary" onclick="importData()">📤 데이터 가져오기</button>
+                            <button class="btn btn-danger" onclick="clearData()">🗑️ 모든 데이터 삭제</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-section hidden" id="account-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <span>⚠️</span>
+                            계정 관리
+                        </h2>
+                        <p class="section-description">비밀번호 변경 및 계정 보안 설정</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">현재 비밀번호</label>
+                        <input type="password" class="form-input" id="current-password" placeholder="현재 비밀번호를 입력하세요">
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">새 비밀번호</label>
+                            <input type="password" class="form-input" id="new-password" placeholder="새 비밀번호 (8자 이상)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">비밀번호 확인</label>
+                            <input type="password" class="form-input" id="confirm-password" placeholder="새 비밀번호 재입력">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="changePassword()">비밀번호 변경</button>
+
+                    <div class="danger-zone">
+                        <h4 class="danger-title">
+                            <span>⚠️</span>
+                            위험 구역
+                        </h4>
+                        <p class="danger-description">
+                            아래 작업들은 되돌릴 수 없습니다. 신중하게 결정해주세요.
+                        </p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-danger" onclick="deactivateAccount()">계정 비활성화</button>
+                            <button class="btn btn-danger" onclick="deleteAccount()">계정 완전 삭제</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="save-bar" id="save-bar">
+        <div class="save-bar-content">
+            <div class="save-info">변경사항이 있습니다</div>
+            <div class="save-actions">
+                <button class="btn btn-secondary" onclick="discardChanges()">취소</button>
+                <button class="btn btn-primary" onclick="saveAllChanges()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let hasUnsavedChanges = false;
+        let selectedPersonality = '';
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.setting-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            document.getElementById(`${sectionName}-section`).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        function selectPersonality(card) {
+            document.querySelectorAll('.personality-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedPersonality = card.dataset.personality;
+            showUnsavedChanges();
+        }
+
+        function uploadAvatar() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('avatar-display').style.backgroundImage = `url(${e.target.result})`;
+                        document.getElementById('avatar-display').style.backgroundSize = 'cover';
+                        document.getElementById('avatar-display').textContent = '';
+                        showUnsavedChanges();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        function showUnsavedChanges() {
+            hasUnsavedChanges = true;
+            document.getElementById('save-bar').classList.add('show');
+        }
+
+        function discardChanges() {
+            hasUnsavedChanges = false;
+            document.getElementById('save-bar').classList.remove('show');
+            loadSettings();
+        }
+
+        function saveAllChanges() {
+            hasUnsavedChanges = false;
+            document.getElementById('save-bar').classList.remove('show');
+            
+            const settings = gatherAllSettings();
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+            
+            updateProfileDisplay();
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1001; animation: slideIn 0.3s ease;';
+            toast.textContent = '설정이 저장되었습니다! ✅';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function gatherAllSettings() {
+            return {
+                profile: {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    birthdate: document.getElementById('birthdate').value,
+                    gender: document.getElementById('gender').value,
+                    height: document.getElementById('height').value,
+                    weight: document.getElementById('weight').value,
+                    bio: document.getElementById('bio').value
+                },
+                goals: {
+                    targetWeight: document.getElementById('target-weight').value,
+                    targetPeriod: document.getElementById('target-period').value,
+                    dailyCalories: document.getElementById('daily-calories').value,
+                    weeklyWorkouts: document.getElementById('weekly-workouts').value,
+                    dailyProtein: document.getElementById('daily-protein').value,
+                    dailyWater: document.getElementById('daily-water').value,
+                    activityLevel: document.getElementById('activity-level').value
+                },
+                ai: {
+                    personality: selectedPersonality,
+                    adviceFrequency: document.getElementById('advice-frequency').value,
+                    adviceTypes: {
+                        diet: document.getElementById('advice-diet').checked,
+                        workout: document.getElementById('advice-workout').checked,
+                        emotion: document.getElementById('advice-emotion').checked,
+                        motivation: document.getElementById('advice-motivation').checked
+                    }
+                },
+                notifications: {
+                    meal: document.getElementById('meal-notifications').checked,
+                    workout: document.getElementById('workout-notifications').checked,
+                    water: document.getElementById('water-notifications').checked,
+                    goal: document.getElementById('goal-notifications').checked,
+                    ai: document.getElementById('ai-notifications').checked,
+                    times: {
+                        breakfast: document.getElementById('breakfast-time').value,
+                        lunch: document.getElementById('lunch-time').value,
+                        dinner: document.getElementById('dinner-time').value,
+                        workout: document.getElementById('workout-time').value
+                    }
+                },
+                privacy: {
+                    dataAnalysis: document.getElementById('data-analysis').checked,
+                    personalizedAds: document.getElementById('personalized-ads').checked,
+                    dataSharing: document.getElementById('data-sharing').checked
+                }
+            };
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('userSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                
+                if (settings.profile) {
+                    Object.keys(settings.profile).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element) element.value = settings.profile[key] || '';
+                    });
+                }
+                
+                if (settings.goals) {
+                    Object.keys(settings.goals).forEach(key => {
+                        const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                        if (element) element.value = settings.goals[key] || '';
+                    });
+                }
+                
+                if (settings.ai) {
+                    selectedPersonality = settings.ai.personality || '';
+                    if (selectedPersonality) {
+                        const card = document.querySelector(`[data-personality="${selectedPersonality}"]`);
+                        if (card) card.classList.add('selected');
+                    }
+                    
+                    const freqElement = document.getElementById('advice-frequency');
+                    if (freqElement) freqElement.value = settings.ai.adviceFrequency || '';
+                    
+                    if (settings.ai.adviceTypes) {
+                        Object.keys(settings.ai.adviceTypes).forEach(type => {
+                            const element = document.getElementById(`advice-${type}`);
+                            if (element) element.checked = settings.ai.adviceTypes[type];
+                        });
+                    }
+                }
+                
+                if (settings.notifications) {
+                    Object.keys(settings.notifications).forEach(key => {
+                        if (key !== 'times') {
+                            const element = document.getElementById(`${key}-notifications`);
+                            if (element) element.checked = settings.notifications[key];
+                        }
+                    });
+                    
+                    if (settings.notifications.times) {
+                        Object.keys(settings.notifications.times).forEach(time => {
+                            const element = document.getElementById(`${time}-time`);
+                            if (element) element.value = settings.notifications.times[time] || '';
+                        });
+                    }
+                }
+                
+                if (settings.privacy) {
+                    Object.keys(settings.privacy).forEach(key => {
+                        const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                        if (element) element.checked = settings.privacy[key];
+                    });
+                }
+                
+                updateProfileDisplay();
+            }
+        }
+
+        function updateProfileDisplay() {
+            const name = document.getElementById('name').value || '사용자';
+            const email = document.getElementById('email').value || 'user@example.com';
+            
+            document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-email').textContent = email;
+            
+            if (name !== '사용자') {
+                document.getElementById('avatar-display').textContent = name.charAt(0).toUpperCase();
+            }
+            
+            const currentWeight = parseFloat(document.getElementById('weight').value) || 0;
+            const targetWeight = parseFloat(document.getElementById('target-weight').value) || 0;
+            
+            if (currentWeight && targetWeight) {
+                const difference = targetWeight - currentWeight;
+                document.getElementById('weight-change').textContent = `${difference > 0 ? '+' : ''}${difference.toFixed(1)}kg`;
+                
+                const helpText = document.getElementById('weight-difference');
+                if (helpText) {
+                    helpText.textContent = `현재 체중: ${currentWeight}kg (${Math.abs(difference).toFixed(1)}kg ${difference > 0 ? '증량' : '감량'} 목표)`;
+                }
+            }
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            showUnsavedChanges();
+        }
+
+        function saveGoals(event) {
+            event.preventDefault();
+            showUnsavedChanges();
+        }
+
+        function changePassword() {
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('새 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                alert('비밀번호는 8자 이상이어야 합니다.');
+                return;
+            }
+            
+            alert('비밀번호가 성공적으로 변경되었습니다! 🔐');
+            document.querySelectorAll('input[type="password"]').forEach(input => input.value = '');
+        }
+
+        function exportData() {
+            const confirm = window.confirm('모든 건강 데이터를 JSON 파일로 내보내시겠습니까?');
+            if (confirm) {
+                const allData = {
+                    settings: JSON.parse(localStorage.getItem('userSettings') || '{}'),
+                    meals: getAllStoredData('meals'),
+                    workouts: getAllStoredData('workouts'), 
+                    emotions: getAllStoredData('emotions'),
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `mydiet_data_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                alert('데이터 내보내기 완료! 📥');
+            }
+        }
+
+        function getAllStoredData(type) {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(type + '-')) {
+                    data[key] = JSON.parse(localStorage.getItem(key));
+                }
+            }
+            return data;
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            
+                            if (data.settings) {
+                                localStorage.setItem('userSettings', JSON.stringify(data.settings));
+                            }
+                            
+                            ['meals', 'workouts', 'emotions'].forEach(type => {
+                                if (data[type]) {
+                                    Object.keys(data[type]).forEach(key => {
+                                        localStorage.setItem(key, JSON.stringify(data[type][key]));
+                                    });
+                                }
+                            });
+                            
+                            alert('데이터 가져오기 완료! 📤');
+                            loadSettings();
+                        } catch (error) {
+                            alert('잘못된 파일 형식입니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function clearData() {
+            const confirm = window.confirm('정말로 모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.');
+            if (confirm) {
+                const doubleConfirm = window.confirm('마지막 확인: 정말로 모든 기록을 삭제하시겠습니까?');
+                if (doubleConfirm) {
+                    localStorage.clear();
+                    alert('모든 데이터가 삭제되었습니다. 🗑️');
+                    location.reload();
+                }
+            }
+        }
+
+        function deactivateAccount() {
+            const confirm = window.confirm('계정을 비활성화하시겠습니까?\n30일 이내에 다시 로그인하면 계정이 복구됩니다.');
+            if (confirm) {
+                alert('계정이 비활성화되었습니다. 언제든 다시 돌아오세요! 👋');
+            }
+        }
+
+        function deleteAccount() {
+            const confirm = window.confirm('계정을 완전히 삭제하시겠습니까?\n모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.');
+            if (confirm) {
+                const verification = prompt('계정 삭제를 확인하려면 "DELETE"를 입력하세요:');
+                if (verification === 'DELETE') {
+                    alert('계정 삭제 요청이 접수되었습니다. 24시간 내에 처리됩니다.');
+                } else {
+                    alert('삭제가 취소되었습니다.');
+                }
+            }
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('.form-input, .form-select, .form-textarea')) {
+                showUnsavedChanges();
+                if (e.target.id === 'name' || e.target.id === 'email' || 
+                    e.target.id === 'weight' || e.target.id === 'target-weight') {
+                    updateProfileDisplay();
+                }
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('.toggle-input, input[type="checkbox"]')) {
+                showUnsavedChanges();
+            }
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '저장하지 않은 변경사항이 있습니다. 정말로 페이지를 떠나시겠습니까?';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+            }
+            loadSettings();
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateX(20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(20px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

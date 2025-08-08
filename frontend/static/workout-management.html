@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 운동 관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            margin-right: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        body.dark .theme-toggle {
+            background: #475569;
+        }
+
+        body.dark .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(20px);
+            background: #334155;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .back-btn {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(-2px);
+        }
+
+        body.dark .back-btn:hover {
+            background: #475569;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a202c;
+        }
+
+        body.dark .page-title {
+            color: #f1f5f9;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        body.dark .page-subtitle {
+            color: #94a3b8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        .workout-timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .workout-timeline {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .timeline-title {
+            color: #f1f5f9;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        body.dark .date-selector {
+            background: #334155;
+        }
+
+        .date-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        body.dark .date-btn {
+            color: #94a3b8;
+        }
+
+        .date-btn:hover {
+            color: #1a202c;
+        }
+
+        body.dark .date-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .current-date {
+            font-weight: 600;
+            color: #1a202c;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        body.dark .current-date {
+            color: #f1f5f9;
+        }
+
+        .workout-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .workout-section {
+            border-left: 4px solid #e2e8f0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .workout-section.cardio { border-left-color: #ef4444; }
+        .workout-section.strength { border-left-color: #3b82f6; }
+        .workout-section.flexibility { border-left-color: #8b5cf6; }
+        .workout-section.sports { border-left-color: #10b981; }
+
+        .workout-section::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .workout-section.cardio::before { background: #ef4444; }
+        .workout-section.strength::before { background: #3b82f6; }
+        .workout-section.flexibility::before { background: #8b5cf6; }
+        .workout-section.sports::before { background: #10b981; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a202c;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        body.dark .section-title {
+            color: #f1f5f9;
+        }
+
+        .section-stats {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        body.dark .section-stats {
+            color: #94a3b8;
+        }
+
+        .add-workout-btn {
+            background: none;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 24px 20px;
+            width: 100%;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        body.dark .add-workout-btn {
+            border-color: #475569;
+            color: #94a3b8;
+        }
+
+        .add-workout-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .add-workout-btn .icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .workout-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .workout-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body.dark .workout-item {
+            background: #334155;
+        }
+
+        .workout-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark .workout-item:hover {
+            background: #475569;
+        }
+
+        .workout-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .workout-icon.cardio { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .workout-icon.strength { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .workout-icon.flexibility { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .workout-icon.sports { background: linear-gradient(135deg, #10b981, #059669); }
+
+        .workout-info {
+            flex: 1;
+        }
+
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .workout-name {
+            font-weight: 600;
+            color: #1a202c;
+            font-size: 16px;
+        }
+
+        body.dark .workout-name {
+            color: #f1f5f9;
+        }
+
+        .workout-time {
+            color: #64748b;
+            font-size: 12px;
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        body.dark .workout-time {
+            background: #475569;
+            color: #94a3b8;
+        }
+
+        .workout-details {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        body.dark .workout-details {
+            color: #94a3b8;
+        }
+
+        .workout-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+        }
+
+        .stat-badge {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        body.dark .stat-badge {
+            background: #475569;
+            color: #94a3b8;
+        }
+
+        .stat-badge.calories { background: #fef3c7; color: #d97706; }
+        .stat-badge.duration { background: #dbeafe; color: #2563eb; }
+        .stat-badge.intensity { background: #fecaca; color: #dc2626; }
+
+        body.dark .stat-badge.calories { background: #451a03; color: #fbbf24; }
+        body.dark .stat-badge.duration { background: #1e3a8a; color: #60a5fa; }
+        body.dark .stat-badge.intensity { background: #7f1d1d; color: #f87171; }
+
+        .workout-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            color: #64748b;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: #1a202c;
+        }
+
+        body.dark .action-btn:hover {
+            background: #475569;
+            color: #f1f5f9;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .card {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark .card-title {
+            color: #f1f5f9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        body.dark .stat-item {
+            background: #334155;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark .stat-label {
+            color: #94a3b8;
+        }
+
+        .progress-section {
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-header span:first-child {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .progress-header span:last-child {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .progress-header span:first-child {
+            color: #94a3b8;
+        }
+
+        body.dark .progress-header span:last-child {
+            color: #f1f5f9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        body.dark .progress-bar {
+            background: #475569;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .quick-start {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-start-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        body.dark .quick-start-btn {
+            background: #334155;
+            border-color: #475569;
+            color: #d1d5db;
+        }
+
+        .quick-start-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        body.dark .quick-start-btn:hover {
+            background: #475569;
+        }
+
+        .quick-start-btn .icon {
+            font-size: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        body.dark .modal-content {
+            background: #1e293b;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark .modal-header {
+            border-bottom-color: #475569;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .modal-title {
+            color: #f1f5f9;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .close-btn {
+            color: #94a3b8;
+        }
+
+        .close-btn:hover {
+            color: #1a202c;
+            transform: rotate(90deg);
+        }
+
+        body.dark .close-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        body.dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        body.dark .form-input,
+        body.dark .form-select {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        body.dark .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .intensity-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .intensity-btn {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        body.dark .intensity-btn {
+            background: #334155;
+            border-color: #475569;
+            color: #d1d5db;
+        }
+
+        .intensity-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .intensity-btn:hover:not(.active) {
+            border-color: #cbd5e0;
+            background: #f8fafc;
+        }
+
+        body.dark .intensity-btn:hover:not(.active) {
+            background: #475569;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        body.dark .btn-secondary {
+            background: #475569;
+            color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .stat-item {
+                padding: 12px 8px;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .quick-start {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .quick-start-btn {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .intensity-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="back-btn">
+                    ← 대시보드로
+                </a>
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🏃‍♂️ 운동 관리</h1>
+            <p class="page-subtitle">운동 기록을 남기고 칼로리 소모량을 추적해보세요</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="workout-timeline">
+                <div class="timeline-header">
+                    <h2 class="timeline-title">오늘의 운동</h2>
+                    <div class="date-selector">
+                        <button class="date-btn" onclick="changeDate(-1)">◀</button>
+                        <span class="current-date" id="current-date">2025년 8월 1일</span>
+                        <button class="date-btn" onclick="changeDate(1)">▶</button>
+                    </div>
+                </div>
+
+                <div class="workout-sections">
+                    <div class="workout-section cardio">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>❤️</span>
+                                유산소 운동
+                            </div>
+                            <div class="section-stats" id="cardio-stats">0분 • 0kcal</div>
+                        </div>
+                        
+                        <div class="workout-items" id="cardio-items"></div>
+                        
+                        <button class="add-workout-btn" onclick="openAddModal('cardio')">
+                            <div class="icon">➕</div>
+                            <div>유산소 운동을 추가해보세요</div>
+                            <small style="opacity: 0.7;">달리기, 걷기, 자전거 등</small>
+                        </button>
+                    </div>
+
+                    <div class="workout-section strength">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>💪</span>
+                                근력 운동
+                            </div>
+                            <div class="section-stats" id="strength-stats">0분 • 0kcal</div>
+                        </div>
+
+                        <div class="workout-items" id="strength-items"></div>
+
+                        <button class="add-workout-btn" onclick="openAddModal('strength')">
+                            <div class="icon">➕</div>
+                            <div>근력 운동을 추가해보세요</div>
+                            <small style="opacity: 0.7;">웨이트, 팔굽혀펴기, 스쿼트 등</small>
+                        </button>
+                    </div>
+
+                    <div class="workout-section flexibility">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>🧘‍♀️</span>
+                                유연성 운동
+                            </div>
+                            <div class="section-stats" id="flexibility-stats">0분 • 0kcal</div>
+                        </div>
+
+                        <div class="workout-items" id="flexibility-items"></div>
+
+                        <button class="add-workout-btn" onclick="openAddModal('flexibility')">
+                            <div class="icon">➕</div>
+                            <div>유연성 운동을 추가해보세요</div>
+                            <small style="opacity: 0.7;">요가, 스트레칭, 필라테스 등</small>
+                        </button>
+                    </div>
+
+                    <div class="workout-section sports">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <span>⚽</span>
+                                스포츠 활동
+                            </div>
+                            <div class="section-stats" id="sports-stats">0분 • 0kcal</div>
+                        </div>
+
+                        <div class="workout-items" id="sports-items"></div>
+
+                        <button class="add-workout-btn" onclick="openAddModal('sports')">
+                            <div class="icon">➕</div>
+                            <div>스포츠 활동을 추가해보세요</div>
+                            <small style="opacity: 0.7;">축구, 농구, 배드민턴 등</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">📊 오늘의 운동 현황</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-duration">0분</div>
+                            <div class="stat-label">총 운동시간</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-calories">0</div>
+                            <div class="stat-label">소모 칼로리</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-workouts">0개</div>
+                            <div class="stat-label">운동 종목</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-intensity">-</div>
+                            <div class="stat-label">평균 강도</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>일일 운동 목표</span>
+                            <span id="duration-progress">0 / 60분</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="duration-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>칼로리 소모 목표</span>
+                            <span id="calorie-progress">0 / 300kcal</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="calorie-bar" style="width: 0%; background: #ef4444;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">⚡ 빠른 시작</h3>
+                    <div class="quick-start">
+                        <button class="quick-start-btn" onclick="quickStart('걷기', 30, 'cardio')">
+                            <div class="icon">🚶‍♂️</div>
+                            <div>걷기 30분</div>
+                        </button>
+                        <button class="quick-start-btn" onclick="quickStart('달리기', 20, 'cardio')">
+                            <div class="icon">🏃‍♂️</div>
+                            <div>달리기 20분</div>
+                        </button>
+                        <button class="quick-start-btn" onclick="quickStart('팔굽혀펴기', 15, 'strength')">
+                            <div class="icon">💪</div>
+                            <div>팔굽혀펴기</div>
+                        </button>
+                        <button class="quick-start-btn" onclick="quickStart('스트레칭', 10, 'flexibility')">
+                            <div class="icon">🧘‍♀️</div>
+                            <div>스트레칭</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">🎯 주간 목표</h3>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>주 3회 운동하기</span>
+                            <span id="weekly-frequency">0/3회</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-section" style="margin-bottom: 0;">
+                        <div class="progress-header">
+                            <span>주 300분 운동하기</span>
+                            <span id="weekly-duration">0/300분</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%; background: #10b981;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">🏃‍♂️ 운동 추가</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-workout-form" onsubmit="addWorkout(event)">
+                    <div class="form-group">
+                        <label class="form-label">운동 종류 *</label>
+                        <select id="workout-type" class="form-select" required onchange="updateCalorieEstimate()">
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">운동 시간 (분) *</label>
+                            <input type="number" id="workout-duration" class="form-input" placeholder="30" required min="1" onchange="updateCalorieEstimate()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">소모 칼로리</label>
+                            <input type="number" id="workout-calories" class="form-input" placeholder="자동 계산됨" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">운동 강도</label>
+                        <div class="intensity-selector">
+                            <button type="button" class="intensity-btn" data-intensity="낮음" onclick="selectIntensity(this)">
+                                😌 낮음
+                            </button>
+                            <button type="button" class="intensity-btn active" data-intensity="보통" onclick="selectIntensity(this)">
+                                😊 보통
+                            </button>
+                            <button type="button" class="intensity-btn" data-intensity="높음" onclick="selectIntensity(this)">
+                                🔥 높음
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">세트/횟수 (선택)</label>
+                        <input type="text" id="workout-sets" class="form-input" placeholder="예: 3세트 x 15회, 5km">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">메모</label>
+                        <textarea id="workout-note" class="form-input" rows="2" placeholder="운동 후 느낌이나 특이사항을 적어보세요"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">추가하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentWorkoutType = '';
+        let selectedIntensity = '보통';
+        let totalDuration = 0;
+        let totalCalories = 0;
+        let totalWorkouts = 0;
+
+        const workoutTypes = {
+            cardio: [
+                { name: '걷기', calories: 4 },
+                { name: '조깅', calories: 8 },
+                { name: '달리기', calories: 12 },
+                { name: '자전거', calories: 6 },
+                { name: '수영', calories: 10 },
+                { name: '계단 오르기', calories: 9 },
+                { name: '러닝머신', calories: 8 },
+                { name: '일립티컬', calories: 7 }
+            ],
+            strength: [
+                { name: '웨이트 트레이닝', calories: 6 },
+                { name: '팔굽혀펴기', calories: 8 },
+                { name: '스쿼트', calories: 8 },
+                { name: '런지', calories: 7 },
+                { name: '플랭크', calories: 5 },
+                { name: '턱걸이', calories: 8 },
+                { name: '덤벨 운동', calories: 6 },
+                { name: '바벨 운동', calories: 7 }
+            ],
+            flexibility: [
+                { name: '요가', calories: 3 },
+                { name: '필라테스', calories: 4 },
+                { name: '스트레칭', calories: 2 },
+                { name: '태극권', calories: 3 },
+                { name: '발레', calories: 5 },
+                { name: '동적 스트레칭', calories: 3 },
+                { name: '정적 스트레칭', calories: 2 }
+            ],
+            sports: [
+                { name: '축구', calories: 10 },
+                { name: '농구', calories: 9 },
+                { name: '배드민턴', calories: 7 },
+                { name: '테니스', calories: 8 },
+                { name: '탁구', calories: 5 },
+                { name: '볼링', calories: 4 },
+                { name: '골프', calories: 5 },
+                { name: '야구', calories: 6 }
+            ]
+        };
+
+        const workoutEmojis = {
+            '걷기': '🚶‍♂️', '조깅': '🏃‍♂️', '달리기': '🏃‍♂️', '자전거': '🚴‍♂️',
+            '수영': '🏊‍♂️', '계단 오르기': '🪜', '러닝머신': '🏃‍♂️', '일립티컬': '🏃‍♂️',
+            '웨이트 트레이닝': '🏋️‍♂️', '팔굽혀펴기': '💪', '스쿼트': '🦵', '런지': '🦵',
+            '플랭크': '🤸‍♂️', '턱걸이': '🤸‍♂️', '덤벨 운동': '🏋️‍♂️', '바벨 운동': '🏋️‍♂️',
+            '요가': '🧘‍♀️', '필라테스': '🤸‍♀️', '스트레칭': '🤸‍♂️', '태극권': '🥋',
+            '발레': '🩰', '동적 스트레칭': '🤸‍♂️', '정적 스트레칭': '🤸‍♂️',
+            '축구': '⚽', '농구': '🏀', '배드민턴': '🏸', '테니스': '🎾',
+            '탁구': '🏓', '볼링': '🎳', '골프': '⛳', '야구': '⚾'
+        };
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function changeDate(direction) {
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateDateDisplay();
+            loadWorkoutData();
+        }
+
+        function updateDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = 
+                currentDate.toLocaleDateString('ko-KR', options);
+        }
+
+        function loadWorkoutData() {
+            const dateKey = currentDate.toDateString();
+            const savedData = localStorage.getItem(`workouts-${dateKey}`);
+            
+            ['cardio', 'strength', 'flexibility', 'sports'].forEach(workoutType => {
+                document.getElementById(`${workoutType}-items`).innerHTML = '';
+            });
+            
+            totalDuration = 0;
+            totalCalories = 0;
+            totalWorkouts = 0;
+            
+            if (savedData) {
+                const workouts = JSON.parse(savedData);
+                Object.keys(workouts).forEach(workoutType => {
+                    workouts[workoutType].forEach(workout => {
+                        addWorkoutToUI(workoutType, workout, false);
+                    });
+                });
+            }
+            
+            updateSectionStats();
+            updateOverallStats();
+        }
+
+        function saveWorkoutData() {
+            const dateKey = currentDate.toDateString();
+            const workouts = { cardio: [], strength: [], flexibility: [], sports: [] };
+            
+            ['cardio', 'strength', 'flexibility', 'sports'].forEach(workoutType => {
+                const items = document.getElementById(`${workoutType}-items`).children;
+                Array.from(items).forEach(item => {
+                    const workoutData = JSON.parse(item.dataset.workout);
+                    workouts[workoutType].push(workoutData);
+                });
+            });
+            
+            localStorage.setItem(`workouts-${dateKey}`, JSON.stringify(workouts));
+        }
+
+        function openAddModal(workoutType) {
+            currentWorkoutType = workoutType;
+            const typeNames = {
+                cardio: '유산소 운동',
+                strength: '근력 운동',
+                flexibility: '유연성 운동',
+                sports: '스포츠 활동'
+            };
+            
+            document.getElementById('modal-title').textContent = `🏃‍♂️ ${typeNames[workoutType]} 추가`;
+            
+            const select = document.getElementById('workout-type');
+            select.innerHTML = '<option value="">선택하세요</option>';
+            
+            workoutTypes[workoutType].forEach(workout => {
+                const option = document.createElement('option');
+                option.value = workout.name;
+                option.textContent = workout.name;
+                option.dataset.calories = workout.calories;
+                select.appendChild(option);
+            });
+            
+            document.getElementById('add-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('workout-type').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            document.getElementById('add-workout-form').reset();
+            selectedIntensity = '보통';
+            updateIntensityButtons();
+        }
+
+        function selectIntensity(btn) {
+            document.querySelectorAll('.intensity-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedIntensity = btn.dataset.intensity;
+            updateCalorieEstimate();
+        }
+
+        function updateIntensityButtons() {
+            document.querySelectorAll('.intensity-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.intensity === selectedIntensity);
+            });
+        }
+
+        function updateCalorieEstimate() {
+            const typeSelect = document.getElementById('workout-type');
+            const durationInput = document.getElementById('workout-duration');
+            const caloriesInput = document.getElementById('workout-calories');
+            
+            if (typeSelect.value && durationInput.value) {
+                const baseCalories = parseFloat(typeSelect.selectedOptions[0].dataset.calories);
+                const duration = parseInt(durationInput.value);
+                const intensityMultiplier = selectedIntensity === '낮음' ? 0.8 : selectedIntensity === '높음' ? 1.3 : 1.0;
+                
+                const estimatedCalories = Math.round(baseCalories * duration * intensityMultiplier);
+                caloriesInput.placeholder = `예상: ${estimatedCalories}kcal`;
+                
+                if (!caloriesInput.value) {
+                    caloriesInput.value = estimatedCalories;
+                }
+            }
+        }
+
+        function addWorkout(event) {
+            event.preventDefault();
+            
+            const workoutData = {
+                name: document.getElementById('workout-type').value,
+                duration: parseInt(document.getElementById('workout-duration').value),
+                calories: parseInt(document.getElementById('workout-calories').value) || 0,
+                intensity: selectedIntensity,
+                sets: document.getElementById('workout-sets').value || '',
+                note: document.getElementById('workout-note').value || '',
+                timestamp: new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            addWorkoutToUI(currentWorkoutType, workoutData, true);
+            updateSectionStats();
+            updateOverallStats();
+            saveWorkoutData();
+            closeModal();
+            
+            setTimeout(() => {
+                const items = document.getElementById(`${currentWorkoutType}-items`);
+                const newItem = items.lastChild;
+                if (newItem) {
+                    newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+
+        function addWorkoutToUI(workoutType, workoutData, animate = false) {
+            const container = document.getElementById(`${workoutType}-items`);
+            const workoutItem = document.createElement('div');
+            workoutItem.className = 'workout-item';
+            workoutItem.dataset.workout = JSON.stringify(workoutData);
+            
+            if (animate) {
+                workoutItem.style.animation = 'slideIn 0.3s ease';
+            }
+            
+            const emoji = workoutEmojis[workoutData.name] || '🏃‍♂️';
+            const setsText = workoutData.sets ? ` • ${workoutData.sets}` : '';
+            
+            workoutItem.innerHTML = `
+                <div class="workout-icon ${workoutType}">${emoji}</div>
+                <div class="workout-info">
+                    <div class="workout-header">
+                        <div class="workout-name">${workoutData.name}</div>
+                        <div class="workout-time">${workoutData.timestamp}</div>
+                    </div>
+                    <div class="workout-details">${workoutData.duration}분 운동${setsText}</div>
+                    <div class="workout-stats">
+                        <span class="stat-badge calories">${workoutData.calories}kcal</span>
+                        <span class="stat-badge duration">${workoutData.duration}분</span>
+                        <span class="stat-badge intensity">${workoutData.intensity}</span>
+                    </div>
+                    ${workoutData.note ? `<div class="workout-details" style="font-style: italic; opacity: 0.8; margin-top: 4px;">"${workoutData.note}"</div>` : ''}
+                </div>
+                <div class="workout-actions">
+                    <button class="action-btn" onclick="editWorkout(this)" title="수정">✏️</button>
+                    <button class="action-btn" onclick="deleteWorkout(this)" title="삭제">🗑️</button>
+                </div>
+            `;
+            
+            container.appendChild(workoutItem);
+            
+            totalDuration += workoutData.duration;
+            totalCalories += workoutData.calories;
+            totalWorkouts += 1;
+        }
+
+        function deleteWorkout(btn) {
+            if (confirm('이 운동 기록을 삭제하시겠습니까?')) {
+                const workoutItem = btn.closest('.workout-item');
+                const workoutData = JSON.parse(workoutItem.dataset.workout);
+                
+                totalDuration -= workoutData.duration;
+                totalCalories -= workoutData.calories;
+                totalWorkouts -= 1;
+                
+                workoutItem.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    workoutItem.remove();
+                    updateSectionStats();
+                    updateOverallStats();
+                    saveWorkoutData();
+                }, 300);
+            }
+        }
+
+        function editWorkout(btn) {
+            const workoutItem = btn.closest('.workout-item');
+            const workoutData = JSON.parse(workoutItem.dataset.workout);
+            
+            document.getElementById('workout-type').value = workoutData.name;
+            document.getElementById('workout-duration').value = workoutData.duration;
+            document.getElementById('workout-calories').value = workoutData.calories;
+            document.getElementById('workout-sets').value = workoutData.sets;
+            document.getElementById('workout-note').value = workoutData.note;
+            selectedIntensity = workoutData.intensity;
+            updateIntensityButtons();
+            
+            deleteWorkout(btn);
+            
+            const workoutSection = workoutItem.closest('.workout-section');
+            currentWorkoutType = workoutSection.className.split(' ')[1];
+            
+            const typeNames = {
+                cardio: '유산소 운동',
+                strength: '근력 운동',
+                flexibility: '유연성 운동',
+                sports: '스포츠 활동'
+            };
+            document.getElementById('modal-title').textContent = `✏️ ${typeNames[currentWorkoutType]} 수정`;
+            
+            const select = document.getElementById('workout-type');
+            select.innerHTML = '<option value="">선택하세요</option>';
+            workoutTypes[currentWorkoutType].forEach(workout => {
+                const option = document.createElement('option');
+                option.value = workout.name;
+                option.textContent = workout.name;
+                option.dataset.calories = workout.calories;
+                select.appendChild(option);
+            });
+            select.value = workoutData.name;
+            
+            document.getElementById('add-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateSectionStats() {
+            ['cardio', 'strength', 'flexibility', 'sports'].forEach(workoutType => {
+                const items = document.getElementById(`${workoutType}-items`).children;
+                let sectionDuration = 0;
+                let sectionCalories = 0;
+                
+                Array.from(items).forEach(item => {
+                    const workoutData = JSON.parse(item.dataset.workout);
+                    sectionDuration += workoutData.duration;
+                    sectionCalories += workoutData.calories;
+                });
+                
+                document.getElementById(`${workoutType}-stats`).textContent = 
+                    `${sectionDuration}분 • ${sectionCalories}kcal`;
+            });
+        }
+
+        function updateOverallStats() {
+            document.getElementById('total-duration').textContent = `${totalDuration}분`;
+            document.getElementById('total-calories').textContent = totalCalories;
+            document.getElementById('total-workouts').textContent = `${totalWorkouts}개`;
+            
+            const avgIntensity = totalWorkouts > 0 ? '보통' : '-';
+            document.getElementById('avg-intensity').textContent = avgIntensity;
+            
+            const durationGoal = 60;
+            const calorieGoal = 300;
+            
+            document.getElementById('duration-progress').textContent = `${totalDuration} / ${durationGoal}분`;
+            document.getElementById('calorie-progress').textContent = `${totalCalories} / ${calorieGoal}kcal`;
+            
+            const durationPercent = Math.min((totalDuration / durationGoal) * 100, 100);
+            const caloriePercent = Math.min((totalCalories / calorieGoal) * 100, 100);
+            
+            document.getElementById('duration-bar').style.width = `${durationPercent}%`;
+            document.getElementById('calorie-bar').style.width = `${caloriePercent}%`;
+        }
+
+        function quickStart(name, duration, type) {
+            const calorieRate = workoutTypes[type].find(w => w.name === name)?.calories || 5;
+            const quickWorkoutData = {
+                name: name,
+                duration: duration,
+                calories: calorieRate * duration,
+                intensity: '보통',
+                sets: '',
+                note: '빠른 시작',
+                timestamp: new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            addWorkoutToUI(type, quickWorkoutData, true);
+            updateSectionStats();
+            updateOverallStats();
+            saveWorkoutData();
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #667eea; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1001; animation: slideIn 0.3s ease;';
+            toast.textContent = `${name} ${duration}분 추가됨! ⚡`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('add-modal').classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        updateDateDisplay();
+        loadWorkoutData();
+    </script>
+</body>
+</html>

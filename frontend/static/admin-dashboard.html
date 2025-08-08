@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 관리자 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .stat-card.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stat-card.primary h3,
+        .stat-card.primary .stat-value,
+        .stat-card.primary .stat-label {
+            color: white;
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .stat-card.success h3,
+        .stat-card.success .stat-value,
+        .stat-card.success .stat-label {
+            color: white;
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .stat-card.warning h3,
+        .stat-card.warning .stat-value,
+        .stat-card.warning .stat-label {
+            color: white;
+        }
+
+        .stat-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .stat-card.info h3,
+        .stat-card.info .stat-value,
+        .stat-card.info .stat-label {
+            color: white;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .recent-activities {
+            list-style: none;
+        }
+
+        .recent-activities li {
+            padding: 15px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .recent-activities li:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-time {
+            color: #999;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            float: right;
+            margin-top: -45px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border: none;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .user-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .user-info h3 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .user-info p {
+            margin: 8px 0;
+            color: #6c757d;
+        }
+
+        .danger-zone {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .danger-zone h3 {
+            color: #e53e3e;
+            margin-bottom: 10px;
+        }
+
+        .danger-zone p {
+            color: #c53030;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .user-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 관리자 대시보드</h1>
+            <p>MyDiet 서비스 운영 현황</p>
+            <button class="refresh-btn" onclick="loadAdminStats()">
+                🔄 새로고침
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card primary" onclick="openModal('users')">
+                <h3>전체 사용자</h3>
+                <div class="stat-value" id="total-users">0</div>
+                <div class="stat-label">등록된 회원 수 (클릭하여 상세보기)</div>
+            </div>
+            
+            <div class="stat-card success">
+                <h3>활성 사용자</h3>
+                <div class="stat-value" id="active-users">0</div>
+                <div class="stat-label">오늘 로그인</div>
+            </div>
+            
+            <div class="stat-card warning" onclick="openModal('meals')">
+                <h3>전체 식단 기록</h3>
+                <div class="stat-value" id="total-meals">0</div>
+                <div class="stat-label">누적 기록 (클릭하여 상세보기)</div>
+            </div>
+            
+            <div class="stat-card info" onclick="openModal('workouts')">
+                <h3>전체 운동 기록</h3>
+                <div class="stat-value" id="total-workouts">0</div>
+                <div class="stat-label">누적 기록 (클릭하여 상세보기)</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" onclick="openModal('emotions')">
+                <h3>전체 감정 기록</h3>
+                <div class="stat-value" id="total-emotions">0</div>
+                <div class="stat-label">누적 기록 (클릭하여 상세보기)</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>오늘 식단 기록</h3>
+                <div class="stat-value" id="today-meals">0</div>
+                <div class="stat-label">오늘 추가됨</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>오늘 운동 기록</h3>
+                <div class="stat-value" id="today-workouts">0</div>
+                <div class="stat-label">오늘 추가됨</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>오늘 감정 기록</h3>
+                <div class="stat-value" id="today-emotions">0</div>
+                <div class="stat-label">오늘 추가됨</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="content-card">
+                <h2>👥 최근 가입 사용자</h2>
+                <div id="users-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>닉네임</th>
+                                <th>이메일</th>
+                                <th>가입일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2>📊 최근 활동</h2>
+                <ul class="recent-activities" id="recent-activities">
+                    <li>
+                        시스템이 시작되었습니다
+                        <span class="activity-time">방금 전</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달들 -->
+    <div id="dataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">데이터 상세보기</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-data-content">
+                    <p>데이터를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>사용자 상세 정보</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="user-detail">
+                    <div class="user-info">
+                        <h3>📝 기본 정보</h3>
+                        <div id="user-basic-info">
+                            <p>데이터를 불러오는 중...</p>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <h3>📊 활동 통계</h3>
+                        <div id="user-activity-stats">
+                            <p>데이터를 불러오는 중...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab('meals')">🍽️ 식단 기록</button>
+                    <button class="tab-button" onclick="switchTab('workouts')">🏃 운동 기록</button>
+                    <button class="tab-button" onclick="switchTab('emotions')">😊 감정 기록</button>
+                </div>
+                
+                <div id="tab-meals" class="tab-content active">
+                    <div id="user-meals-data">
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+                
+                <div id="tab-workouts" class="tab-content">
+                    <div id="user-workouts-data">
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+                
+                <div id="tab-emotions" class="tab-content">
+                    <div id="user-emotions-data">
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+                
+                <div class="danger-zone">
+                    <h3>⚠️ 위험 구역</h3>
+                    <p>이 작업은 되돌릴 수 없습니다. 사용자의 모든 데이터가 영구적으로 삭제됩니다.</p>
+                    <button class="btn btn-danger" onclick="deleteUser()">🗑️ 사용자 삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+
+        // 관리자 통계 로드 함수
+        async function loadAdminStats() {
+            console.log('Loading admin stats...');
+            
+            try {
+                const response = await fetch('/api/debug/all-data');
+                console.log('Stats response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('All data:', data);
+                    
+                    // 통계 업데이트
+                    document.getElementById('total-users').textContent = data.users?.length || 0;
+                    document.getElementById('active-users').textContent = data.users?.length || 0;
+                    document.getElementById('total-meals').textContent = data.meals?.length || 0;
+                    document.getElementById('total-workouts').textContent = data.workouts?.length || 0;
+                    document.getElementById('total-emotions').textContent = data.emotions?.length || 0;
+                    
+                    // 오늘 날짜로 필터링
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayMeals = data.meals?.filter(meal => meal.date === today) || [];
+                    const todayWorkouts = data.workouts?.filter(workout => workout.date === today) || [];
+                    const todayEmotions = data.emotions?.filter(emotion => emotion.date === today) || [];
+                    
+                    document.getElementById('today-meals').textContent = todayMeals.length;
+                    document.getElementById('today-workouts').textContent = todayWorkouts.length;
+                    document.getElementById('today-emotions').textContent = todayEmotions.length;
+                    
+                    // 사용자 목록 업데이트
+                    displayUsers(data.users || []);
+                    
+                    // 활동 로그 추가
+                    addActivity('통계가 업데이트되었습니다');
+                    
+                } else {
+                    console.error('Failed to load stats:', response.statusText);
+                    setDefaultStats();
+                }
+            } catch (error) {
+                console.error('Error loading admin stats:', error);
+                setDefaultStats();
+                addActivity('통계 로드 실패: ' + error.message);
+            }
+        }
+
+        function setDefaultStats() {
+            document.getElementById('total-users').textContent = '0';
+            document.getElementById('active-users').textContent = '0';
+            document.getElementById('total-meals').textContent = '0';
+            document.getElementById('total-workouts').textContent = '0';
+            document.getElementById('total-emotions').textContent = '0';
+            document.getElementById('today-meals').textContent = '0';
+            document.getElementById('today-workouts').textContent = '0';
+            document.getElementById('today-emotions').textContent = '0';
+        }
+
+        function displayUsers(users) {
+            const usersList = document.getElementById('users-list');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            등록된 사용자가 없습니다
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            usersList.innerHTML = users.slice(0, 10).map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.nickname || '미설정'}</td>
+                    <td>${user.email || '-'}</td>
+                    <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '-'}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="viewUserDetail(${user.id})">👁️ 상세</button>
+                        <button class="btn btn-danger" onclick="confirmDeleteUser(${user.id}, '${user.nickname || '사용자'}')">🗑️ 삭제</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 모달 관련 함수들
+        async function openModal(dataType) {
+            const modal = document.getElementById('dataModal');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-data-content');
+            
+            const titles = {
+                users: '👥 전체 사용자 목록',
+                meals: '🍽️ 전체 식단 기록',
+                workouts: '🏃 전체 운동 기록',
+                emotions: '😊 전체 감정 기록'
+            };
+            
+            title.textContent = titles[dataType];
+            content.innerHTML = '<p>데이터를 불러오는 중...</p>';
+            modal.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/debug/all-data');
+                const data = await response.json();
+                
+                displayModalData(dataType, data[dataType] || []);
+            } catch (error) {
+                content.innerHTML = `<p style="color: red;">데이터를 불러오는데 실패했습니다: ${error.message}</p>`;
+            }
+        }
+
+        function displayModalData(dataType, data) {
+            const content = document.getElementById('modal-data-content');
+            
+            if (data.length === 0) {
+                content.innerHTML = '<p>데이터가 없습니다.</p>';
+                return;
+            }
+            
+            let tableHTML = '<table class="data-table"><thead><tr>';
+            
+            // 테이블 헤더 생성
+            const headers = {
+                users: ['ID', '닉네임', '이메일', '목표체중', '감정모드', '가입일'],
+                meals: ['ID', '사용자', '설명', '칼로리', '날짜'],
+                workouts: ['ID', '사용자', '운동종류', '시간(분)', '소모칼로리', '날짜'],
+                emotions: ['ID', '사용자', '기분', '메모', '날짜']
+            };
+            
+            headers[dataType].forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            // 테이블 데이터 생성
+            data.forEach(item => {
+                tableHTML += '<tr>';
+                
+                if (dataType === 'users') {
+                    tableHTML += `
+                        <td>${item.id}</td>
+                        <td>${item.nickname || '-'}</td>
+                        <td>${item.email || '-'}</td>
+                        <td>${item.weightGoal || '-'}</td>
+                        <td>${item.emotionMode || '-'}</td>
+                        <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR') : '-'}</td>
+                    `;
+                } else if (dataType === 'meals') {
+                    tableHTML += `
+                        <td>${item.id}</td>
+                        <td>${item.user?.nickname || 'ID:' + item.user?.id || '-'}</td>
+                        <td>${item.description || '-'}</td>
+                        <td>${item.caloriesEstimate || '-'}</td>
+                        <td>${item.date || '-'}</td>
+                    `;
+                } else if (dataType === 'workouts') {
+                    tableHTML += `
+                        <td>${item.id}</td>
+                        <td>${item.user?.nickname || 'ID:' + item.user?.id || '-'}</td>
+                        <td>${item.type || '-'}</td>
+                        <td>${item.duration || '-'}</td>
+                        <td>${item.caloriesBurned || '-'}</td>
+                        <td>${item.date || '-'}</td>
+                    `;
+                } else if (dataType === 'emotions') {
+                    tableHTML += `
+                        <td>${item.id}</td>
+                        <td>${item.user?.nickname || 'ID:' + item.user?.id || '-'}</td>
+                        <td>${item.mood || '-'}</td>
+                        <td>${item.note || '-'}</td>
+                        <td>${item.date || '-'}</td>
+                    `;
+                }
+                
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            content.innerHTML = tableHTML;
+        }
+
+        async function viewUserDetail(userId) {
+            currentUserId = userId;
+            const modal = document.getElementById('userDetailModal');
+            modal.style.display = 'block';
+            
+            // 기본 정보 초기화
+            document.getElementById('user-basic-info').innerHTML = '<p>데이터를 불러오는 중...</p>';
+            document.getElementById('user-activity-stats').innerHTML = '<p>데이터를 불러오는 중...</p>';
+            document.getElementById('user-meals-data').innerHTML = '<p>데이터를 불러오는 중...</p>';
+            document.getElementById('user-workouts-data').innerHTML = '<p>데이터를 불러오는 중...</p>';
+            document.getElementById('user-emotions-data').innerHTML = '<p>데이터를 불러오는 중...</p>';
+            
+            try {
+                const response = await fetch(`/api/debug/user/${userId}`);
+                const data = await response.json();
+                
+                displayUserDetail(data);
+            } catch (error) {
+                document.getElementById('user-basic-info').innerHTML = `<p style="color: red;">데이터를 불러오는데 실패했습니다: ${error.message}</p>`;
+            }
+        }
+
+        function displayUserDetail(data) {
+            const user = data.user;
+            
+            // 기본 정보
+            document.getElementById('user-basic-info').innerHTML = `
+                <p><strong>ID:</strong> ${user.id}</p>
+                <p><strong>닉네임:</strong> ${user.nickname || '미설정'}</p>
+                <p><strong>이메일:</strong> ${user.email || '미설정'}</p>
+                <p><strong>목표 체중:</strong> ${user.weightGoal || '미설정'}kg</p>
+                <p><strong>감정 모드:</strong> ${user.emotionMode || '미설정'}</p>
+                <p><strong>가입일:</strong> ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '미설정'}</p>
+            `;
+            
+            // 활동 통계
+            const totalMeals = data.todayMeals?.length || 0;
+            const totalWorkouts = data.todayWorkouts?.length || 0;
+            const totalEmotions = data.todayEmotions?.length || 0;
+            const totalCalories = data.todayMeals?.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0) || 0;
+            
+            document.getElementById('user-activity-stats').innerHTML = `
+                <p><strong>오늘 식단 기록:</strong> ${totalMeals}건</p>
+                <p><strong>오늘 운동 기록:</strong> ${totalWorkouts}건</p>
+                <p><strong>오늘 감정 기록:</strong> ${totalEmotions}건</p>
+                <p><strong>오늘 총 칼로리:</strong> ${totalCalories}kcal</p>
+            `;
+            
+            // 식단 데이터
+            displayUserMeals(data.todayMeals || []);
+            
+            // 운동 데이터
+            displayUserWorkouts(data.todayWorkouts || []);
+            
+            // 감정 데이터
+            displayUserEmotions(data.todayEmotions || []);
+        }
+
+        function displayUserMeals(meals) {
+            const container = document.getElementById('user-meals-data');
+            
+            if (meals.length === 0) {
+                container.innerHTML = '<p>오늘 기록된 식단이 없습니다.</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>설명</th><th>칼로리</th><th>날짜</th></tr></thead><tbody>';
+            meals.forEach(meal => {
+                html += `
+                    <tr>
+                        <td>${meal.description || '-'}</td>
+                        <td>${meal.caloriesEstimate || '-'}</td>
+                        <td>${meal.date || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayUserWorkouts(workouts) {
+            const container = document.getElementById('user-workouts-data');
+            
+            if (workouts.length === 0) {
+                container.innerHTML = '<p>오늘 기록된 운동이 없습니다.</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>운동종류</th><th>시간(분)</th><th>소모칼로리</th><th>날짜</th></tr></thead><tbody>';
+            workouts.forEach(workout => {
+                html += `
+                    <tr>
+                        <td>${workout.type || '-'}</td>
+                        <td>${workout.duration || '-'}</td>
+                        <td>${workout.caloriesBurned || '-'}</td>
+                        <td>${workout.date || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayUserEmotions(emotions) {
+            const container = document.getElementById('user-emotions-data');
+            
+            if (emotions.length === 0) {
+                container.innerHTML = '<p>오늘 기록된 감정이 없습니다.</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table"><thead><tr><th>기분</th><th>메모</th><th>날짜</th></tr></thead><tbody>';
+            emotions.forEach(emotion => {
+                html += `
+                    <tr>
+                        <td>${emotion.mood || '-'}</td>
+                        <td>${emotion.note || '-'}</td>
+                        <td>${emotion.date || '-'}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function confirmDeleteUser(userId, nickname) {
+            if (confirm(`정말로 사용자 "${nickname}"을(를) 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없으며, 해당 사용자의 모든 데이터가 영구적으로 삭제됩니다.`)) {
+                deleteUserById(userId);
+            }
+        }
+
+        async function deleteUserById(userId) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    addActivity(`사용자 ID ${userId} 삭제됨`);
+                    loadAdminStats(); // 통계 새로고침
+                    alert('사용자가 성공적으로 삭제되었습니다.');
+                } else {
+                    throw new Error('삭제 실패: ' + response.statusText);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('사용자 삭제 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        function deleteUser() {
+            if (currentUserId && confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+                deleteUserById(currentUserId);
+                closeModal();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('dataModal').style.display = 'none';
+            document.getElementById('userDetailModal').style.display = 'none';
+            currentUserId = null;
+        }
+
+        // 활동 로그 추가
+        function addActivity(message) {
+            const activities = document.getElementById('recent-activities');
+            const now = new Date().toLocaleTimeString('ko-KR');
+            
+            const li = document.createElement('li');
+            li.innerHTML = `
+                ${message}
+                <span class="activity-time">${now}</span>
+            `;
+            
+            activities.insertBefore(li, activities.firstChild);
+            
+            // 최대 10개만 유지
+            while (activities.children.length > 10) {
+                activities.removeChild(activities.lastChild);
+            }
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Enhanced admin dashboard loaded');
+            loadAdminStats();
+            
+            // 30초마다 통계 갱신
+            setInterval(loadAdminStats, 30000);
+        });
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const dataModal = document.getElementById('dataModal');
+            const userModal = document.getElementById('userDetailModal');
+            
+            if (event.target === dataModal) {
+                dataModal.style.display = 'none';
+            }
+            if (event.target === userModal) {
+                userModal.style.display = 'none';
+                currentUserId = null;
+            }
+        }
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            // ESC키로 모달 닫기
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+            // Ctrl+R로 새로고침
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                loadAdminStats();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 식단 관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark .navbar {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            margin-right: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        body.dark .theme-toggle {
+            background: #475569;
+        }
+
+        body.dark .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(20px);
+            background: #334155;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .back-btn {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .back-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(-2px);
+        }
+
+        body.dark .back-btn:hover {
+            background: #475569;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a202c;
+        }
+
+        body.dark .page-title {
+            color: #f1f5f9;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        body.dark .page-subtitle {
+            color: #94a3b8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        .meal-timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .meal-timeline {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .timeline-title {
+            color: #f1f5f9;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        body.dark .date-selector {
+            background: #334155;
+        }
+
+        .date-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        body.dark .date-btn {
+            color: #94a3b8;
+        }
+
+        .date-btn:hover {
+            color: #1a202c;
+        }
+
+        body.dark .date-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .current-date {
+            font-weight: 600;
+            color: #1a202c;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        body.dark .current-date {
+            color: #f1f5f9;
+        }
+
+        .meal-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .meal-section {
+            border-left: 4px solid #e2e8f0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .meal-section.breakfast { border-left-color: #fbbf24; }
+        .meal-section.lunch { border-left-color: #34d399; }
+        .meal-section.dinner { border-left-color: #f87171; }
+        .meal-section.snack { border-left-color: #a78bfa; }
+
+        .meal-section::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .meal-section.breakfast::before { background: #fbbf24; }
+        .meal-section.lunch::before { background: #34d399; }
+        .meal-section.dinner::before { background: #f87171; }
+        .meal-section.snack::before { background: #a78bfa; }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .meal-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        body.dark .meal-time {
+            color: #f1f5f9;
+        }
+
+        .meal-calories {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        body.dark .meal-calories {
+            color: #94a3b8;
+        }
+
+        .add-meal-btn {
+            background: none;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 32px 20px;
+            width: 100%;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        body.dark .add-meal-btn {
+            border-color: #475569;
+            color: #94a3b8;
+        }
+
+        .add-meal-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .add-meal-btn .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #64748b;
+        }
+
+        body.dark .empty-state h3 {
+            color: #94a3b8;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .food-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .food-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body.dark .food-item {
+            background: #334155;
+        }
+
+        .food-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark .food-item:hover {
+            background: #475569;
+        }
+
+        .food-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .food-info {
+            flex: 1;
+        }
+
+        .food-name {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        body.dark .food-name {
+            color: #f1f5f9;
+        }
+
+        .food-details {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        body.dark .food-details {
+            color: #94a3b8;
+        }
+
+        .food-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            color: #64748b;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: #1a202c;
+        }
+
+        body.dark .action-btn:hover {
+            background: #475569;
+            color: #f1f5f9;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        body.dark .card {
+            background: #1e293b;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark .card-title {
+            color: #f1f5f9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        body.dark .stat-item {
+            background: #334155;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark .stat-label {
+            color: #94a3b8;
+        }
+
+        .progress-section {
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-header span:first-child {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .progress-header span:last-child {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .progress-header span:first-child {
+            color: #94a3b8;
+        }
+
+        body.dark .progress-header span:last-child {
+            color: #f1f5f9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        body.dark .progress-bar {
+            background: #475569;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .quick-add {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-add-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        body.dark .quick-add-btn {
+            background: #334155;
+            border-color: #475569;
+            color: #d1d5db;
+        }
+
+        .quick-add-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        body.dark .quick-add-btn:hover {
+            background: #475569;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        body.dark .modal-content {
+            background: #1e293b;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark .modal-header {
+            border-bottom-color: #475569;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        body.dark .modal-title {
+            color: #f1f5f9;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        body.dark .close-btn {
+            color: #94a3b8;
+        }
+
+        .close-btn:hover {
+            color: #1a202c;
+            transform: rotate(90deg);
+        }
+
+        body.dark .close-btn:hover {
+            color: #f1f5f9;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        body.dark .form-label {
+            color: #d1d5db;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        body.dark .form-input {
+            background: #334155;
+            border-color: #475569;
+            color: #f1f5f9;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        body.dark .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        body.dark .btn-secondary {
+            background: #475569;
+            color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        body.dark .btn-secondary:hover {
+            background: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .stat-item {
+                padding: 12px 8px;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .quick-add {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .add-meal-btn {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="back-btn">
+                    ← 대시보드로
+                </a>
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🍽️ 식단 관리</h1>
+            <p class="page-subtitle">오늘 먹은 음식들을 기록하고 영양소를 추적해보세요</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="meal-timeline">
+                <div class="timeline-header">
+                    <h2 class="timeline-title">오늘의 식단</h2>
+                    <div class="date-selector">
+                        <button class="date-btn" onclick="changeDate(-1)">◀</button>
+                        <span class="current-date" id="current-date">2025년 8월 1일</span>
+                        <button class="date-btn" onclick="changeDate(1)">▶</button>
+                    </div>
+                </div>
+
+                <div class="meal-sections">
+                    <div class="meal-section breakfast">
+                        <div class="meal-header">
+                            <div class="meal-time">
+                                <span>🌅</span>
+                                아침
+                            </div>
+                            <div class="meal-calories" id="breakfast-calories">0 kcal</div>
+                        </div>
+                        
+                        <div class="food-items" id="breakfast-items"></div>
+                        
+                        <button class="add-meal-btn" onclick="openAddModal('breakfast')">
+                            <div class="icon">➕</div>
+                            <div>첫 번째 아침 식단을 추가해보세요</div>
+                            <small style="opacity: 0.7;">건강한 하루의 시작!</small>
+                        </button>
+                    </div>
+
+                    <div class="meal-section lunch">
+                        <div class="meal-header">
+                            <div class="meal-time">
+                                <span>☀️</span>
+                                점심
+                            </div>
+                            <div class="meal-calories" id="lunch-calories">0 kcal</div>
+                        </div>
+
+                        <div class="food-items" id="lunch-items"></div>
+
+                        <button class="add-meal-btn" onclick="openAddModal('lunch')">
+                            <div class="icon">➕</div>
+                            <div>점심 식단을 추가해보세요</div>
+                            <small style="opacity: 0.7;">균형 잡힌 영양을 위해!</small>
+                        </button>
+                    </div>
+
+                    <div class="meal-section dinner">
+                        <div class="meal-header">
+                            <div class="meal-time">
+                                <span>🌙</span>
+                                저녁
+                            </div>
+                            <div class="meal-calories" id="dinner-calories">0 kcal</div>
+                        </div>
+
+                        <div class="food-items" id="dinner-items"></div>
+
+                        <button class="add-meal-btn" onclick="openAddModal('dinner')">
+                            <div class="icon">➕</div>
+                            <div>저녁 식단을 추가해보세요</div>
+                            <small style="opacity: 0.7;">하루를 마무리하는 식사</small>
+                        </button>
+                    </div>
+
+                    <div class="meal-section snack">
+                        <div class="meal-header">
+                            <div class="meal-time">
+                                <span>🍪</span>
+                                간식
+                            </div>
+                            <div class="meal-calories" id="snack-calories">0 kcal</div>
+                        </div>
+
+                        <div class="food-items" id="snack-items"></div>
+
+                        <button class="add-meal-btn" onclick="openAddModal('snack')">
+                            <div class="icon">➕</div>
+                            <div>간식을 추가해보세요</div>
+                            <small style="opacity: 0.7;">적당한 간식도 좋아요</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">📊 오늘의 영양 현황</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-calories">0</div>
+                            <div class="stat-label">칼로리</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-protein">0g</div>
+                            <div class="stat-label">단백질</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-carbs">0g</div>
+                            <div class="stat-label">탄수화물</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-fat">0g</div>
+                            <div class="stat-label">지방</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>일일 칼로리 목표</span>
+                            <span id="calorie-progress">0 / 1,500</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="calorie-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>단백질</span>
+                            <span id="protein-progress">0 / 80g</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="protein-bar" style="width: 0%; background: #34d399;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">⚡ 빠른 추가</h3>
+                    <div class="quick-add">
+                        <button class="quick-add-btn" onclick="quickAdd('물 500ml', 0, 'water')">
+                            💧 물 500ml
+                        </button>
+                        <button class="quick-add-btn" onclick="quickAdd('아메리카노', 5, 'coffee')">
+                            ☕ 아메리카노
+                        </button>
+                        <button class="quick-add-btn" onclick="quickAdd('바나나 1개', 95, 'banana')">
+                            🍌 바나나
+                        </button>
+                        <button class="quick-add-btn" onclick="quickAdd('견과류 한줌', 180, 'nuts')">
+                            🥜 견과류
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">🎯 주간 목표</h3>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>균형 잡힌 식단</span>
+                            <span id="weekly-balance">0/7일</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-section" style="margin-bottom: 0;">
+                        <div class="progress-header">
+                            <span>물 8잔 마시기</span>
+                            <span id="weekly-water">0/7일</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%; background: #4facfe;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">🍽️ 식단 추가</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-food-form" onsubmit="addFood(event)">
+                    <div class="form-group">
+                        <label class="form-label">음식명 *</label>
+                        <input type="text" id="food-name" class="form-input" placeholder="예: 현미밥, 치킨샐러드" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">칼로리 *</label>
+                        <input type="number" id="food-calories" class="form-input" placeholder="예: 300" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">분량</label>
+                        <input type="text" id="food-portion" class="form-input" placeholder="예: 1공기, 200g, 1개">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">단백질 (g)</label>
+                        <input type="number" id="food-protein" class="form-input" placeholder="예: 25" min="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">탄수화물 (g)</label>
+                        <input type="number" id="food-carbs" class="form-input" placeholder="예: 45" min="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">지방 (g)</label>
+                        <input type="number" id="food-fat" class="form-input" placeholder="예: 12" min="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">메모</label>
+                        <textarea id="food-note" class="form-input" rows="2" placeholder="맛있었어요! 또 먹고 싶네요."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">추가하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentMealType = '';
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFat = 0;
+
+        const foodEmojis = {
+            '밥': '🍚', '현미밥': '🍚', '쌀': '🍚',
+            '빵': '🍞', '토스트': '🍞', '샌드위치': '🥪',
+            '면': '🍜', '라면': '🍜', '파스타': '🍝',
+            '치킨': '🍗', '닭': '🍗', '고기': '🥩',
+            '생선': '🐟', '연어': '🐟', '참치': '🐟',
+            '샐러드': '🥗', '야채': '🥬', '채소': '🥬',
+            '과일': '🍎', '사과': '🍎', '바나나': '🍌',
+            '물': '💧', '커피': '☕', '차': '🍵',
+            '우유': '🥛', '요거트': '🍦',
+            '견과류': '🥜', '아몬드': '🥜'
+        };
+
+        function getRandomEmoji() {
+            const emojis = ['🍽️', '🥘', '🍲', '🥙', '🌮', '🍱', '🍛'];
+            return emojis[Math.floor(Math.random() * emojis.length)];
+        }
+
+        function getFoodEmoji(foodName) {
+            for (let key in foodEmojis) {
+                if (foodName.includes(key)) {
+                    return foodEmojis[key];
+                }
+            }
+            return getRandomEmoji();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function changeDate(direction) {
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateDateDisplay();
+            loadMealData();
+        }
+
+        function updateDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = 
+                currentDate.toLocaleDateString('ko-KR', options);
+        }
+
+        function loadMealData() {
+            const dateKey = currentDate.toDateString();
+            const savedData = localStorage.getItem(`meals-${dateKey}`);
+            
+            ['breakfast', 'lunch', 'dinner', 'snack'].forEach(mealType => {
+                document.getElementById(`${mealType}-items`).innerHTML = '';
+            });
+            
+            totalCalories = 0;
+            totalProtein = 0;
+            totalCarbs = 0;
+            totalFat = 0;
+            
+            if (savedData) {
+                const meals = JSON.parse(savedData);
+                Object.keys(meals).forEach(mealType => {
+                    meals[mealType].forEach(food => {
+                        addFoodToUI(mealType, food, false);
+                    });
+                });
+            }
+            
+            updateMealCalories();
+            updateNutritionStats();
+        }
+
+        function saveMealData() {
+            const dateKey = currentDate.toDateString();
+            const meals = { breakfast: [], lunch: [], dinner: [], snack: [] };
+            
+            ['breakfast', 'lunch', 'dinner', 'snack'].forEach(mealType => {
+                const items = document.getElementById(`${mealType}-items`).children;
+                Array.from(items).forEach(item => {
+                    const foodData = JSON.parse(item.dataset.food);
+                    meals[mealType].push(foodData);
+                });
+            });
+            
+            localStorage.setItem(`meals-${dateKey}`, JSON.stringify(meals));
+        }
+
+        function openAddModal(mealType) {
+            currentMealType = mealType;
+            const mealNames = {
+                breakfast: '아침',
+                lunch: '점심', 
+                dinner: '저녁',
+                snack: '간식'
+            };
+            document.getElementById('modal-title').textContent = `🍽️ ${mealNames[mealType]} 추가`;
+            document.getElementById('add-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('food-name').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            document.getElementById('add-food-form').reset();
+        }
+
+        function addFood(event) {
+            event.preventDefault();
+            
+            const foodData = {
+                name: document.getElementById('food-name').value,
+                calories: parseInt(document.getElementById('food-calories').value) || 0,
+                portion: document.getElementById('food-portion').value || '',
+                protein: parseFloat(document.getElementById('food-protein').value) || 0,
+                carbs: parseFloat(document.getElementById('food-carbs').value) || 0,
+                fat: parseFloat(document.getElementById('food-fat').value) || 0,
+                note: document.getElementById('food-note').value || '',
+                timestamp: new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            addFoodToUI(currentMealType, foodData, true);
+            updateMealCalories();
+            updateNutritionStats();
+            saveMealData();
+            closeModal();
+            
+            setTimeout(() => {
+                const items = document.getElementById(`${currentMealType}-items`);
+                const newItem = items.lastChild;
+                if (newItem) {
+                    newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+
+        function addFoodToUI(mealType, foodData, animate = false) {
+            const container = document.getElementById(`${mealType}-items`);
+            const foodItem = document.createElement('div');
+            foodItem.className = 'food-item';
+            foodItem.dataset.food = JSON.stringify(foodData);
+            
+            if (animate) {
+                foodItem.style.animation = 'slideIn 0.3s ease';
+            }
+            
+            const emoji = getFoodEmoji(foodData.name);
+            const portionText = foodData.portion ? ` (${foodData.portion})` : '';
+            const nutritionText = [];
+            if (foodData.protein > 0) nutritionText.push(`단백질 ${foodData.protein}g`);
+            if (foodData.carbs > 0) nutritionText.push(`탄수 ${foodData.carbs}g`);
+            if (foodData.fat > 0) nutritionText.push(`지방 ${foodData.fat}g`);
+            
+            foodItem.innerHTML = `
+                <div class="food-image">${emoji}</div>
+                <div class="food-info">
+                    <div class="food-name">${foodData.name}${portionText}</div>
+                    <div class="food-details">${foodData.calories} kcal${nutritionText.length ? ' • ' + nutritionText.join(' • ') : ''}</div>
+                    ${foodData.note ? `<div class="food-details" style="font-style: italic; opacity: 0.8;">"${foodData.note}"</div>` : ''}
+                </div>
+                <div class="food-actions">
+                    <button class="action-btn" onclick="editFood(this)" title="수정">✏️</button>
+                    <button class="action-btn" onclick="deleteFood(this)" title="삭제">🗑️</button>
+                </div>
+            `;
+            
+            container.appendChild(foodItem);
+            
+            totalCalories += foodData.calories;
+            totalProtein += foodData.protein;
+            totalCarbs += foodData.carbs;
+            totalFat += foodData.fat;
+        }
+
+        function deleteFood(btn) {
+            if (confirm('이 음식을 삭제하시겠습니까?')) {
+                const foodItem = btn.closest('.food-item');
+                const foodData = JSON.parse(foodItem.dataset.food);
+                
+                totalCalories -= foodData.calories;
+                totalProtein -= foodData.protein;
+                totalCarbs -= foodData.carbs;
+                totalFat -= foodData.fat;
+                
+                foodItem.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    foodItem.remove();
+                    updateMealCalories();
+                    updateNutritionStats();
+                    saveMealData();
+                }, 300);
+            }
+        }
+
+        function editFood(btn) {
+            const foodItem = btn.closest('.food-item');
+            const foodData = JSON.parse(foodItem.dataset.food);
+            
+            document.getElementById('food-name').value = foodData.name;
+            document.getElementById('food-calories').value = foodData.calories;
+            document.getElementById('food-portion').value = foodData.portion;
+            document.getElementById('food-protein').value = foodData.protein;
+            document.getElementById('food-carbs').value = foodData.carbs;
+            document.getElementById('food-fat').value = foodData.fat;
+            document.getElementById('food-note').value = foodData.note;
+            
+            deleteFood(btn);
+            
+            const mealSection = foodItem.closest('.meal-section');
+            currentMealType = mealSection.className.split(' ')[1];
+            
+            const mealNames = {
+                breakfast: '아침',
+                lunch: '점심', 
+                dinner: '저녁',
+                snack: '간식'
+            };
+            document.getElementById('modal-title').textContent = `✏️ ${mealNames[currentMealType]} 수정`;
+            document.getElementById('add-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateMealCalories() {
+            ['breakfast', 'lunch', 'dinner', 'snack'].forEach(mealType => {
+                const items = document.getElementById(`${mealType}-items`).children;
+                let mealCalories = 0;
+                
+                Array.from(items).forEach(item => {
+                    const foodData = JSON.parse(item.dataset.food);
+                    mealCalories += foodData.calories;
+                });
+                
+                document.getElementById(`${mealType}-calories`).textContent = `${mealCalories} kcal`;
+            });
+        }
+
+        function updateNutritionStats() {
+            document.getElementById('total-calories').textContent = totalCalories;
+            document.getElementById('total-protein').textContent = `${totalProtein.toFixed(1)}g`;
+            document.getElementById('total-carbs').textContent = `${totalCarbs.toFixed(1)}g`;
+            document.getElementById('total-fat').textContent = `${totalFat.toFixed(1)}g`;
+            
+            const calorieGoal = 1500;
+            const proteinGoal = 80;
+            
+            document.getElementById('calorie-progress').textContent = `${totalCalories} / ${calorieGoal}`;
+            document.getElementById('protein-progress').textContent = `${totalProtein.toFixed(1)} / ${proteinGoal}g`;
+            
+            const caloriePercent = Math.min((totalCalories / calorieGoal) * 100, 100);
+            const proteinPercent = Math.min((totalProtein / proteinGoal) * 100, 100);
+            
+            document.getElementById('calorie-bar').style.width = `${caloriePercent}%`;
+            document.getElementById('protein-bar').style.width = `${proteinPercent}%`;
+        }
+
+        function quickAdd(name, calories, type = 'default') {
+            const quickFoodData = {
+                name: name,
+                calories: calories,
+                portion: '',
+                protein: 0,
+                carbs: 0,
+                fat: 0,
+                note: '빠른 추가',
+                timestamp: new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            let targetMeal = 'snack';
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 11) targetMeal = 'breakfast';
+            else if (hour >= 11 && hour < 17) targetMeal = 'lunch';
+            else if (hour >= 17 && hour < 22) targetMeal = 'dinner';
+            
+            addFoodToUI(targetMeal, quickFoodData, true);
+            updateMealCalories();
+            updateNutritionStats();
+            saveMealData();
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #667eea; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1001; animation: slideIn 0.3s ease;';
+            toast.textContent = `${name} 추가됨! ⚡`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('add-modal').classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        updateDateDisplay();
+        loadMealData();
+    </script>
+</body>
+</html>
