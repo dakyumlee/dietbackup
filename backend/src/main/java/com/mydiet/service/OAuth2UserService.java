@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -50,17 +49,14 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User createNewUser(String email, String nickname, String providerId, String provider) {
-        User newUser = User.builder()
-            .email(email)
-            .nickname(nickname)
-            .provider(provider)
-            .providerId(providerId)
-            .role("USER")
-            .emotionMode("다정함")
-            .weightGoal(70.0)
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setNickname(nickname);
+        newUser.setProvider(provider);
+        newUser.setProviderId(providerId);
+        newUser.setRole(User.Role.USER);
+        newUser.setEmotionMode("다정함"); 
+        newUser.setWeightGoal(70.0);  
         
         return userRepository.save(newUser);
     }

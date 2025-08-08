@@ -33,7 +33,7 @@ public class SecurityConfig {
                     "/workout-management.html", "/emotion-diary.html", "/admin-login.html",
                     "/admin-dashboard.html").permitAll()
                 .antMatchers("/api/auth/**", "/api/simple/**", "/api/simple-ai/**", 
-                    "/api/test/**", "/health", "/test-ai").permitAll()
+                    "/api/test/**", "/api/ai/**", "/health", "/test-ai").permitAll()
                 .antMatchers("/css/**", "/js/**", "/images/**", "/**/*.css", 
                     "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif").permitAll()
                 .antMatchers("/admin/**", "/api/admin/**").permitAll()

@@ -5,7 +5,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 public class OAuth2UserPrincipal implements OAuth2User {
     private final User user;
@@ -50,7 +52,8 @@ public class OAuth2UserPrincipal implements OAuth2User {
     }
 
     public String getRole() {
-        return user.getRole() != null ? user.getRole() : "USER";
+        User.Role userRole = user.getRole();
+        return userRole != null ? userRole.name() : "USER";
     }
 
     public Double getWeightGoal() {
