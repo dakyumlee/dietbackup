@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Login</title></head>
+<body>
+<h1>테스트 로그인</h1>
+<form id="f">
+    Email: <input id="e" value="test@gmail.com"><br><br>
+    Password: <input id="p" value="password"><br><br>
+    <button type="submit">로그인</button>
+</form>
+<div id="r"></div>
+<script>
+document.getElementById('f').onsubmit = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('e').value;
+    const password = document.getElementById('p').value;
+    console.log('시도:', email, password);
+    
+    const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, password})
+    });
+    
+    const result = await response.json();
+    console.log('결과:', result);
+    document.getElementById('r').innerHTML = JSON.stringify(result);
+    
+    if (response.ok) {
+        setTimeout(() => window.location.href = '/dashboard.html', 1000);
+    }
+};
+</script>
+</body>
+</html>

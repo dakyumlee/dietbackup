@@ -898,6 +898,30 @@
                 const userData = await authResponse.json();
                 console.log('현재 사용자:', userData);
                 
+                // 사용자 정보 표시
+                const welcomeElement = document.getElementById('user-welcome');
+                if (welcomeElement) {
+                    welcomeElement.textContent = `안녕하세요, ${userData.nickname || '사용자'}님!`;
+                }
+                
+            } catch (error) {
+                console.error('인증 확인 중 오류:', error);
+                window.location.href = '/auth.html';
+            }
+        });
+        
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const authResponse = await fetch('/api/auth/current-user');
+                
+                if (!authResponse.ok) {
+                    window.location.href = '/auth.html';
+                    return;
+                }
+                
+                const userData = await authResponse.json();
+                console.log('현재 사용자:', userData);
+                
                 const welcomeElement = document.getElementById('user-welcome');
                 if (welcomeElement) {
                     welcomeElement.textContent = `안녕하세요, ${userData.nickname || '사용자'}님!`;
@@ -987,7 +1011,7 @@
                 console.error('로그아웃 중 오류:', error);
             }
         }
-        
+
         let currentData = {
             meals: [],
             workouts: [],
