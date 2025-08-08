@@ -435,7 +435,6 @@
             transform: none;
         }
 
-        /* AI 채팅 스타일 */
         .ai-chat-container {
             border: 2px solid #e9ecef;
             border-radius: 15px;
@@ -772,7 +771,6 @@
 
     <button class="refresh-btn" onclick="refreshDashboard()" title="새로고침">🔄</button>
 
-    <!-- 식단 입력 모달 -->
     <div id="meal-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -791,7 +789,6 @@
         </div>
     </div>
 
-    <!-- 운동 입력 모달 -->
     <div id="workout-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -827,7 +824,6 @@
         </div>
     </div>
 
-    <!-- 감정 입력 모달 -->
     <div id="emotion-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -856,7 +852,6 @@
         </div>
     </div>
 
-    <!-- 프로필 설정 모달 -->
     <div id="profile-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -888,11 +883,111 @@
         </div>
     </div>
 
-    <!-- 토스트 알림 -->
     <div id="toast" class="toast"></div>
 
     <script>
-        // 전역 변수
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const authResponse = await fetch('/api/auth/current-user');
+                
+                if (!authResponse.ok) {
+                    window.location.href = '/auth.html';
+                    return;
+                }
+                
+                const userData = await authResponse.json();
+                console.log('현재 사용자:', userData);
+                
+                const welcomeElement = document.getElementById('user-welcome');
+                if (welcomeElement) {
+                    welcomeElement.textContent = `안녕하세요, ${userData.nickname || '사용자'}님!`;
+                }
+                
+                const goalElement = document.getElementById('user-goal');
+                if (goalElement && userData.weightGoal) {
+                    goalElement.textContent = `목표 체중: ${userData.weightGoal}kg`;
+                }
+                
+                const userEmailElement = document.getElementById('user-email');
+                if (userEmailElement) {
+                    userEmailElement.textContent = userData.email;
+                }
+                
+                await loadDashboardData();
+                
+            } catch (error) {
+                console.error('인증 확인 중 오류:', error);
+                window.location.href = '/auth.html';
+            }
+        });
+        
+        async function loadDashboardData() {
+            try {
+                console.log('대시보드 데이터 로딩 시작');
+                
+                await Promise.all([
+                    loadTodayMeals(),
+                    loadTodayWorkouts(),
+                    loadTodayEmotions()
+                ]);
+                
+            } catch (error) {
+                console.error('대시보드 데이터 로딩 실패:', error);
+            }
+        }
+        
+        async function loadTodayMeals() {
+            try {
+                const response = await fetch('/api/meals/today');
+                if (response.ok) {
+                    const meals = await response.json();
+                    console.log('오늘의 식단:', meals);
+                }
+            } catch (error) {
+                console.error('식단 데이터 로딩 실패:', error);
+            }
+        }
+        
+        async function loadTodayWorkouts() {
+            try {
+                const response = await fetch('/api/workouts/today');
+                if (response.ok) {
+                    const workouts = await response.json();
+                    console.log('오늘의 운동:', workouts);
+                }
+            } catch (error) {
+                console.error('운동 데이터 로딩 실패:', error);
+            }
+        }
+        
+        async function loadTodayEmotions() {
+            try {
+                const response = await fetch('/api/emotions/today');
+                if (response.ok) {
+                    const emotions = await response.json();
+                    console.log('오늘의 감정:', emotions);
+                }
+            } catch (error) {
+                console.error('감정 데이터 로딩 실패:', error);
+            }
+        }
+        
+        async function logout() {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/auth.html';
+                } else {
+                    console.error('로그아웃 실패');
+                }
+            } catch (error) {
+                console.error('로그아웃 중 오류:', error);
+            }
+        }
+        
         let currentData = {
             meals: [],
             workouts: [],

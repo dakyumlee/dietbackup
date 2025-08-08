@@ -82,9 +82,8 @@
 
         .sidebar-subtitle {
             font-size: 18px;
+            margin-bottom: 32px;
             opacity: 0.9;
-            margin-bottom: 40px;
-            line-height: 1.6;
         }
 
         .feature-list {
@@ -93,23 +92,16 @@
         }
 
         .feature-list li {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            font-size: 16px;
-            opacity: 0.9;
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
         }
 
         .feature-list li::before {
             content: '✓';
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            margin-right: 12px;
+            position: absolute;
+            left: 0;
+            color: #a8f5a8;
             font-weight: bold;
         }
 
@@ -119,32 +111,33 @@
             align-items: center;
             justify-content: center;
             padding: 40px;
-            background: white;
             position: relative;
         }
 
         body.dark .auth-main {
-            background: #1e293b;
+            background: #0f172a;
         }
 
         .theme-toggle {
-            position: fixed;
+            position: absolute;
             top: 20px;
             right: 20px;
-            width: 50px;
-            height: 24px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 12px;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .theme-toggle::before {
             content: '☀️';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 26px;
+            height: 26px;
             background: white;
             border-radius: 50%;
             top: 2px;
@@ -153,32 +146,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        body.dark .theme-toggle {
-            background: rgba(255,255,255,0.1);
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         body.dark .theme-toggle::before {
             content: '🌙';
-            transform: translateX(26px);
-            background: #334155;
+            transform: translateX(30px);
+            background: #1e293b;
         }
 
         .admin-shortcut {
-            position: fixed;
-            top: 20px;
+            position: absolute;
+            bottom: 20px;
             left: 20px;
+            padding: 8px 16px;
             background: rgba(102, 126, 234, 0.1);
             color: #667eea;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
             text-decoration: none;
-            font-size: 13px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 500;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             z-index: 1000;
             display: flex;
@@ -425,7 +415,11 @@
         .divider-text {
             padding: 0 16px;
             color: #6b7280;
-            font-size: 13px;
+            font-size: 14px;
+        }
+
+        body.dark .divider-text {
+            color: #94a3b8;
         }
 
         .social-buttons {
@@ -438,83 +432,87 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            gap: 8px;
+            padding: 12px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
-            background: white;
-            color: #374151;
             text-decoration: none;
-            font-size: 14px;
+            color: #374151;
             font-weight: 500;
             transition: all 0.2s ease;
+            background: white;
         }
 
         body.dark .social-btn {
             background: #334155;
             border-color: #475569;
-            color: #d1d5db;
+            color: #f1f5f9;
         }
 
         .social-btn:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
+            border-color: #667eea;
+            background: #f8fafc;
         }
 
         body.dark .social-btn:hover {
+            border-color: #667eea;
             background: #475569;
         }
 
-        .social-btn span {
-            margin-right: 6px;
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
             .auth-layout {
                 flex-direction: column;
             }
-
+            
             .auth-sidebar {
                 flex: none;
                 min-height: 200px;
                 padding: 30px 20px;
             }
-
+            
             .sidebar-title {
                 font-size: 24px;
             }
-
+            
             .sidebar-subtitle {
                 font-size: 16px;
-                margin-bottom: 20px;
             }
-
+            
             .feature-list {
                 display: none;
             }
-
+            
             .auth-main {
-                padding: 30px 20px;
-            }
-
-            .theme-toggle {
-                top: 10px;
-                right: 10px;
-            }
-
-            .admin-shortcut {
-                top: 10px;
-                left: 10px;
-                font-size: 12px;
-                padding: 6px 12px;
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div class="theme-toggle" onclick="toggleTheme()"></div>
+    
     <a href="admin-login.html" class="admin-shortcut">
-        <span>🛡️</span>
-        관리자
+        🛡️ 관리자
     </a>
 
     <div class="auth-layout">
@@ -546,17 +544,20 @@
                     <button class="tab-btn" onclick="switchTab('signup')">회원가입</button>
                 </div>
 
+                <div class="error-message" id="error-message"></div>
+                <div class="success-message" id="success-message"></div>
+
                 <div class="form-container">
                     <form class="auth-form" id="login-form">
                         <div class="form-group">
                             <label>이메일</label>
-                            <input type="email" class="form-input" placeholder="name@company.com" required>
+                            <input type="email" name="email" class="form-input" placeholder="name@company.com" required>
                         </div>
 
                         <div class="form-group">
                             <label>비밀번호</label>
                             <div class="password-container">
-                                <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                                <input type="password" name="password" id="login-password" class="form-input" placeholder="••••••••" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword('login-password')">👁️</button>
                             </div>
                         </div>
@@ -575,18 +576,18 @@
                     <form class="auth-form hidden" id="signup-form">
                         <div class="form-group">
                             <label>이름</label>
-                            <input type="text" class="form-input" placeholder="김핑핑" required>
+                            <input type="text" name="nickname" class="form-input" placeholder="김핑핑" required>
                         </div>
 
                         <div class="form-group">
                             <label>이메일</label>
-                            <input type="email" class="form-input" placeholder="name@company.com" required>
+                            <input type="email" name="email" class="form-input" placeholder="name@company.com" required>
                         </div>
 
                         <div class="form-group">
                             <label>비밀번호</label>
                             <div class="password-container">
-                                <input type="password" id="signup-password" class="form-input" placeholder="8자 이상" required>
+                                <input type="password" name="password" id="signup-password" class="form-input" placeholder="8자 이상" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">👁️</button>
                             </div>
                         </div>
@@ -606,24 +607,55 @@
                         <button type="submit" class="submit-btn">계정 만들기</button>
                     </form>
                 </div>
+                
                 <div class="divider">
                     <span class="divider-text">또는</span>
                 </div>
+                
                 <div class="social-buttons">
-                    <button type="button" class="social-btn" onclick="loginWithGoogle()">
+                    <a href="/oauth2/authorization/google" class="social-btn">
                         <span>🔍</span>
                         Google
-                    </button>
-                    <button type="button" class="social-btn" onclick="loginWithKakao()">
+                    </a>
+                    <a href="/oauth2/authorization/kakao" class="social-btn">
                         <span>💬</span>
                         Kakao
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/auth/current-user');
+                if (response.ok) {
+                    window.location.href = '/dashboard.html';
+                }
+            } catch (error) {
+                console.log('인증되지 않은 사용자');
+            }
+        });
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('success-message');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 3000);
+        }
+
         function toggleTheme() {
             document.body.classList.toggle('dark');
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
@@ -660,42 +692,108 @@
             }
         }
 
-        function loginWithGoogle() {
-            window.location.href = '/oauth2/authorization/google';
-        }
-
-        function loginWithKakao() {
-            window.location.href = '/oauth2/authorization/kakao';
-        }
-
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const btn = this.querySelector('.submit-btn');
+            const originalText = btn.textContent;
             btn.textContent = '로그인 중...';
             btn.disabled = true;
             
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
+            const formData = new FormData(this);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('로그인 성공! 잠시만 기다려주세요...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 1000);
+                } else {
+                    showError(result.message || '로그인에 실패했습니다.');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
-        
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const btn = this.querySelector('.submit-btn');
+            const originalText = btn.textContent;
             btn.textContent = '계정 생성 중...';
             btn.disabled = true;
             
-            setTimeout(() => {
-                alert('계정이 생성되었습니다!');
-                switchTab('login');
-                btn.textContent = '계정 만들기';
+            const formData = new FormData(this);
+            const password = formData.get('password');
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showError('비밀번호가 일치하지 않습니다.');
+                btn.textContent = originalText;
                 btn.disabled = false;
-            }, 1500);
+                return;
+            }
+            
+            const signupData = {
+                nickname: formData.get('nickname'),
+                email: formData.get('email'),
+                password: password
+            };
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(signupData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('계정이 생성되었습니다! 로그인 탭으로 이동합니다.');
+                    setTimeout(() => {
+                        switchTab('login');
+                        this.reset();
+                        document.getElementById('confirm-password').value = '';
+                    }, 2000);
+                } else {
+                    showError(result.message || '회원가입에 실패했습니다.');
+                }
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
- 
+
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark');
         }
-</script>
+    </script>
 </body>
 </html>
