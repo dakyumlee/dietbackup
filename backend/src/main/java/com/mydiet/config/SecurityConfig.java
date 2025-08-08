@@ -41,18 +41,16 @@ public class SecurityConfig {
                 .and()
             .oauth2Login()
                 .loginPage("/auth.html")
+                .defaultSuccessUrl("/dashboard.html", true)
                 .userInfoEndpoint()
                     .userService(oAuth2UserService)
                     .and()
-                .successHandler(oAuth2LoginSuccessHandler)
                 .failureUrl("/auth.html?error=true")
                 .and()
             .formLogin()
                 .loginPage("/auth.html")
                 .loginProcessingUrl("/api/auth/login")
-                .successHandler((request, response, authentication) -> {
-                    response.sendRedirect("/dashboard.html");
-                })
+                .defaultSuccessUrl("/dashboard.html", true)
                 .failureHandler((request, response, exception) -> {
                     response.sendRedirect("/auth.html?error=true");
                 })

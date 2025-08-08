@@ -610,14 +610,14 @@
                     <span class="divider-text">또는</span>
                 </div>
                 <div class="social-buttons">
-                    <a href="/oauth2/authorization/google" class="social-btn">
+                    <button type="button" class="social-btn" onclick="loginWithGoogle()">
                         <span>🔍</span>
                         Google
-                    </a>
-                    <a href="/oauth2/authorization/kakao" class="social-btn">
+                    </button>
+                    <button type="button" class="social-btn" onclick="loginWithKakao()">
                         <span>💬</span>
                         Kakao
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -660,29 +660,25 @@
             }
         }
 
-            document.getElementById('login-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const btn = this.querySelector('.submit-btn');
-                btn.textContent = '로그인 중...';
-                btn.disabled = true;
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            });
-            
-            document.getElementById('signup-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const btn = this.querySelector('.submit-btn');
-                btn.textContent = '계정 생성 중...';
-                btn.disabled = true;
-                
-                setTimeout(() => {
-                    alert('계정이 생성되었습니다!');
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            });
+        function loginWithGoogle() {
+            window.location.href = '/oauth2/authorization/google';
+        }
 
+        function loginWithKakao() {
+            window.location.href = '/oauth2/authorization/kakao';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('.submit-btn');
+            btn.textContent = '로그인 중...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+        
         document.getElementById('signup-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = this.querySelector('.submit-btn');
@@ -700,6 +696,6 @@
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark');
         }
-    </script>
+</script>
 </body>
 </html>
