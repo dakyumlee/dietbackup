@@ -1,5 +1,5 @@
 package com.mydiet.controller;
-
+import com.mydiet.model.Role;
 import com.mydiet.config.ClaudeApiClient;
 import com.mydiet.model.User;
 import com.mydiet.repository.UserRepository;

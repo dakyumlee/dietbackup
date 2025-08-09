@@ -1,5 +1,5 @@
 package com.mydiet.dto.request;
-
+import com.mydiet.model.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,5 @@
 package com.mydiet.model;
-
+import com.mydiet.model.Role;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

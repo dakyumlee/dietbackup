@@ -1,5 +1,5 @@
 package com.mydiet.controller;
-
+import com.mydiet.model.Role;
 import com.mydiet.repository.MealLogRepository;
 import com.mydiet.repository.EmotionLogRepository;
 import com.mydiet.repository.WorkoutLogRepository;

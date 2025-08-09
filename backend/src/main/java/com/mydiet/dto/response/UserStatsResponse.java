@@ -1,5 +1,5 @@
 package com.mydiet.dto.response;
-
+import com.mydiet.model.Role;
 import lombok.Builder;
 import lombok.Data;
 

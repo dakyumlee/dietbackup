@@ -29,6 +29,68 @@
             color: #e2e8f0;
         }
 
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle::before {
+            content: '🌙';
+        }
+
+        body.dark .theme-toggle::before {
+            content: '☀️';
+        }
+
+        .admin-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: 20px;
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-link:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        body.dark .admin-link {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        body.dark .admin-link:hover {
+            background: #ef4444;
+            color: white;
+        }
+
         .auth-layout {
             display: flex;
             width: 100%;
@@ -84,7 +146,7 @@
             font-size: 18px;
             opacity: 0.9;
             margin-bottom: 40px;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
         .feature-list {
@@ -93,114 +155,32 @@
         }
 
         .feature-list li {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            font-size: 16px;
-            opacity: 0.9;
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+            opacity: 0.85;
         }
 
         .feature-list li::before {
             content: '✓';
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            margin-right: 12px;
+            position: absolute;
+            left: 0;
+            color: #a7f3d0;
             font-weight: bold;
         }
 
         .auth-main {
             flex: 1;
+            padding: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
-            background: white;
-            position: relative;
+            background: #ffffff;
         }
 
         body.dark .auth-main {
             background: #1e293b;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 24px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .theme-toggle::before {
-            content: '☀️';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        body.dark .theme-toggle {
-            background: rgba(255,255,255,0.1);
-        }
-
-        body.dark .theme-toggle::before {
-            content: '🌙';
-            transform: translateX(26px);
-            background: #334155;
-        }
-
-        .admin-shortcut {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 8px 16px;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .admin-shortcut:hover {
-            background: rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        body.dark .admin-shortcut {
-            background: rgba(102, 126, 234, 0.15);
-            color: #a5b4fc;
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        body.dark .admin-shortcut:hover {
-            background: rgba(102, 126, 234, 0.25);
         }
 
         .auth-container {
@@ -210,85 +190,81 @@
 
         .auth-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
         .auth-header h1 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            color: #1e293b;
             margin-bottom: 8px;
+            color: #1f2937;
         }
 
         body.dark .auth-header h1 {
-            color: #f1f5f9;
+            color: #f9fafb;
         }
 
         .auth-header p {
-            color: #64748b;
-            font-size: 15px;
+            color: #6b7280;
+            font-size: 16px;
         }
 
         body.dark .auth-header p {
-            color: #94a3b8;
+            color: #9ca3af;
         }
 
         .form-tabs {
             display: flex;
-            background: #f8fafc;
+            margin-bottom: 30px;
             border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 32px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
         }
 
         body.dark .form-tabs {
-            background: #334155;
+            border-color: #374151;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 12px 20px;
             border: none;
-            background: none;
-            border-radius: 6px;
+            background: #f9fafb;
+            color: #6b7280;
             cursor: pointer;
-            font-weight: 500;
             transition: all 0.2s ease;
-            color: #64748b;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: #1e293b;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        body.dark .tab-btn.active {
-            background: #1e293b;
-            color: #f1f5f9;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         body.dark .tab-btn {
-            color: #94a3b8;
+            background: #374151;
+            color: #9ca3af;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        body.dark .tab-btn:hover:not(.active) {
+            background: #4b5563;
         }
 
         .form-container {
-            position: relative;
-            min-height: 320px;
+            margin-bottom: 30px;
         }
 
         .auth-form {
-            position: absolute;
-            width: 100%;
-            opacity: 1;
-            transform: translateX(0);
-            transition: all 0.3s ease;
+            display: block;
         }
 
         .auth-form.hidden {
-            opacity: 0;
-            transform: translateX(20px);
-            pointer-events: none;
+            display: none;
         }
 
         .form-group {
@@ -312,29 +288,21 @@
             padding: 12px 16px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.2s ease;
             background: white;
         }
 
         body.dark .form-input {
-            background: #334155;
-            border-color: #475569;
-            color: #f1f5f9;
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: #9ca3af;
-        }
-
-        body.dark .form-input::placeholder {
-            color: #6b7280;
         }
 
         .password-container {
@@ -349,8 +317,12 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #6b7280;
             font-size: 16px;
+            opacity: 0.6;
+        }
+
+        .password-toggle:hover {
+            opacity: 1;
         }
 
         .form-row {
@@ -358,79 +330,113 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            font-size: 14px;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .checkbox-group input[type="checkbox"] {
-            margin-right: 8px;
-            accent-color: #667eea;
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        body.dark .checkbox-group label {
+            color: #9ca3af;
         }
 
         .forgot-link {
             color: #667eea;
             text-decoration: none;
+            font-size: 14px;
             font-weight: 500;
         }
 
         .forgot-link:hover {
-            color: #5a67d8;
+            text-decoration: underline;
         }
 
         .submit-btn {
             width: 100%;
-            padding: 12px;
-            background: #667eea;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
         }
 
         .submit-btn:hover {
-            background: #5a67d8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .submit-btn:disabled {
-            opacity: 0.7;
+            background: #cbd5e0;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            display: none;
+        }
+
+        body.dark .error-message {
+            background: #7f1d1d;
+            border-color: #991b1b;
+            color: #fca5a5;
         }
 
         .divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
+            position: relative;
+            text-align: center;
+            margin: 30px 0;
         }
 
-        .divider::before,
-        .divider::after {
+        .divider::before {
             content: '';
-            flex: 1;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
             height: 1px;
             background: #e5e7eb;
         }
 
-        body.dark .divider::before,
-        body.dark .divider::after {
-            background: #475569;
+        body.dark .divider::before {
+            background: #374151;
         }
 
         .divider-text {
+            background: white;
             padding: 0 16px;
             color: #6b7280;
             font-size: 14px;
         }
 
         body.dark .divider-text {
-            color: #94a3b8;
+            background: #1e293b;
+            color: #9ca3af;
         }
 
         .social-buttons {
@@ -440,93 +446,81 @@
 
         .social-btn {
             flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
+            padding: 12px 16px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             text-decoration: none;
             color: #374151;
-            font-weight: 500;
+            text-align: center;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
             background: white;
         }
 
         body.dark .social-btn {
-            background: #334155;
-            border-color: #475569;
-            color: #f1f5f9;
+            background: #374151;
+            border-color: #4b5563;
+            color: #d1d5db;
         }
 
         .social-btn:hover {
-            border-color: #667eea;
-            background: #f8fafc;
+            background: #f9fafb;
+            border-color: #9ca3af;
         }
 
         body.dark .social-btn:hover {
-            border-color: #667eea;
-            background: #475569;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .success-message {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
+            background: #4b5563;
+            border-color: #6b7280;
         }
 
         @media (max-width: 768px) {
             .auth-layout {
                 flex-direction: column;
             }
-            
+
             .auth-sidebar {
-                flex: none;
                 min-height: 200px;
                 padding: 30px 20px;
             }
-            
+
             .sidebar-title {
                 font-size: 24px;
             }
-            
+
             .sidebar-subtitle {
                 font-size: 16px;
-                margin-bottom: 20px;
             }
-            
+
             .feature-list {
                 display: none;
             }
-            
+
             .auth-main {
-                padding: 20px;
+                padding: 30px 20px;
+            }
+
+            .social-buttons {
+                flex-direction: column;
+            }
+
+            .admin-link,
+            .theme-toggle {
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                margin: 10px;
             }
         }
     </style>
 </head>
 <body>
+    <a href="admin-login.html" class="admin-link">🛡️ 관리자</a>
     <div class="theme-toggle" onclick="toggleTheme()"></div>
-    
-    <a href="admin-login.html" class="admin-shortcut">
-        <span>🛡️</span>
-        관리자
-    </a>
 
     <div class="auth-layout">
         <div class="auth-sidebar">
@@ -557,20 +551,17 @@
                     <button class="tab-btn" onclick="switchTab('signup')">회원가입</button>
                 </div>
 
-                <div class="error-message" id="error-message"></div>
-                <div class="success-message" id="success-message"></div>
-
                 <div class="form-container">
                     <form class="auth-form" id="login-form">
                         <div class="form-group">
                             <label>이메일</label>
-                            <input type="email" name="email" class="form-input" placeholder="name@company.com" required>
+                            <input type="email" id="login-email" class="form-input" placeholder="name@company.com" required>
                         </div>
 
                         <div class="form-group">
                             <label>비밀번호</label>
                             <div class="password-container">
-                                <input type="password" name="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                                <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword('login-password')">👁️</button>
                             </div>
                         </div>
@@ -583,24 +574,25 @@
                             <a href="#" class="forgot-link">비밀번호 찾기</a>
                         </div>
 
-                        <button type="submit" class="submit-btn">로그인</button>
+                        <button type="submit" class="submit-btn" id="login-submit">로그인</button>
+                        <div class="error-message" id="login-error"></div>
                     </form>
 
                     <form class="auth-form hidden" id="signup-form">
                         <div class="form-group">
                             <label>이름</label>
-                            <input type="text" name="nickname" class="form-input" placeholder="김핑핑" required>
+                            <input type="text" id="signup-name" class="form-input" placeholder="김핑핑" required>
                         </div>
 
                         <div class="form-group">
                             <label>이메일</label>
-                            <input type="email" name="email" class="form-input" placeholder="name@company.com" required>
+                            <input type="email" id="signup-email" class="form-input" placeholder="name@company.com" required>
                         </div>
 
                         <div class="form-group">
                             <label>비밀번호</label>
                             <div class="password-container">
-                                <input type="password" name="password" id="signup-password" class="form-input" placeholder="8자 이상" required>
+                                <input type="password" id="signup-password" class="form-input" placeholder="8자 이상" required>
                                 <button type="button" class="password-toggle" onclick="togglePassword('signup-password')">👁️</button>
                             </div>
                         </div>
@@ -617,14 +609,13 @@
                             <input type="checkbox" id="terms" required>
                             <label for="terms" style="font-size:12px;">이용약관에 동의합니다</label>
                         </div>
-                        <button type="submit" class="submit-btn">계정 만들기</button>
+                        <button type="submit" class="submit-btn" id="signup-submit">계정 만들기</button>
+                        <div class="error-message" id="signup-error"></div>
                     </form>
                 </div>
-                
                 <div class="divider">
                     <span class="divider-text">또는</span>
                 </div>
-                
                 <div class="social-buttons">
                     <a href="/oauth2/authorization/google" class="social-btn">
                         <span>🔍</span>
@@ -640,141 +631,176 @@
     </div>
 
     <script>
-        function showError(message) {
-            const errorEl = document.getElementById('error-message');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-            setTimeout(() => errorEl.style.display = 'none', 5000);
-        }
-
-        function showSuccess(message) {
-            const successEl = document.getElementById('success-message');
-            successEl.textContent = message;
-            successEl.style.display = 'block';
-            setTimeout(() => successEl.style.display = 'none', 3000);
-        }
-
         function toggleTheme() {
             document.body.classList.toggle('dark');
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
         }
 
-        function switchTab(tab) {
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const tabs = document.querySelectorAll('.tab-btn');
-
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'login') {
-                tabs[0].classList.add('active');
-                loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
-            } else {
-                tabs[1].classList.add('active');
-                signupForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-            }
-        }
-
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const btn = input.nextElementSibling;
+            const button = input.nextElementSibling;
             
             if (input.type === 'password') {
                 input.type = 'text';
-                btn.textContent = '🙈';
+                button.textContent = '🙈';
             } else {
                 input.type = 'password';
-                btn.textContent = '👁️';
+                button.textContent = '👁️';
             }
         }
 
-        document.getElementById('login-form').onsubmit = async function(e) {
-            e.preventDefault();
-            
-            const email = this.querySelector('input[name="email"]').value;
-            const password = this.querySelector('input[name="password"]').value;
-            
-            console.log('로그인 시도:', email);
-            
-            const btn = this.querySelector('.submit-btn');
-            btn.textContent = '로그인 중...';
-            btn.disabled = true;
-            
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({email, password})
-                });
-                
-                const result = await response.json();
-                console.log('로그인 결과:', result);
-                
-                if (response.ok) {
-                    showSuccess('로그인 성공!');
-                    setTimeout(() => window.location.href = '/dashboard.html', 1000);
-                } else {
-                    showError(result.message || '로그인 실패');
-                }
-                
-            } catch (error) {
-                console.error('로그인 에러:', error);
-                showError('로그인 중 오류 발생');
-            } finally {
-                btn.textContent = '로그인';
-                btn.disabled = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
             }
-        };
 
-        document.getElementById('signup-form').onsubmit = async function(e) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            
+            if (error) {
+                let errorMessage = '';
+                switch(error) {
+                    case 'oauth_failed':
+                        errorMessage = 'OAuth 로그인에 실패했습니다. 다시 시도해주세요.';
+                        break;
+                    case 'login_failed':
+                        errorMessage = '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
+                        break;
+                    default:
+                        errorMessage = '오류가 발생했습니다. 다시 시도해주세요.';
+                }
+                showError('login-error', errorMessage);
+            }
+        });
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            
+            hideError('login-error');
+            hideError('signup-error');
+            
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabBtns[0].classList.add('active');
+                tabBtns[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabBtns[0].classList.remove('active');
+                tabBtns[1].classList.add('active');
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const nickname = this.querySelector('input[name="nickname"]').value;
-            const email = this.querySelector('input[name="email"]').value;
-            const password = this.querySelector('input[name="password"]').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const submitBtn = document.getElementById('login-submit');
             
-            if (password !== confirmPassword) {
-                showError('비밀번호가 일치하지 않습니다.');
+            if (!email || !password) {
+                showError('login-error', '이메일과 비밀번호를 모두 입력해주세요.');
                 return;
             }
             
-            const btn = this.querySelector('.submit-btn');
-            btn.textContent = '계정 생성 중...';
-            btn.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '로그인 중...';
+            hideError('login-error');
+            
+            try {
+                const response = await fetch('/api/auth/login-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = result.redirectUrl || '/dashboard.html';
+                } else {
+                    showError('login-error', result.error || '로그인에 실패했습니다.');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('login-error', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '로그인';
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nickname = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const submitBtn = document.getElementById('signup-submit');
+            
+            if (!nickname || !email || !password || !confirmPassword) {
+                showError('signup-error', '모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('signup-error', '비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('signup-error', '비밀번호는 8자 이상이어야 합니다.');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '가입 중...';
+            hideError('signup-error');
             
             try {
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({nickname, email, password})
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nickname, email, password })
                 });
                 
                 const result = await response.json();
                 
-                if (response.ok) {
-                    showSuccess('계정이 생성되었습니다!');
-                    setTimeout(() => {
-                        switchTab('login');
-                        this.reset();
-                        document.getElementById('confirm-password').value = '';
-                    }, 2000);
+                if (result.success) {
+                    alert('회원가입이 완료되었습니다! 로그인해주세요.');
+                    switchTab('login');
+                    document.getElementById('login-email').value = email;
                 } else {
-                    showError(result.message || '회원가입 실패');
+                    showError('signup-error', result.error || '회원가입에 실패했습니다.');
                 }
                 
             } catch (error) {
-                showError('회원가입 중 오류 발생');
+                console.error('Signup error:', error);
+                showError('signup-error', '네트워크 오류가 발생했습니다. 다시 시도해주세요.');
             } finally {
-                btn.textContent = '계정 만들기';
-                btn.disabled = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = '계정 만들기';
             }
-        };
+        });
 
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
         }
     </script>
 </body>

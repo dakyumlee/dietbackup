@@ -1,5 +1,5 @@
 package com.mydiet.controller;
-
+import com.mydiet.model.Role;
 import com.mydiet.config.ClaudeApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

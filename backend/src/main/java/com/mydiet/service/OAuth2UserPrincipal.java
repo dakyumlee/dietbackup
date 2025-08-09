@@ -1,13 +1,12 @@
 package com.mydiet.service;
 
+import com.mydiet.model.Role;
 import com.mydiet.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 public class OAuth2UserPrincipal implements OAuth2User {
     private final User user;
@@ -27,7 +26,9 @@ public class OAuth2UserPrincipal implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        Role userRole = user.getRole(); 
+        String roleString = userRole != null ? userRole.name() : "USER";
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + roleString));
     }
 
     @Override
@@ -52,8 +53,7 @@ public class OAuth2UserPrincipal implements OAuth2User {
     }
 
     public String getRole() {
-        User.Role userRole = user.getRole();
-        return userRole != null ? userRole.name() : "USER";
+        return user.getRole() != null ? user.getRole().name() : "USER";
     }
 
     public Double getWeightGoal() {

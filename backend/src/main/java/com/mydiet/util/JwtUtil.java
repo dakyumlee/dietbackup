@@ -1,5 +1,5 @@
 package com.mydiet.util;
-
+import com.mydiet.model.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;

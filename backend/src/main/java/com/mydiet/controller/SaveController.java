@@ -1,5 +1,5 @@
 package com.mydiet.controller;
-
+import com.mydiet.model.Role;
 import com.mydiet.model.User;
 import com.mydiet.model.MealLog;
 import com.mydiet.model.WorkoutLog;

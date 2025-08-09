@@ -1,5 +1,5 @@
 package com.mydiet.service;
-
+import com.mydiet.model.Role;
 import com.mydiet.model.WorkoutLog;
 import com.mydiet.model.User;
 import com.mydiet.repository.WorkoutLogRepository;

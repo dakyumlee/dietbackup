@@ -1,5 +1,5 @@
 package com.mydiet.repository;
-
+import com.mydiet.model.Role;
 import com.mydiet.model.ClaudeResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

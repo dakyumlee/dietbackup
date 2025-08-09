@@ -1,5 +1,5 @@
 package com.mydiet.controller;
-
+import com.mydiet.model.Role;
 import com.mydiet.service.OAuth2UserPrincipal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
