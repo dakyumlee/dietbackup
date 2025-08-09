@@ -20,17 +20,29 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                       Authentication authentication) throws IOException, ServletException {
         
-        OAuth2UserPrincipal principal = (OAuth2UserPrincipal) authentication.getPrincipal();
-        
-        HttpSession session = request.getSession(true);
-        session.setAttribute("userId", principal.getUser().getId());
-        session.setAttribute("userEmail", principal.getUser().getEmail());
-        session.setAttribute("userNickname", principal.getUser().getNickname());
-        session.setAttribute("authenticated", true);
-        session.setAttribute("userRole", principal.getUser().getRole() != null ? principal.getUser().getRole().toString() : "USER");
-        
-        log.info("OAuth2 로그인 성공: {} (세션: {})", principal.getUser().getEmail(), session.getId());
-        
-        response.sendRedirect("/dashboard.html");
+        try {
+            OAuth2UserPrincipal principal = (OAuth2UserPrincipal) authentication.getPrincipal();
+            
+            HttpSession session = request.getSession(true);
+            session.setAttribute("userId", principal.getUser().getId());
+            session.setAttribute("userEmail", principal.getUser().getEmail());
+            session.setAttribute("userNickname", principal.getUser().getNickname());
+            session.setAttribute("authenticated", true);
+            session.setAttribute("userRole", "USER");
+            
+            session.setMaxInactiveInterval(3600);
+            
+            log.info("=== OAuth2 로그인 성공 ===");
+            log.info("사용자 이메일: {}", principal.getUser().getEmail());
+            log.info("사용자 ID: {}", principal.getUser().getId());
+            log.info("세션 ID: {}", session.getId());
+            log.info("리다이렉트 대상: /dashboard.html");
+            
+            response.sendRedirect("/dashboard.html");
+            
+        } catch (Exception e) {
+            log.error("OAuth2 로그인 성공 처리 중 오류", e);
+            response.sendRedirect("/auth.html?error=oauth_error");
+        }
     }
 }
