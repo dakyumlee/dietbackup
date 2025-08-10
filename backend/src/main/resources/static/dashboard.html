@@ -56,6 +56,24 @@
             margin-bottom: 10px;
         }
 
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-top: 15px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -91,28 +109,65 @@
 
         .stat-label {
             color: #666;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        .content-grid {
+        .main-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
+            margin-bottom: 30px;
         }
 
-        .content-card {
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
             background: white;
             border-radius: 15px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .content-card h2 {
-            color: #333;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            font-size: 1.5rem;
             padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .data-list {
@@ -120,15 +175,14 @@
         }
 
         .data-item {
-            background: #f8f9fa;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
         .data-item:hover {
@@ -143,131 +197,40 @@
 
         .data-info p {
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .delete-btn {
-            background: #ff4757;
+            background: #dc3545;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
         }
 
         .delete-btn:hover {
-            background: #ff3838;
+            background: #c82333;
+            transform: scale(1.05);
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             color: #999;
         }
 
         .empty-state .emoji {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .quick-action {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .quick-action:hover {
-            border-color: #667eea;
-            background: white;
-            transform: translateY(-3px);
-        }
-
-        .quick-action.delete-action {
-            background: #ffe6e6;
-            border-color: #ffcccc;
-        }
-
-        .quick-action.delete-action:hover {
-            border-color: #ff4757;
-            background: #ffd6d6;
-        }
-
-        .quick-action .icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .refresh-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .refresh-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-radius: 50%;
-            border-top-color: #667eea;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            font-size: 2.5rem;
+            margin-bottom: 15px;
         }
 
         .goal-progress {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-bottom: 20px;
         }
@@ -275,6 +238,7 @@
         .goal-progress h3 {
             color: #333;
             margin-bottom: 15px;
+            text-align: center;
         }
 
         .progress-bar {
@@ -294,6 +258,7 @@
         .progress-text {
             font-size: 0.9rem;
             color: #666;
+            text-align: center;
         }
 
         .modal {
@@ -344,7 +309,7 @@
         }
 
         .modal-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #333;
         }
@@ -352,12 +317,12 @@
         .close-btn {
             background: none;
             border: none;
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #999;
             cursor: pointer;
             padding: 0;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,7 +342,7 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
+            font-weight: 600;
             color: #333;
         }
 
@@ -385,198 +350,52 @@
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 16px;
+            outline: none;
             transition: border-color 0.3s ease;
+            font-size: 1rem;
         }
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
-            outline: none;
             border-color: #667eea;
         }
 
         .form-group textarea {
+            min-height: 100px;
             resize: vertical;
-            height: 100px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
         }
 
         .submit-btn {
+            width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
+            transition: all 0.3s ease;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .ai-chat-container {
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            overflow: hidden;
-            background: white;
-        }
-
-        .ai-chat-messages {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f8f9fa;
-        }
-
-        .ai-message {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: flex-start;
-        }
-
-        .user-message {
-            flex-direction: row-reverse;
-        }
-
-        .ai-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .user-avatar {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            margin-right: 0;
-            margin-left: 10px;
-        }
-
-        .ai-text {
-            background: white;
-            padding: 12px 16px;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            max-width: 80%;
-            line-height: 1.4;
-            font-size: 0.9rem;
-        }
-
-        .user-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .ai-input-container {
-            display: flex;
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .ai-input-container input {
-            flex: 1;
-            border: 1px solid #e9ecef;
-            border-radius: 25px;
-            padding: 12px 20px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .ai-input-container input:focus {
-            border-color: #667eea;
-        }
-
-        .ai-send-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .ai-send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .ai-send-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            padding: 10px 16px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #999;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #4CAF50;
+            background: #28a745;
             color: white;
-            padding: 15px 20px;
+            padding: 15px 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             z-index: 3000;
             opacity: 0;
             transform: translateX(100%);
@@ -589,32 +408,199 @@
         }
 
         .toast.error {
-            background: #ff4757;
+            background: #dc3545;
         }
 
-        @media (max-width: 1024px) {
-            .content-grid {
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quick-action {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .quick-action .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .ai-chat-container {
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .ai-chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .ai-message {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .ai-message.user-message {
+            flex-direction: row-reverse;
+        }
+
+        .ai-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin: 0 10px;
+            flex-shrink: 0;
+        }
+
+        .ai-message:not(.user-message) .ai-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .ai-message.user-message .ai-avatar {
+            background: #28a745;
+            color: white;
+        }
+
+        .ai-text {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .ai-message.user-message .ai-text {
+            background: #007bff;
+            color: white;
+        }
+
+        .ai-input-container {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .ai-input-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            margin-right: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .ai-input-container input:focus {
+            border-color: #667eea;
+        }
+
+        .ai-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ai-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .ai-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
                 grid-template-columns: 1fr;
             }
             
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .form-grid {
-                grid-template-columns: 1fr;
+            
+            .header h1 {
+                font-size: 2rem;
             }
-        }
-
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
+            
             .modal-content {
                 margin: 10px;
                 padding: 20px;
@@ -626,41 +612,33 @@
     <div class="container">
         <div class="header">
             <h1>🍎 MyDiet</h1>
-            <p>AI와 함께하는 스마트한 건강 관리</p>
-        </div>
-
-        <div class="user-welcome">
-            <h2 id="user-welcome">안녕하세요! 👋</h2>
-            <p id="user-goal">목표를 향해 함께 달려봐요!</p>
+            <div class="user-welcome">
+                <h2 id="user-nickname-display">유저님, 안녕하세요! 👋</h2>
+                <p id="goal-message">목표 체중 65kg을 향해 함께 달려봐요!</p>
+                <button class="refresh-btn" onclick="refreshDashboard()">🔄 새로고침</button>
+            </div>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">🍽️</div>
                 <div class="stat-value" id="meal-count">0</div>
-                <div class="stat-label">오늘 섭취 칼로리</div>
-                <small id="total-calories">0 kcal</small>
+                <div class="stat-label">오늘 식단 기록</div>
             </div>
-            
             <div class="stat-card">
                 <div class="stat-icon">🏃</div>
                 <div class="stat-value" id="workout-count">0</div>
-                <div class="stat-label">오늘 운동 횟수</div>
-                <small id="burned-calories">0 kcal 소모</small>
+                <div class="stat-label">오늘 운동 기록</div>
             </div>
-            
             <div class="stat-card">
                 <div class="stat-icon">😊</div>
                 <div class="stat-value" id="emotion-count">-</div>
                 <div class="stat-label">감정 기록</div>
-                <small>오늘의 감정 상태</small>
             </div>
-            
             <div class="stat-card">
                 <div class="stat-icon">🎯</div>
                 <div class="stat-value" id="goal-achievement">0%</div>
                 <div class="stat-label">오늘 목표 달성률</div>
-                <small>계속 노력해봐요!</small>
             </div>
         </div>
 
@@ -669,30 +647,39 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
             </div>
-            <div class="progress-text" id="progress-text">목표 칼로리까지 0 kcal 남았습니다</div>
+            <div class="progress-text" id="progress-text">목표 칼로리까지 2000 kcal 남았습니다</div>
         </div>
 
-        <div class="content-grid">
-            <div class="content-card">
-                <h2>📝 오늘의 기록</h2>
+        <div class="main-grid">
+            <div class="main-content">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">📊 데이터 관리</h2>
                 
-                <h3 style="margin-top: 20px; margin-bottom: 15px; color: #667eea;">🍽️ 식단</h3>
+                <div class="section-header">
+                    <h3 class="section-title">🍽️ 오늘 식단</h3>
+                    <button class="add-btn" onclick="openMealModal()">+ 식단 추가</button>
+                </div>
                 <ul class="data-list" id="meal-list">
                     <li class="empty-state">
                         <div class="emoji">🍽️</div>
                         <p>아직 기록된 식단이 없습니다</p>
                     </li>
                 </ul>
-                
-                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">🏃 운동</h3>
+
+                <div class="section-header" style="margin-top: 30px;">
+                    <h3 class="section-title">🏃 오늘 운동</h3>
+                    <button class="add-btn" onclick="openWorkoutModal()">+ 운동 추가</button>
+                </div>
                 <ul class="data-list" id="workout-list">
                     <li class="empty-state">
                         <div class="emoji">🏃</div>
                         <p>아직 기록된 운동이 없습니다</p>
                     </li>
                 </ul>
-                
-                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #667eea;">😊 감정</h3>
+
+                <div class="section-header" style="margin-top: 30px;">
+                    <h3 class="section-title">😊 오늘 감정</h3>
+                    <button class="add-btn" onclick="openEmotionModal()">+ 감정 추가</button>
+                </div>
                 <ul class="data-list" id="emotion-list">
                     <li class="empty-state">
                         <div class="emoji">😊</div>
@@ -700,129 +687,119 @@
                     </li>
                 </ul>
             </div>
-            
-            <div class="content-card">
-                <h2>🚀 빠른 실행</h2>
-                <div class="quick-actions">
-                    <div class="quick-action" onclick="openMealModal()">
-                        <div class="icon">🍽️</div>
-                        <div>식단 기록</div>
-                    </div>
-                    <div class="quick-action" onclick="openWorkoutModal()">
-                        <div class="icon">🏃</div>
-                        <div>운동 기록</div>
-                    </div>
-                    <div class="quick-action" onclick="openEmotionModal()">
-                        <div class="icon">😊</div>
-                        <div>감정 기록</div>
-                    </div>
-                    <div class="quick-action" onclick="openProfileModal()">
-                        <div class="icon">⚙️</div>
-                        <div>설정</div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🔥 칼로리 현황</h3>
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 15px;">
+                            <strong>섭취 칼로리</strong>
+                            <div style="font-size: 1.5rem; color: #667eea;" id="total-calories">0 kcal</div>
+                        </div>
+                        <div>
+                            <strong>소모 칼로리</strong>
+                            <div style="font-size: 1.5rem; color: #28a745;" id="burned-calories">0 kcal 소모</div>
+                        </div>
                     </div>
                 </div>
 
-                <h2 style="margin-top: 30px;">🗑️ 데이터 관리</h2>
-                <div class="quick-actions">
-                    <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayMeals()">
-                        <div class="icon">🍽️</div>
-                        <div>오늘 식단<br>전체 삭제</div>
-                    </div>
-                    <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayWorkouts()">
-                        <div class="icon">🏃</div>
-                        <div>오늘 운동<br>전체 삭제</div>
-                    </div>
-                    <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayEmotions()">
-                        <div class="icon">😊</div>
-                        <div>오늘 감정<br>전체 삭제</div>
-                    </div>
-                    <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayData()">
-                        <div class="icon">🧹</div>
-                        <div>오늘 모든<br>데이터 삭제</div>
+                <div class="sidebar-card">
+                    <h3 style="text-align: center; margin-bottom: 15px;">⚙️ 설정</h3>
+                    <button class="add-btn" onclick="openProfileModal()" style="width: 100%;">프로필 수정</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h2 style="margin-bottom: 20px; color: #dc3545;">🗑️ 데이터 관리</h2>
+            <div class="quick-actions">
+                <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayMeals()">
+                    <div class="icon">🍽️</div>
+                    <div>오늘 식단<br>전체 삭제</div>
+                </div>
+                <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayWorkouts()">
+                    <div class="icon">🏃</div>
+                    <div>오늘 운동<br>전체 삭제</div>
+                </div>
+                <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayEmotions()">
+                    <div class="icon">😊</div>
+                    <div>오늘 감정<br>전체 삭제</div>
+                </div>
+                <div class="quick-action" style="background: #ffe6e6; border-color: #ffcccc;" onclick="deleteAllTodayData()">
+                    <div class="icon">🧹</div>
+                    <div>오늘 모든<br>데이터 삭제</div>
+                </div>
+            </div>
+            
+            <h2 style="margin-top: 30px;">🤖 오늘의 Claude 멘트</h2>
+            <div id="claude-response" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px; font-style: italic; color: #666;">
+                Claude의 조언을 불러오는 중...
+            </div>
+            
+            <h2 style="margin-top: 30px;">💬 Claude에게 물어보세요</h2>
+            <div class="ai-chat-container">
+                <div id="ai-chat-messages" class="ai-chat-messages">
+                    <div class="ai-message">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-text">안녕하세요! 건강 관리나 다이어트에 대해 궁금한 것이 있으면 언제든 물어보세요!</div>
                     </div>
                 </div>
-                
-                <h2 style="margin-top: 30px;">🤖 오늘의 Claude 멘트</h2>
-                <div id="claude-response" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px; font-style: italic; color: #666;">
-                    Claude의 조언을 불러오는 중...
-                </div>
-                
-                <h2 style="margin-top: 30px;">💬 Claude에게 물어보세요</h2>
-                <div style="margin-top: 15px;">
-                    <div class="ai-chat-container">
-                        <div id="ai-chat-messages" class="ai-chat-messages">
-                            <div class="ai-message">
-                                <div class="ai-avatar">🤖</div>
-                                <div class="ai-text">안녕하세요! 건강 관리나 다이어트에 대해 궁금한 것이 있으면 언제든 물어보세요!</div>
-                            </div>
-                        </div>
-                        <div class="ai-input-container">
-                            <input type="text" id="ai-question-input" placeholder="Claude에게 질문하세요... (예: 오늘 먹은 음식 어때?)" 
-                                   onkeypress="handleEnterKey(event)" />
-                            <button onclick="askClaude()" class="ai-send-btn">📤</button>
-                        </div>
-                    </div>
+                <div class="ai-input-container">
+                    <input type="text" id="ai-question-input" placeholder="Claude에게 질문하세요... (예: 오늘 먹은 음식 어때?)" onkeypress="handleEnterKey(event)">
+                    <button class="ai-send-btn" onclick="askClaude()">전송</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <button class="refresh-btn" onclick="refreshDashboard()" title="새로고침">🔄</button>
-
-    <div id="meal-modal" class="modal">
+    <div id="mealModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">🍽️ 식단 기록</h2>
                 <button class="close-btn" onclick="closeMealModal()">&times;</button>
             </div>
             <div class="form-group">
-                <label for="meal-description">음식명</label>
-                <input type="text" id="meal-description" placeholder="예: 김치볶음밥, 샐러드" required>
+                <label for="meal-description">식단 설명</label>
+                <input type="text" id="meal-description" placeholder="예: 아침 - 밥, 계란후라이, 김치" required>
             </div>
             <div class="form-group">
                 <label for="meal-calories">칼로리 (kcal)</label>
-                <input type="number" id="meal-calories" placeholder="예: 650" min="0" required>
+                <input type="number" id="meal-calories" placeholder="예: 400" min="1" required>
             </div>
             <button class="submit-btn" onclick="saveMeal()">식단 기록하기</button>
         </div>
     </div>
 
-    <div id="workout-modal" class="modal">
+    <div id="workoutModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">🏃 운동 기록</h2>
                 <button class="close-btn" onclick="closeWorkoutModal()">&times;</button>
             </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="workout-type">운동 종류</label>
-                    <select id="workout-type" required>
-                        <option value="">선택하세요</option>
-                        <option value="걷기">걷기</option>
-                        <option value="조깅">조깅</option>
-                        <option value="달리기">달리기</option>
-                        <option value="자전거">자전거</option>
-                        <option value="수영">수영</option>
-                        <option value="헬스">헬스</option>
-                        <option value="요가">요가</option>
-                        <option value="필라테스">필라테스</option>
-                        <option value="기타">기타</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="workout-duration">시간 (분)</label>
-                    <input type="number" id="workout-duration" placeholder="예: 30" min="1" required>
-                </div>
+            <div class="form-group">
+                <label for="workout-type">운동 종류</label>
+                <select id="workout-type" required>
+                    <option value="">선택하세요</option>
+                    <option value="걷기">걷기</option>
+                    <option value="조깅">조깅</option>
+                    <option value="달리기">달리기</option>
+                    <option value="자전거">자전거</option>
+                    <option value="수영">수영</option>
+                    <option value="헬스">헬스</option>
+                    <option value="요가">요가</option>
+                    <option value="필라테스">필라테스</option>
+                    <option value="기타">기타</option>
+                </select>
             </div>
             <div class="form-group">
-                <label for="workout-calories">소모 칼로리 (kcal)</label>
-                <input type="number" id="workout-calories" placeholder="예: 200" min="0" required>
+                <label for="workout-duration">시간 (분)</label>
+                <input type="number" id="workout-duration" placeholder="예: 30" min="1" required>
             </div>
             <button class="submit-btn" onclick="saveWorkout()">운동 기록하기</button>
         </div>
     </div>
 
-    <div id="emotion-modal" class="modal">
+    <div id="emotionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">😊 감정 기록</h2>
@@ -850,7 +827,7 @@
         </div>
     </div>
 
-    <div id="profile-modal" class="modal">
+    <div id="profileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">⚙️ 프로필 설정</h2>
@@ -884,133 +861,165 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        let currentData = { meals: [], workouts: [], emotions: [] };
+        let currentData = {};
 
-        async function safeApiCall(url, options = {}) {
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                askClaude();
+            }
+        }
+
+        window.addEventListener('load', function() {
+            console.log('Dashboard loading...');
+            createDefaultUser();
+            loadUserProfile();
+            loadDashboardStats();
+            loadTodayData();
+            loadClaudeResponse();
+        });
+
+        async function createDefaultUser() {
             try {
-                console.log(`API 호출: ${url}`);
-                const response = await fetch(url, options);
-                console.log(`응답 상태: ${response.status}`);
+                const response = await fetch('/api/user-check/create-default', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                console.log('Default user creation result:', result);
                 
-                if (!response.ok) {
-                    console.warn(`API 오류: ${url} - ${response.status}`);
-                    return null;
-                }
-                
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const data = await response.json();
-                    console.log(`응답 데이터:`, data);
-                    return data;
-                } else {
-                    const text = await response.text();
-                    console.log('텍스트 응답:', text);
-                    return { text: text };
+                if (result.user) {
+                    await fetch('/api/simple/echo', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({userId: result.user.id, authenticated: true})
+                    });
                 }
             } catch (error) {
-                console.error(`API 호출 에러: ${url}`, error);
-                return null;
+                console.error('Error creating default user:', error);
             }
         }
 
         async function loadUserProfile() {
-            console.log('프로필 로드 시작');
-            const profile = await safeApiCall('/api/user/profile');
-            
-            if (profile) {
-                const welcomeEl = document.getElementById('user-welcome');
-                const goalEl = document.getElementById('user-goal');
-                
-                const nickname = profile.nickname || '사용자';
-                const weightGoal = profile.weightGoal || 65;
-                
-                if (welcomeEl) welcomeEl.textContent = `안녕하세요, ${nickname}님! 👋`;
-                if (goalEl) goalEl.textContent = `목표 체중 ${weightGoal}kg을 향해 함께 달려봐요!`;
-            }
-        }
-
-        async function loadTodayData() {
-            console.log('오늘 데이터 로드 시작');
-            const data = await safeApiCall('/api/user/today-data');
-            
-            if (data && data.success) {
-                currentData = data;
-                const meals = data.meals || [];
-                const workouts = data.workouts || [];
-                const emotions = data.emotions || [];
-                
-                displayMeals(meals);
-                displayWorkouts(workouts);
-                displayEmotions(emotions);
-                updateCalorieStats(data);
-            } else {
-                displayMeals([]);
-                displayWorkouts([]);
-                displayEmotions([]);
+            try {
+                const response = await fetch('/api/user-check/get/1');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('User profile loaded:', data);
+                    
+                    const profile = data.user || data;
+                    const nicknameEl = document.getElementById('user-nickname-display');
+                    const goalEl = document.getElementById('goal-message');
+                    
+                    if (nicknameEl && profile.nickname) {
+                        nicknameEl.textContent = `${profile.nickname}님, 안녕하세요! 👋`;
+                    }
+                    
+                    if (goalEl && profile.weightGoal) {
+                        goalEl.textContent = `목표 체중 ${profile.weightGoal}kg을 향해 함께 달려봐요!`;
+                    }
+                } else {
+                    console.log('User not found, using default display');
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
             }
         }
 
         async function loadDashboardStats() {
-            console.log('통계 로드 시작');
-            const stats = await safeApiCall('/api/user/stats');
-            
-            if (stats && stats.success) {
-                const todayStats = stats.stats.today || {};
-                
-                const mealCountEl = document.getElementById('meal-count');
-                const workoutCountEl = document.getElementById('workout-count');
-                const emotionCountEl = document.getElementById('emotion-count');
-                
-                if (mealCountEl) mealCountEl.textContent = todayStats.meals || 0;
-                if (workoutCountEl) workoutCountEl.textContent = todayStats.workouts || 0;
-                if (emotionCountEl) emotionCountEl.textContent = todayStats.emotions > 0 ? '😊' : '-';
-            }
-        }
-
-        function updateCalorieStats(data) {
-            const totalCaloriesEl = document.getElementById('total-calories');
-            const burnedCaloriesEl = document.getElementById('burned-calories');
-            const progressFill = document.getElementById('progress-fill');
-            const progressText = document.getElementById('progress-text');
-            const goalAchievementEl = document.getElementById('goal-achievement');
-            
-            const totalCalories = data.totalCaloriesConsumed || 0;
-            const burnedCalories = data.totalCaloriesBurned || 0;
-            
-            if (totalCaloriesEl) totalCaloriesEl.textContent = `${totalCalories} kcal`;
-            if (burnedCaloriesEl) burnedCaloriesEl.textContent = `${burnedCalories} kcal 소모`;
-            
-            if (progressFill && progressText && goalAchievementEl) {
-                const goalCalories = 2000;
-                const achievement = Math.min(100, (totalCalories / goalCalories) * 100);
-                
-                progressFill.style.width = achievement + '%';
-                goalAchievementEl.textContent = Math.round(achievement) + '%';
-                
-                const remaining = Math.max(0, goalCalories - totalCalories);
-                if (remaining > 0) {
-                    progressText.textContent = `목표 칼로리까지 ${remaining} kcal 남았습니다`;
-                } else {
-                    progressText.textContent = '목표 달성! 🎉';
-                }
-            }
-        }
-
-        async function loadClaudeResponse() {
             try {
-                const response = await fetch('/api/claude/message?userId=1');
-                const claudeResponseEl = document.getElementById('claude-response');
-                
+                const response = await fetch('/api/debug/all-data');
                 if (response.ok) {
-                    const text = await response.text();
-                    claudeResponseEl.textContent = text;
+                    const data = await response.json();
+                    console.log('All data loaded:', data);
+                    
+                    const today = new Date().toISOString().split('T')[0];
+                    const mealCount = data.meals ? data.meals.filter(meal => meal.date === today).length : 0;
+                    const workoutCount = data.workouts ? data.workouts.filter(workout => workout.date === today).length : 0;
+                    const emotionCount = data.emotions ? data.emotions.filter(emotion => emotion.date === today).length : 0;
+                    
+                    document.getElementById('meal-count').textContent = mealCount;
+                    document.getElementById('workout-count').textContent = workoutCount;
+                    document.getElementById('emotion-count').textContent = emotionCount;
+                    
+                    const achievement = Math.min(100, Math.round((mealCount + workoutCount + emotionCount) * 15));
+                    document.getElementById('goal-achievement').textContent = achievement + '%';
+                    
+                    const progressFill = document.getElementById('progress-fill');
+                    const progressText = document.getElementById('progress-text');
+                    
+                    progressFill.style.width = achievement + '%';
+                    
+                    if (achievement >= 100) {
+                        progressText.textContent = '목표 달성! 🎉';
+                    } else {
+                        progressText.textContent = `목표까지 ${100 - achievement}% 남았습니다`;
+                    }
+
+                    const totalCalories = data.meals ? data.meals
+                        .filter(meal => meal.date === today)
+                        .reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0) : 0;
+                    const totalBurned = data.workouts ? data.workouts
+                        .filter(workout => workout.date === today)
+                        .reduce((sum, workout) => sum + (workout.caloriesBurned || 0), 0) : 0;
+                    
+                    document.getElementById('total-calories').textContent = totalCalories + ' kcal';
+                    document.getElementById('burned-calories').textContent = totalBurned + ' kcal 소모';
                 } else {
-                    claudeResponseEl.textContent = 'Claude의 조언을 불러올 수 없습니다.';
+                    console.log('Stats not available, using default values');
                 }
             } catch (error) {
-                console.error('Claude 응답 로드 에러:', error);
-                document.getElementById('claude-response').textContent = 'Claude의 조언을 불러올 수 없습니다.';
+                console.error('Error loading dashboard stats:', error);
             }
+        }
+
+        async function loadTodayData() {
+            try {
+                const response = await fetch('/api/debug/all-data');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Today data loaded:', data);
+                    
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayMeals = data.meals ? data.meals.filter(meal => meal.date === today) : [];
+                    const todayWorkouts = data.workouts ? data.workouts.filter(workout => workout.date === today) : [];
+                    const todayEmotions = data.emotions ? data.emotions.filter(emotion => emotion.date === today) : [];
+                    
+                    displayMeals(todayMeals);
+                    displayWorkouts(todayWorkouts);
+                    displayEmotions(todayEmotions);
+                    
+                    currentData = {
+                        meals: todayMeals,
+                        workouts: todayWorkouts,
+                        emotions: todayEmotions
+                    };
+                } else {
+                    displayEmptyStates();
+                }
+            } catch (error) {
+                console.error('Error loading today data:', error);
+                displayEmptyStates();
+            }
+        }
+
+        function displayEmptyStates() {
+            document.getElementById('meal-list').innerHTML = `
+                <li class="empty-state">
+                    <div class="emoji">🍽️</div>
+                    <p>아직 기록된 식단이 없습니다</p>
+                </li>
+            `;
+            document.getElementById('workout-list').innerHTML = `
+                <li class="empty-state">
+                    <div class="emoji">🏃</div>
+                    <p>아직 기록된 운동이 없습니다</p>
+                </li>
+            `;
+            document.getElementById('emotion-list').innerHTML = `
+                <li class="empty-state">
+                    <div class="emoji">😊</div>
+                    <p>아직 기록된 감정이 없습니다</p>
+                </li>
+            `;
         }
 
         function displayMeals(meals) {
@@ -1032,7 +1041,7 @@
                         <h4>${meal.description || '식단'}</h4>
                         <p>칼로리: ${meal.caloriesEstimate || 0} kcal</p>
                     </div>
-                    <button class="delete-btn" onclick="deleteMeal(${meal.id})">삭제</button>
+                    <button class="delete-btn" onclick="showToast('삭제 기능 준비 중입니다')">삭제</button>
                 </li>
             `).join('');
         }
@@ -1056,7 +1065,7 @@
                         <h4>${workout.type || '운동'}</h4>
                         <p>${workout.duration || 0}분 | ${workout.caloriesBurned || 0} kcal 소모</p>
                     </div>
-                    <button class="delete-btn" onclick="deleteWorkout(${workout.id})">삭제</button>
+                    <button class="delete-btn" onclick="showToast('삭제 기능 준비 중입니다')">삭제</button>
                 </li>
             `).join('');
         }
@@ -1080,124 +1089,142 @@
                         <h4>${emotion.mood || '기분'}</h4>
                         <p>${emotion.note || '메모 없음'}</p>
                     </div>
-                    <button class="delete-btn" onclick="deleteEmotion(${emotion.id})">삭제</button>
+                    <button class="delete-btn" onclick="showToast('삭제 기능 준비 중입니다')">삭제</button>
                 </li>
             `).join('');
         }
 
-        async function refreshDashboard() {
-            console.log('대시보드 새로고침');
-            const refreshBtn = document.querySelector('.refresh-btn');
-            if (refreshBtn) refreshBtn.innerHTML = '<div class="loading"></div>';
-            
+        async function loadClaudeResponse() {
             try {
-                await Promise.allSettled([
-                    loadUserProfile(),
-                    loadDashboardStats(),
-                    loadTodayData(),
-                    loadClaudeResponse()
-                ]);
-                showToast('대시보드를 새로고침했습니다! 🔄');
+                const response = await fetch('/api/test/simple');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('claude-response').innerHTML = 
+                        '오늘도 건강한 하루 보내세요! 꾸준한 노력이 성공의 열쇠입니다. 💪';
+                } else {
+                    document.getElementById('claude-response').innerHTML = '건강한 하루 보내세요! 💪';
+                }
             } catch (error) {
-                console.error('새로고침 에러:', error);
-                showToast('일부 데이터 로드에 실패했습니다', 'error');
-            } finally {
-                if (refreshBtn) refreshBtn.innerHTML = '🔄';
+                console.error('Error loading Claude response:', error);
+                document.getElementById('claude-response').innerHTML = '건강한 하루 보내세요! 💪';
             }
         }
 
         function openMealModal() {
-            document.getElementById('meal-modal').classList.add('show');
+            const modal = document.getElementById('mealModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
         }
 
         function closeMealModal() {
-            document.getElementById('meal-modal').classList.remove('show');
-            clearMealForm();
+            const modal = document.getElementById('mealModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                document.getElementById('meal-description').value = '';
+                document.getElementById('meal-calories').value = '';
+            }
         }
 
         function openWorkoutModal() {
-            document.getElementById('workout-modal').classList.add('show');
+            const modal = document.getElementById('workoutModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
         }
 
         function closeWorkoutModal() {
-            document.getElementById('workout-modal').classList.remove('show');
-            clearWorkoutForm();
+            const modal = document.getElementById('workoutModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                document.getElementById('workout-type').value = '';
+                document.getElementById('workout-duration').value = '';
+            }
         }
 
         function openEmotionModal() {
-            document.getElementById('emotion-modal').classList.add('show');
+            const modal = document.getElementById('emotionModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
         }
 
         function closeEmotionModal() {
-            document.getElementById('emotion-modal').classList.remove('show');
-            clearEmotionForm();
+            const modal = document.getElementById('emotionModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                document.getElementById('emotion-mood').value = '';
+                document.getElementById('emotion-note').value = '';
+            }
         }
 
         function openProfileModal() {
             loadCurrentProfile();
-            document.getElementById('profile-modal').classList.add('show');
+            const modal = document.getElementById('profileModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
         }
 
         function closeProfileModal() {
-            document.getElementById('profile-modal').classList.remove('show');
-        }
-
-        function closeAllModals() {
-            document.querySelectorAll('.modal').forEach(modal => {
+            const modal = document.getElementById('profileModal');
+            if (modal) {
                 modal.classList.remove('show');
-            });
-        }
-
-        function clearMealForm() {
-            document.getElementById('meal-description').value = '';
-            document.getElementById('meal-calories').value = '';
-        }
-
-        function clearWorkoutForm() {
-            document.getElementById('workout-type').value = '';
-            document.getElementById('workout-duration').value = '';
-            document.getElementById('workout-calories').value = '';
-        }
-
-        function clearEmotionForm() {
-            document.getElementById('emotion-mood').value = '';
-            document.getElementById('emotion-note').value = '';
-        }
-
-        function calculateWorkoutCalories() {
-            const type = document.getElementById('workout-type').value;
-            const duration = parseInt(document.getElementById('workout-duration').value) || 0;
-            
-            const caloriesPerMinute = {
-                '걷기': 3.5, '조깅': 7, '달리기': 10, '자전거': 6, '수영': 8,
-                '헬스': 5, '요가': 2.5, '필라테스': 3, '기타': 4
-            };
-            
-            if (type && duration > 0) {
-                const calories = Math.round(duration * (caloriesPerMinute[type] || 4));
-                document.getElementById('workout-calories').value = calories;
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
             }
         }
+
+        window.onclick = function(event) {
+            const modals = ['mealModal', 'workoutModal', 'emotionModal', 'profileModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && event.target === modal) {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
+                }
+            });
+        };
 
         async function saveMeal() {
             const description = document.getElementById('meal-description').value.trim();
             const calories = parseInt(document.getElementById('meal-calories').value) || 0;
             
             if (!description) {
-                showToast('음식명을 입력해주세요', 'error');
+                showToast('식단 설명을 입력해주세요', 'error');
                 return;
             }
             
             if (calories <= 0) {
-                showToast('칼로리를 입력해주세요', 'error');
+                showToast('칼로리를 정확히 입력해주세요', 'error');
                 return;
             }
 
             try {
-                const response = await fetch('/api/save/meal', {
+                const response = await fetch('/api/debug/test-meal', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ description, caloriesEstimate: calories })
+                    body: JSON.stringify({
+                        userId: 1,
+                        description: description,
+                        caloriesEstimate: calories
+                    })
                 });
 
                 const result = await response.json();
@@ -1205,9 +1232,11 @@
                 if (result.success) {
                     showToast('식단이 기록되었습니다! 🍽️');
                     closeMealModal();
-                    refreshDashboard();
+                    setTimeout(() => {
+                        refreshDashboard();
+                    }, 1000);
                 } else {
-                    showToast('저장에 실패했습니다: ' + result.error, 'error');
+                    showToast('저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
                 showToast('네트워크 오류가 발생했습니다', 'error');
@@ -1218,7 +1247,6 @@
         async function saveWorkout() {
             const type = document.getElementById('workout-type').value;
             const duration = parseInt(document.getElementById('workout-duration').value) || 0;
-            const calories = parseInt(document.getElementById('workout-calories').value) || 0;
             
             if (!type) {
                 showToast('운동 종류를 선택해주세요', 'error');
@@ -1226,15 +1254,22 @@
             }
             
             if (duration <= 0) {
-                showToast('운동 시간을 입력해주세요', 'error');
+                showToast('운동 시간을 정확히 입력해주세요', 'error');
                 return;
             }
 
+            const caloriesBurned = Math.round(duration * 5);
+
             try {
-                const response = await fetch('/api/save/workout', {
+                const response = await fetch('/api/debug/test-workout', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type, duration, caloriesBurned: calories })
+                    body: JSON.stringify({
+                        userId: 1,
+                        type: type,
+                        duration: duration,
+                        caloriesBurned: caloriesBurned
+                    })
                 });
 
                 const result = await response.json();
@@ -1242,9 +1277,11 @@
                 if (result.success) {
                     showToast('운동이 기록되었습니다! 🏃');
                     closeWorkoutModal();
-                    refreshDashboard();
+                    setTimeout(() => {
+                        refreshDashboard();
+                    }, 1000);
                 } else {
-                    showToast('저장에 실패했습니다: ' + result.error, 'error');
+                    showToast('저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
                 showToast('네트워크 오류가 발생했습니다', 'error');
@@ -1257,15 +1294,19 @@
             const note = document.getElementById('emotion-note').value.trim();
             
             if (!mood) {
-                showToast('감정 상태를 선택해주세요', 'error');
+                showToast('기분을 선택해주세요', 'error');
                 return;
             }
 
             try {
-                const response = await fetch('/api/save/emotion', {
+                const response = await fetch('/api/debug/test-emotion', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ mood, note: note || '' })
+                    body: JSON.stringify({
+                        userId: 1,
+                        mood: mood,
+                        note: note
+                    })
                 });
 
                 const result = await response.json();
@@ -1273,9 +1314,11 @@
                 if (result.success) {
                     showToast('감정이 기록되었습니다! 😊');
                     closeEmotionModal();
-                    refreshDashboard();
+                    setTimeout(() => {
+                        refreshDashboard();
+                    }, 1000);
                 } else {
-                    showToast('저장에 실패했습니다: ' + result.error, 'error');
+                    showToast('저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
                 showToast('네트워크 오류가 발생했습니다', 'error');
@@ -1300,20 +1343,27 @@
             }
 
             try {
-                const response = await fetch('/api/user/profile', {
+                const response = await fetch('/api/debug/test-profile', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ nickname, email, weightGoal, emotionMode })
+                    body: JSON.stringify({
+                        userId: 1,
+                        nickname: nickname,
+                        email: email,
+                        weightGoal: weightGoal,
+                        emotionMode: emotionMode
+                    })
                 });
 
-                const result = await response.json();
-                
-                if (result.success) {
+                if (response.ok) {
+                    const result = await response.json();
                     showToast('프로필이 업데이트되었습니다! ⚙️');
                     closeProfileModal();
-                    refreshDashboard();
+                    setTimeout(() => {
+                        refreshDashboard();
+                    }, 1000);
                 } else {
-                    showToast('저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
+                    showToast('저장에 실패했습니다', 'error');
                 }
             } catch (error) {
                 showToast('네트워크 오류가 발생했습니다', 'error');
@@ -1323,9 +1373,10 @@
 
         async function loadCurrentProfile() {
             try {
-                const response = await fetch('/api/user/profile');
+                const response = await fetch('/api/user-check/get/1');
                 if (response.ok) {
-                    const profile = await response.json();
+                    const data = await response.json();
+                    const profile = data.user || data;
                     
                     document.getElementById('user-nickname').value = profile.nickname || '';
                     document.getElementById('user-email').value = profile.email || '';
@@ -1333,186 +1384,34 @@
                     document.getElementById('emotion-mode').value = profile.emotionMode || '다정함';
                 }
             } catch (error) {
-                console.error('프로필 로드 에러:', error);
+                console.error('Error loading profile:', error);
             }
         }
 
-        async function deleteAllTodayMeals() {
-            const mealCount = currentData.meals ? currentData.meals.length : 0;
-            
-            if (mealCount === 0) {
-                showToast('삭제할 식단이 없습니다', 'error');
-                return;
-            }
-            
-            const confirmed = confirm(`오늘의 모든 식단 ${mealCount}개를 삭제하시겠습니까?`);
-            if (!confirmed) return;
-            
-            try {
-                const response = await fetch('/api/delete/meals/today', { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(`오늘의 식단 ${result.deletedCount}개가 삭제되었습니다 🍽️`);
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
+        function deleteAllTodayMeals() {
+            showToast('식단 삭제 기능은 준비 중입니다', 'error');
         }
 
-        async function deleteAllTodayWorkouts() {
-            const workoutCount = currentData.workouts ? currentData.workouts.length : 0;
-            
-            if (workoutCount === 0) {
-                showToast('삭제할 운동이 없습니다', 'error');
-                return;
-            }
-            
-            const confirmed = confirm(`오늘의 모든 운동 ${workoutCount}개를 삭제하시겠습니까?`);
-            if (!confirmed) return;
-            
-            try {
-                const response = await fetch('/api/delete/workouts/today', { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(`오늘의 운동 ${result.deletedCount}개가 삭제되었습니다 🏃`);
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
+        function deleteAllTodayWorkouts() {
+            showToast('운동 삭제 기능은 준비 중입니다', 'error');
         }
 
-        async function deleteAllTodayEmotions() {
-            const emotionCount = currentData.emotions ? currentData.emotions.length : 0;
-            
-            if (emotionCount === 0) {
-                showToast('삭제할 감정이 없습니다', 'error');
-                return;
-            }
-            
-            const confirmed = confirm(`오늘의 모든 감정 기록 ${emotionCount}개를 삭제하시겠습니까?`);
-            if (!confirmed) return;
-            
-            try {
-                const response = await fetch('/api/delete/emotions/today', { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(`오늘의 감정 ${result.deletedCount}개가 삭제되었습니다 😊`);
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
+        function deleteAllTodayEmotions() {
+            showToast('감정 삭제 기능은 준비 중입니다', 'error');
         }
 
-        async function deleteAllTodayData() {
-            const mealCount = currentData.meals ? currentData.meals.length : 0;
-            const workoutCount = currentData.workouts ? currentData.workouts.length : 0;
-            const emotionCount = currentData.emotions ? currentData.emotions.length : 0;
-            const totalCount = mealCount + workoutCount + emotionCount;
-            
-            if (totalCount === 0) {
-                showToast('삭제할 데이터가 없습니다', 'error');
-                return;
-            }
-            
-            const confirmed = confirm(`오늘의 모든 데이터 ${totalCount}개를 삭제하시겠습니까?`);
-            if (!confirmed) return;
-            
-            try {
-                const response = await fetch('/api/delete/all/today', { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(`오늘의 모든 데이터 ${result.deletedCount}개가 삭제되었습니다 🧹`);
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다: ' + result.message, 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
-        }
-
-        async function deleteMeal(id) {
-            if (!confirm('이 식단을 삭제하시겠습니까?')) return;
-            
-            try {
-                const response = await fetch(`/api/delete/meal/${id}`, { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('식단이 삭제되었습니다');
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다', 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-            }
-        }
-
-        async function deleteWorkout(id) {
-            if (!confirm('이 운동을 삭제하시겠습니까?')) return;
-            
-            try {
-                const response = await fetch(`/api/delete/workout/${id}`, { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('운동이 삭제되었습니다');
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다', 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-            }
-        }
-
-        async function deleteEmotion(id) {
-            if (!confirm('이 감정을 삭제하시겠습니까?')) return;
-            
-            try {
-                const response = await fetch(`/api/delete/emotion/${id}`, { method: 'DELETE' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast('감정이 삭제되었습니다');
-                    refreshDashboard();
-                } else {
-                    showToast('삭제에 실패했습니다', 'error');
-                }
-            } catch (error) {
-                showToast('네트워크 오류가 발생했습니다', 'error');
-            }
-        }
-
-        function handleEnterKey(event) {
-            if (event.key === 'Enter') {
-                askClaude();
-            }
+        function deleteAllTodayData() {
+            showToast('데이터 삭제 기능은 준비 중입니다', 'error');
         }
 
         async function askClaude() {
             const input = document.getElementById('ai-question-input');
             const question = input.value.trim();
             
-            if (!question) return;
+            if (!question) {
+                showToast('질문을 입력해주세요', 'error');
+                return;
+            }
             
             addMessage(question, 'user');
             input.value = '';
@@ -1525,22 +1424,26 @@
             try {
                 const response = await fetch('/api/chat/ask', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question, userId: 1 })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: question})
                 });
                 
+                hideTypingIndicator();
+                
                 if (response.ok) {
-                    const data = await response.json();
-                    hideTypingIndicator();
-                    addMessage(data.answer || '죄송합니다. 응답을 생성할 수 없습니다.', 'ai');
+                    const result = await response.json();
+                    if (result.answer) {
+                        addMessage(result.answer, 'ai');
+                    } else {
+                        addMessage('죄송합니다. 답변을 생성하는데 문제가 발생했습니다.', 'ai');
+                    }
                 } else {
-                    hideTypingIndicator();
-                    addMessage('죄송합니다. 현재 응답을 생성할 수 없습니다.', 'ai');
+                    addMessage('현재 AI 서비스가 준비 중입니다. 조금만 기다려주세요!', 'ai');
                 }
             } catch (error) {
-                console.error('Claude 채팅 에러:', error);
                 hideTypingIndicator();
-                addMessage('오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'ai');
+                addMessage('현재 AI 서비스가 준비 중입니다. 조금만 기다려주세요!', 'ai');
+                console.error('Error asking Claude:', error);
             } finally {
                 sendBtn.disabled = false;
             }
@@ -1601,35 +1504,25 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function initializeDashboard() {
-            console.log('대시보드 초기화');
+        async function refreshDashboard() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            const originalText = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<div class="loading"></div>';
             
-            document.getElementById('workout-type').addEventListener('change', calculateWorkoutCalories);
-            document.getElementById('workout-duration').addEventListener('input', calculateWorkoutCalories);
-            
-            window.addEventListener('click', function(event) {
-                if (event.target.classList.contains('modal')) {
-                    closeAllModals();
-                }
-            });
-            
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    closeAllModals();
-                }
-            });
-            
-            refreshDashboard();
-            
-            setInterval(() => {
-                refreshDashboard();
-            }, 30000);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeDashboard);
-        } else {
-            initializeDashboard();
+            try {
+                await Promise.all([
+                    loadUserProfile(),
+                    loadDashboardStats(),
+                    loadTodayData(),
+                    loadClaudeResponse()
+                ]);
+                
+                console.log('Dashboard refreshed successfully');
+            } catch (error) {
+                console.error('Error refreshing dashboard:', error);
+            } finally {
+                refreshBtn.innerHTML = originalText;
+            }
         }
     </script>
 </body>
