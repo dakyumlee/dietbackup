@@ -1059,6 +1059,7 @@
                     showToast('감정이 기록되었습니다! 😊');
                     closeEmotionModal();
                     
+                    // 실시간 업데이트
                     if (!currentData.emotions) currentData.emotions = [];
                     currentData.emotions.push({
                         id: result.emotion.id,
@@ -1312,6 +1313,15 @@
 
             input.value = '';
             
+            const loadingId = 'loading-' + Date.now();
+            chatContainer.innerHTML += `
+                <div class="ai-message" id="${loadingId}">
+                    <strong>Claude:</strong> 생각 중...
+                </div>
+            `;
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
             try {
                 const response = await fetch('/api/chat/ask', {
                     method: 'POST',
@@ -1320,11 +1330,18 @@
                 });
 
                 const result = await response.json();
+                console.log('AI 응답:', result);
                 
-                if (result.response) {
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                
+                if (result.response || result.answer) {
+                    const aiResponse = result.response || result.answer;
                     chatContainer.innerHTML += `
                         <div class="ai-message">
-                            <strong>Claude:</strong> ${result.response}
+                            <strong>Claude:</strong> ${aiResponse}
                         </div>
                     `;
                 } else {
@@ -1339,11 +1356,19 @@
                 
             } catch (error) {
                 console.error('Error sending message:', error);
+                
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                
                 chatContainer.innerHTML += `
                     <div class="ai-message">
                         <strong>Claude:</strong> 네트워크 오류가 발생했습니다.
                     </div>
                 `;
+                
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
 
