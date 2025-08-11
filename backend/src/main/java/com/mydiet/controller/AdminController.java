@@ -5,6 +5,7 @@ import com.mydiet.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,6 +70,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{userId}")
+    @Transactional
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long userId) {
         log.info("=== 관리자 사용자 삭제 요청: userId={} ===", userId);
         
@@ -83,16 +85,25 @@ public class AdminController {
 
             log.info("사용자 관련 데이터 삭제 시작: userId={}", userId);
             
-            int deletedMeals = mealLogRepository.findByUserId(userId).size();
-            mealLogRepository.deleteByUserId(userId);
+            List<com.mydiet.model.MealLog> meals = mealLogRepository.findByUserId(userId);
+            int deletedMeals = meals.size();
+            for (com.mydiet.model.MealLog meal : meals) {
+                mealLogRepository.delete(meal);
+            }
             log.info("식단 기록 {}개 삭제", deletedMeals);
             
-            int deletedWorkouts = workoutLogRepository.findByUserId(userId).size();
-            workoutLogRepository.deleteByUserId(userId);
+            List<com.mydiet.model.WorkoutLog> workouts = workoutLogRepository.findByUserId(userId);
+            int deletedWorkouts = workouts.size();
+            for (com.mydiet.model.WorkoutLog workout : workouts) {
+                workoutLogRepository.delete(workout);
+            }
             log.info("운동 기록 {}개 삭제", deletedWorkouts);
             
-            int deletedEmotions = emotionLogRepository.findByUserId(userId).size();
-            emotionLogRepository.deleteByUserId(userId);
+            List<com.mydiet.model.EmotionLog> emotions = emotionLogRepository.findByUserId(userId);
+            int deletedEmotions = emotions.size();
+            for (com.mydiet.model.EmotionLog emotion : emotions) {
+                emotionLogRepository.delete(emotion);
+            }
             log.info("감정 기록 {}개 삭제", deletedEmotions);
             
             userRepository.deleteById(userId);
