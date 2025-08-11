@@ -37,25 +37,25 @@ public class MealService {
         return mealLogRepository.findByUserIdAndDate(userId, LocalDate.now());
     }
 
-    public List<MealLog> getMealsByDate(Long userId, LocalDate date) {
-        return mealLogRepository.findByUserIdAndDate(userId, date);
-    }
-
     public List<MealLog> getRecentMeals(Long userId, int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
-        return mealLogRepository.findRecentMealsByUser(userId, startDate);
+        return mealLogRepository.findByUserId(userId).stream()
+            .filter(meal -> !meal.getDate().isBefore(startDate))
+            .toList();
     }
 
-    public Integer getTotalCaloriesToday(Long userId) {
-        Long calories = mealLogRepository.getTotalCaloriesByUserAndDate(userId, LocalDate.now());
-        return calories != null ? calories.intValue() : 0;
+    public long getTodayTotalCalories(Long userId) {
+        return mealLogRepository.findByUserIdAndDate(userId, LocalDate.now()).stream()
+            .mapToLong(meal -> meal.getCaloriesEstimate() != null ? meal.getCaloriesEstimate() : 0)
+            .sum();
     }
 
     public long getTodayMealCount(Long userId) {
-        return mealLogRepository.countMealsByUserAndDate(userId, LocalDate.now());
+        return mealLogRepository.findByUserIdAndDate(userId, LocalDate.now()).size();
     }
 
     public void deleteTodayMeals(Long userId) {
-        mealLogRepository.deleteByUserIdAndDate(userId, LocalDate.now());
+        List<MealLog> todayMeals = mealLogRepository.findByUserIdAndDate(userId, LocalDate.now());
+        mealLogRepository.deleteAll(todayMeals);
     }
 }

@@ -38,6 +38,12 @@ public class SecurityConfig {
                 .antMatchers("/", "/index.html", "/auth.html", 
                     "/api/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/api/test/**", "/api/auth/check", "/api/debug/**").permitAll()
+                .antMatchers("/dashboard.html").permitAll()
+                .antMatchers("/api/user/**").permitAll()
+                .antMatchers("/api/claude/**").permitAll()
+                .antMatchers("/api/data/**").permitAll()
+                .antMatchers("/api/delete/**").permitAll()
+                .antMatchers("/api/ai/**").permitAll()
                 .antMatchers("/admin/**", "/api/admin/**", "/admin-dashboard.html").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()

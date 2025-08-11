@@ -26,7 +26,6 @@ public class WorkoutService {
             .user(user)
             .type(request.getType())
             .duration(request.getDuration())
-            .intensity(request.getIntensity())
             .caloriesBurned(request.getCaloriesBurned())
             .date(request.getDate() != null ? request.getDate() : LocalDate.now())
             .build();
@@ -38,30 +37,31 @@ public class WorkoutService {
         return workoutLogRepository.findByUserIdAndDate(userId, LocalDate.now());
     }
 
-    public List<WorkoutLog> getWorkoutsByDate(Long userId, LocalDate date) {
-        return workoutLogRepository.findByUserIdAndDate(userId, date);
-    }
-
     public List<WorkoutLog> getRecentWorkouts(Long userId, int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
-        return workoutLogRepository.findRecentWorkoutsByUser(userId, startDate);
+        return workoutLogRepository.findByUserId(userId).stream()
+            .filter(workout -> !workout.getDate().isBefore(startDate))
+            .toList();
     }
 
-    public Integer getTotalDurationToday(Long userId) {
-        Long duration = workoutLogRepository.getTotalDurationByUserAndDate(userId, LocalDate.now());
-        return duration != null ? duration.intValue() : 0;
+    public long getTodayTotalDuration(Long userId) {
+        return workoutLogRepository.findByUserIdAndDate(userId, LocalDate.now()).stream()
+            .mapToLong(workout -> workout.getDuration() != null ? workout.getDuration() : 0)
+            .sum();
     }
 
-    public Integer getTotalCaloriesBurnedToday(Long userId) {
-        Long calories = workoutLogRepository.getTotalCaloriesBurnedByUserAndDate(userId, LocalDate.now());
-        return calories != null ? calories.intValue() : 0;
+    public long getTodayCaloriesBurned(Long userId) {
+        return workoutLogRepository.findByUserIdAndDate(userId, LocalDate.now()).stream()
+            .mapToLong(workout -> workout.getCaloriesBurned() != null ? workout.getCaloriesBurned() : 0)
+            .sum();
     }
 
     public long getTodayWorkoutCount(Long userId) {
-        return workoutLogRepository.countWorkoutsByUserAndDate(userId, LocalDate.now());
+        return workoutLogRepository.findByUserIdAndDate(userId, LocalDate.now()).size();
     }
 
     public void deleteTodayWorkouts(Long userId) {
-        workoutLogRepository.deleteByUserIdAndDate(userId, LocalDate.now());
+        List<WorkoutLog> todayWorkouts = workoutLogRepository.findByUserIdAndDate(userId, LocalDate.now());
+        workoutLogRepository.deleteAll(todayWorkouts);
     }
 }

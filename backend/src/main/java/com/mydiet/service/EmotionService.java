@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,6 @@ public class EmotionService {
             .user(user)
             .mood(request.getMood())
             .note(request.getNote())
-            .stressLevel(request.getStressLevel())
             .date(request.getDate() != null ? request.getDate() : LocalDate.now())
             .build();
 
@@ -38,30 +36,24 @@ public class EmotionService {
         return emotionLogRepository.findByUserIdAndDate(userId, LocalDate.now());
     }
 
-    public Optional<EmotionLog> getLatestEmotion(Long userId) {
-        List<EmotionLog> emotions = emotionLogRepository.findTopByUserIdAndDateOrderByCreatedAtDesc(userId, LocalDate.now());
-        return emotions.isEmpty() ? Optional.empty() : Optional.of(emotions.get(0));
-    }
-
-    public List<EmotionLog> getEmotionsByDate(Long userId, LocalDate date) {
-        return emotionLogRepository.findByUserIdAndDate(userId, date);
+    public List<EmotionLog> getLatestEmotion(Long userId) {
+        List<EmotionLog> emotions = emotionLogRepository.findByUserIdAndDate(userId, LocalDate.now());
+        return emotions.isEmpty() ? List.of() : emotions.subList(0, Math.min(1, emotions.size()));
     }
 
     public List<EmotionLog> getRecentEmotions(Long userId, int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
-        return emotionLogRepository.findRecentEmotionsByUser(userId, startDate);
+        return emotionLogRepository.findByUserId(userId).stream()
+            .filter(emotion -> !emotion.getDate().isBefore(startDate))
+            .toList();
     }
 
     public long getTodayEmotionCount(Long userId) {
-        return emotionLogRepository.countEmotionsByUserAndDate(userId, LocalDate.now());
-    }
-
-    public Double getAverageStressLevel(Long userId, int days) {
-        LocalDate startDate = LocalDate.now().minusDays(days);
-        return emotionLogRepository.getAverageStressLevel(userId, startDate, LocalDate.now());
+        return emotionLogRepository.findByUserIdAndDate(userId, LocalDate.now()).size();
     }
 
     public void deleteTodayEmotions(Long userId) {
-        emotionLogRepository.deleteByUserIdAndDate(userId, LocalDate.now());
+        List<EmotionLog> todayEmotions = emotionLogRepository.findByUserIdAndDate(userId, LocalDate.now());
+        emotionLogRepository.deleteAll(todayEmotions);
     }
 }
