@@ -1,58 +1,66 @@
 package com.mydiet.service;
 
-import com.mydiet.model.Role;
 import com.mydiet.model.User;
 import com.mydiet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
 
-    public User createDefaultUser() {
-        log.info("기본 사용자 생성 시작");
-        
-        User user = User.builder()
-            .nickname("기본 사용자")
-            .email("default@mydiet.com")
-            .role(Role.USER)
-            .emotionMode("다정함")
-            .weightGoal(70.0)
-            .provider("LOCAL")
-            .createdAt(LocalDateTime.now())
-            .build();
-        
-        User saved = userRepository.save(user);
-        log.info("기본 사용자 생성 완료: {}", saved.getEmail());
-        
-        return saved;
-    }
-
+    @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public User save(User user) {
+    @Transactional(readOnly = true)
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Transactional
+    public User createUser(User user) {
         return userRepository.save(user);
     }
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    @Transactional
+    public void deleteUser(Long userId) {
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+            log.info("사용자 삭제 완료: userId={}", userId);
+        } else {
+            throw new RuntimeException("사용자를 찾을 수 없습니다: " + userId);
+        }
     }
 
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
+    @Transactional
+    public User updateUserRole(Long userId, String newRole) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + userId));
+        
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+        log.info("사용자 역할 변경: userId={}, newRole={}", userId, newRole);
+        
+        return updatedUser;
     }
 
-    public long count() {
+    @Transactional(readOnly = true)
+    public long getTotalUserCount() {
         return userRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findUsersByRole(String role) {
+        return userRepository.findByRole(role);
     }
 }

@@ -1,6 +1,5 @@
 package com.mydiet.service;
 
-import com.mydiet.model.Role;
 import com.mydiet.model.User;
 import com.mydiet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,22 +29,15 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
  
-        try {
-            String email = extractEmail(oauth2User, registrationId);
-            String nickname = extractNickname(oauth2User, registrationId);
-            String providerId = oauth2User.getAttribute(userNameAttributeName).toString();
-            
-            log.info("OAuth2 로그인 시도: email={}, provider={}", email, registrationId);
-     
-            User user = userRepository.findByEmail(email)
-                .map(existingUser -> updateExistingUser(existingUser, nickname, providerId, registrationId))
-                .orElse(createNewUser(email, nickname, providerId, registrationId));
-     
-            return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), userNameAttributeName);
-        } catch (Exception e) {
-            log.error("OAuth2 사용자 로드 실패", e);
-            throw new OAuth2AuthenticationException("OAuth2 사용자 로드 실패: " + e.getMessage());
-        }
+        String email = extractEmail(oauth2User, registrationId);
+        String nickname = extractNickname(oauth2User, registrationId);
+        String providerId = oauth2User.getAttribute(userNameAttributeName).toString();
+ 
+        User user = userRepository.findByEmail(email)
+            .map(existingUser -> updateExistingUser(existingUser, nickname, providerId, registrationId))
+            .orElse(createNewUser(email, nickname, providerId, registrationId));
+ 
+        return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), userNameAttributeName);
     }
 
     private User updateExistingUser(User user, String nickname, String providerId, String provider) {
@@ -53,8 +45,6 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         user.setProviderId(providerId);
         user.setProvider(provider);
         user.setUpdatedAt(LocalDateTime.now());
-        
-        log.info("기존 사용자 업데이트: userId={}, email={}", user.getId(), user.getEmail());
         return userRepository.save(user);
     }
 
@@ -64,14 +54,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         newUser.setNickname(nickname);
         newUser.setProvider(provider);
         newUser.setProviderId(providerId);
-        newUser.setRole(Role.USER);
+        newUser.setRole("USER");
         newUser.setEmotionMode("다정함"); 
-        newUser.setWeightGoal(70.0);
-        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setWeightGoal(70.0);  
         
-        User savedUser = userRepository.save(newUser);
-        log.info("새 OAuth2 사용자 생성: userId={}, email={}", savedUser.getId(), savedUser.getEmail());
-        return savedUser;
+        return userRepository.save(newUser);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,11 +67,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return oauth2User.getAttribute("email");
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> kakaoAccount = (Map<String, Object>) oauth2User.getAttribute("kakao_account");
-            if (kakaoAccount != null) {
-                return (String) kakaoAccount.get("email");
-            }
+            return (String) kakaoAccount.get("email");
         }
-        throw new OAuth2AuthenticationException("이메일을 추출할 수 없습니다.");
+        throw new OAuth2AuthenticationException("지원하지 않는 OAuth 제공자입니다.");
     }
 
     @SuppressWarnings("unchecked")
@@ -93,9 +78,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return oauth2User.getAttribute("name");
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> properties = (Map<String, Object>) oauth2User.getAttribute("properties");
-            if (properties != null) {
-                return (String) properties.get("nickname");
-            }
+            return (String) properties.get("nickname");
         }
         return "사용자";
     }

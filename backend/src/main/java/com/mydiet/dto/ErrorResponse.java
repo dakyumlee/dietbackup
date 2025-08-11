@@ -1,20 +1,19 @@
 package com.mydiet.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class ErrorResponse {
-    private String error;
     private String message;
-    private int status;
+    private String code;
+    private long timestamp;
     
-    public ErrorResponse(String error, String message) {
-        this.error = error;
-        this.message = message;
-        this.status = 500;
+    public static ErrorResponse of(String message) {
+        return ErrorResponse.builder()
+            .message(message)
+            .timestamp(System.currentTimeMillis())
+            .build();
     }
 }

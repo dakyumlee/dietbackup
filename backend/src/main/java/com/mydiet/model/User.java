@@ -32,9 +32,9 @@ public class User {
     @Column(name = "emotion_mode")
     private String emotionMode;  
     
-    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     @Builder.Default
-    private Role role = Role.USER;  
+    private String role = "USER";  
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -47,10 +47,29 @@ public class User {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+        if (role == null) {
+            role = "USER";
+        }
     }
     
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+    
+    public void setRole(String role) {
+        this.role = role;
+    }
+    
+    public String getRole() {
+        return this.role != null ? this.role : "USER";
+    }
+    
+    public boolean isAdmin() {
+        return "ADMIN".equals(this.role);
+    }
+    
+    public boolean isUser() {
+        return "USER".equals(this.role);
     }
 }

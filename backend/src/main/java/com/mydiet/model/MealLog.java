@@ -1,9 +1,10 @@
 package com.mydiet.model;
-import com.mydiet.model.Role;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -12,10 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "meal_logs")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+@Builder
 public class MealLog {
     
     @Id
@@ -24,45 +24,29 @@ public class MealLog {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
     
     @Column(nullable = false)
     private String description;
     
-    private Integer caloriesEstimate;
-    
+    @Column(name = "photo_url")
     private String photoUrl;
     
-    private String mealType;
+    @Column(name = "calories_estimate")
+    private Integer caloriesEstimate;
     
     @Column(nullable = false)
     private LocalDate date;
     
-    private Double protein;
-    private Double carbohydrate;
-    private Double fat;
-    private Double fiber;
-    private Double sugar;
-    private Double sodium;
-    
-    private String note;
-    
-    @CreatedDate
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-    
-    public String getMealTypeKorean() {
-        switch (mealType != null ? mealType.toLowerCase() : "snack") {
-            case "breakfast": return "아침";
-            case "lunch": return "점심";
-            case "dinner": return "저녁";
-            default: return "간식";
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        if (date == null) {
+            date = LocalDate.now();
         }
-    }
-    
-    public boolean isToday() {
-        return date != null && date.equals(LocalDate.now());
     }
 }

@@ -26,10 +26,18 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         session.setAttribute("userId", principal.getUser().getId());
         session.setAttribute("userEmail", principal.getUser().getEmail());
         session.setAttribute("userNickname", principal.getUser().getNickname());
+        session.setAttribute("userRole", principal.getUser().getRole());
         session.setAttribute("authenticated", true);
         
-        log.info("OAuth2 로그인 성공: {} (userId: {})", principal.getUser().getEmail(), principal.getUser().getId());
+        log.info("OAuth2 로그인 성공: {} (ID: {}, Role: {})", 
+                principal.getUser().getEmail(), 
+                principal.getUser().getId(),
+                principal.getUser().getRole());
         
-        response.sendRedirect("/dashboard.html");
+        if ("ADMIN".equals(principal.getUser().getRole())) {
+            response.sendRedirect("/admin.html");
+        } else {
+            response.sendRedirect("/dashboard.html");
+        }
     }
 }
