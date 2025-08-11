@@ -1,5 +1,5 @@
 package com.mydiet.dto;
-import com.mydiet.model.Role;
+
 import lombok.Data;
 
 @Data

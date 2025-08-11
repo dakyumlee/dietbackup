@@ -1,9 +1,11 @@
 package com.mydiet.model;
-import com.mydiet.model.Role;
+
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+
+
 
 @Entity
 @Table(name = "users")
@@ -52,9 +54,5 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-    
-    public String getRoleString() {
-        return role != null ? role.name() : "USER";
     }
 }

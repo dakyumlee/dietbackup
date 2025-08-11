@@ -1,16 +1,17 @@
 package com.mydiet.dto;
-import com.mydiet.model.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ErrorResponse {
     private String message;
-    private String error;
-    private Integer status;
+    
+    public ErrorResponse(String message) {
+        this.message = message;
+    }
+    
+    public String getMessage() {
+        return message;
+    }
+    
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

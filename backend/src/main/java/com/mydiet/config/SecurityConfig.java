@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -17,6 +18,7 @@ public class SecurityConfig {
 
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final SessionAuthenticationFilter sessionAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -27,22 +29,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
+            .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-                .antMatchers("/", "/index.html", "/auth.html", 
-                    "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                
-                .antMatchers("/api/auth/**").permitAll()
-                
-                .antMatchers("/api/user-check/**").permitAll()
-                
-                .antMatchers("/admin/**", "/api/admin/**", "/admin-dashboard.html").permitAll()
-                
-                .antMatchers("/login/oauth2/code/**").permitAll()
-                
-                .antMatchers("/dashboard.html").authenticated()
-                
-                .antMatchers("/api/user/**", "/api/save/**", "/api/delete/**", "/api/chat/**", "/api/claude/**").permitAll()
-                
+                .antMatchers("/", "/index.html", "/auth.html", "/admin-login.html",
+                    "/api/auth/**", "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                .antMatchers("/admin/**", "/admin-dashboard.html").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .oauth2Login()
@@ -51,29 +42,14 @@ public class SecurityConfig {
                     .userService(oAuth2UserService)
                     .and()
                 .successHandler(oAuth2LoginSuccessHandler)
-                .failureUrl("/auth.html?error=oauth_failed")
-                .and()
-            .formLogin()
-                .loginPage("/auth.html")
-                .loginProcessingUrl("/api/auth/login")
-                .successHandler((request, response, authentication) -> {
-                    response.sendRedirect("/dashboard.html");
-                })
-                .failureHandler((request, response, exception) -> {
-                    response.sendRedirect("/auth.html?error=login_failed");
-                })
-                .permitAll()
+                .failureUrl("/auth.html?error=true")
                 .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .permitAll()
-                .and()
-            .sessionManagement()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false);
+                .permitAll();
 
         return http.build();
     }

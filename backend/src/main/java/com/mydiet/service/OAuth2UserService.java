@@ -11,12 +11,13 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
@@ -25,33 +26,28 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oauth2User = super.loadUser(userRequest);
         
-        final String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        final String email = extractEmail(oauth2User, registrationId);
-        final String nickname = extractNickname(oauth2User, registrationId);
-        final String providerId = getProviderId(oauth2User);
-        
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        String userNameAttributeName = userRequest.getClientRegistration()
+                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+ 
+        String email = extractEmail(oauth2User, registrationId);
+        String nickname = extractNickname(oauth2User, registrationId);
+        String providerId = oauth2User.getAttribute(userNameAttributeName).toString();
+ 
         User user = userRepository.findByEmail(email)
             .map(existingUser -> updateExistingUser(existingUser, nickname, providerId, registrationId))
-            .orElseGet(() -> createNewUser(email, nickname, providerId, registrationId));
-        
-        return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), "email");
+            .orElse(createNewUser(email, nickname, providerId, registrationId));
+ 
+        return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), userNameAttributeName);
     }
 
-    private String getProviderId(OAuth2User oauth2User) {
-        String providerId = oauth2User.getAttribute("sub");
-        if (providerId == null) {
-            Object id = oauth2User.getAttribute("id");
-            providerId = id != null ? id.toString() : "unknown";
-        }
-        return providerId;
-    }
-
-    private User updateExistingUser(User existingUser, String nickname, String providerId, String provider) {
-        existingUser.setNickname(nickname);
-        existingUser.setProviderId(providerId);
-        existingUser.setProvider(provider);
+    private User updateExistingUser(User user, String nickname, String providerId, String provider) {
+        user.setNickname(nickname);
+        user.setProviderId(providerId);
+        user.setProvider(provider);
+        user.setUpdatedAt(LocalDateTime.now());
         
-        return userRepository.save(existingUser);
+        return userRepository.save(user);
     }
 
     private User createNewUser(String email, String nickname, String providerId, String provider) {
@@ -62,7 +58,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         newUser.setProviderId(providerId);
         newUser.setRole(Role.USER);
         newUser.setEmotionMode("다정함"); 
-        newUser.setWeightGoal(70.0);  
+        newUser.setWeightGoal(70.0);
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setUpdatedAt(LocalDateTime.now());
         
         return userRepository.save(newUser);
     }
