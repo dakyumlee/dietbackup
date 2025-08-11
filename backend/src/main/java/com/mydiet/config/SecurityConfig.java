@@ -28,9 +28,10 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeRequests()
-                .antMatchers("/", "/index.html", "/auth.html", "/admin-login.html",
-                    "/api/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
-                .antMatchers("/admin-dashboard.html", "/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/", "/index.html", "/auth.html", 
+                    "/admin-login.html", "/admin-dashboard.html",
+                    "/api/auth/**", "/api/admin/**", "/api/debug/**",
+                    "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .oauth2Login()
@@ -57,10 +58,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .permitAll()
-                .and()
-            .exceptionHandling()
-                .accessDeniedPage("/auth.html?error=access_denied");
+                .permitAll();
 
         return http.build();
     }

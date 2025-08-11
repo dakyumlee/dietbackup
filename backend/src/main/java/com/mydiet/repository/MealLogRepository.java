@@ -9,8 +9,10 @@ import java.util.List;
 
 @Repository
 public interface MealLogRepository extends JpaRepository<MealLog, Long> {
+    List<MealLog> findByUserId(Long userId);
     List<MealLog> findByUserIdAndDate(Long userId, LocalDate date);
     List<MealLog> findByUserIdOrderByDateDesc(Long userId);
     List<MealLog> findByDate(LocalDate date);
+    long countByUserId(Long userId);
     void deleteByUserId(Long userId);
 }

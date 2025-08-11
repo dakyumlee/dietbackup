@@ -1,9 +1,8 @@
 package com.mydiet.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,56 +20,49 @@ public class User {
     private Long id;
     
     @Column(nullable = false)
+    private String nickname;
+    
+    @Column(unique = true, nullable = false)
     private String email;
     
-    private String nickname;
     private String password;
-    private String role = "USER";
-    
-    @Column(name = "weight_goal")
-    private Double weightGoal = 70.0;
-    
-    @Column(name = "current_weight")
-    private Double currentWeight = 70.0;
-    
-    @Column(name = "emotion_mode")
-    private String emotionMode = "다정함";
     
     private String provider;
     
-    @Column(name = "provider_id")
     private String providerId;
     
-    @Column(name = "created_at")
+    @Builder.Default
+    private String role = "USER";
+    
+    @Builder.Default
+    private Double weightGoal = 70.0;
+    
+    @Builder.Default
+    private Double currentWeight = 70.0;
+    
+    @Builder.Default
+    private String emotionMode = "다정함";
+    
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     
-    @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
     
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+        if (this.role == null) {
+            this.role = "USER";
         }
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now();
+        if (this.weightGoal == null) {
+            this.weightGoal = 70.0;
         }
-        if (role == null) {
-            role = "USER";
+        if (this.currentWeight == null) {
+            this.currentWeight = 70.0;
         }
-        if (weightGoal == null) {
-            weightGoal = 70.0;
+        if (this.emotionMode == null) {
+            this.emotionMode = "다정함";
         }
-        if (currentWeight == null) {
-            currentWeight = 70.0;
-        }
-        if (emotionMode == null) {
-            emotionMode = "다정함";
-        }
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }
