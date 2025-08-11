@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDiet - 바디 트래킹</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .tracking-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-area {
+            border: 3px dashed #e2e8f0;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e6f3ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .preview-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .analysis-results {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .inbody-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .trend-down {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .trend-stable {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .ai-analysis {
+            background: linear-gradient(135deg, #f0f9ff, #e0e7ff);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .ai-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3730a3;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-content {
+            color: #4338ca;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .inbody-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="back-btn">
+                    ← 대시보드로
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📸 바디 트래킹</h1>
+            <p class="page-subtitle">신체 변화를 기록하고 AI가 분석한 맞춤형 피드백을 받아보세요</p>
+        </div>
+
+        <div class="tracking-grid">
+            <div class="tracking-card">
+                <h2 class="card-title">📷 눈바디 촬영</h2>
+                
+                <div class="upload-area" id="body-photo-upload" onclick="triggerFileInput('body-photo-input')">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">전신 사진을 업로드하세요</div>
+                    <div class="upload-hint">권장: 정면, 측면, 후면 사진 (JPG, PNG)</div>
+                    <button class="upload-btn">사진 선택하기</button>
+                </div>
+                
+                <input type="file" id="body-photo-input" style="display: none;" accept="image/*" multiple onchange="handleBodyPhotoUpload(event)">
+                
+                <div class="preview-container" id="body-photo-preview">
+                    <img class="preview-image" id="preview-img" alt="미리보기">
+                    <div class="image-actions">
+                        <button class="action-btn btn-primary" onclick="analyzeBodyPhoto()">🤖 AI 분석</button>
+                        <button class="action-btn btn-secondary" onclick="retakePhoto()">🔄 다시 촬영</button>
+                        <button class="action-btn btn-danger" onclick="deletePhoto()">🗑️ 삭제</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-results" id="body-analysis-results">
+                    <h4>🎯 AI 분석 결과</h4>
+                    <div id="body-analysis-content"></div>
+                </div>
+            </div>
+
+            <div class="tracking-card">
+                <h2 class="card-title">📊 인바디 데이터 입력</h2>
+                
+                <form class="inbody-form" onsubmit="saveInbodyData(event)">
+                    <div class="form-group">
+                        <label class="form-label">체중 (kg)</label>
+                        <input type="number" id="weight" class="form-input" step="0.1" placeholder="65.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">체지방률 (%)</label>
+                        <input type="number" id="body-fat" class="form-input" step="0.1" placeholder="18.5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">골격근량 (kg)</label>
+                        <input type="number" id="muscle-mass" class="form-input" step="0.1" placeholder="28.3">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">수분량 (%)</label>
+                        <input type="number" id="water-content" class="form-input" step="0.1" placeholder="60.2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">기초대사율 (kcal)</label>
+                        <input type="number" id="bmr" class="form-input" placeholder="1650">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">내장지방 레벨</label>
+                        <input type="number" id="visceral-fat" class="form-input" min="1" max="20" placeholder="5">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label">메모</label>
+                        <input type="text" id="inbody-memo" class="form-input" placeholder="측정 장소, 컨디션 등을 기록하세요">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <button type="submit" class="submit-btn">📊 인바디 데이터 저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h2 class="card-title">📈 변화 추이 분석</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>최초 측정</th>
+                        <th>최근 측정</th>
+                        <th>변화량</th>
+                        <th>추세</th>
+                    </tr>
+                </thead>
+                <tbody id="comparison-data">
+                    <tr>
+                        <td>체중</td>
+                        <td>68.5kg</td>
+                        <td>65.2kg</td>
+                        <td>-3.3kg</td>
+                        <td><span class="trend-indicator trend-down">⬇️ 감소</span></td>
+                    </tr>
+                    <tr>
+                        <td>체지방률</td>
+                        <td>22.1%</td>
+                        <td>18.5%</td>
+                        <td>-3.6%</td>
+                        <td><span class="trend-indicator trend-down">⬇️ 감소</span></td>
+                    </tr>
+                    <tr>
+                        <td>골격근량</td>
+                        <td>26.8kg</td>
+                        <td>28.3kg</td>
+                        <td>+1.5kg</td>
+                        <td><span class="trend-indicator trend-up">⬆️ 증가</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="ai-analysis">
+                <h3 class="ai-title">🤖 Claude AI 종합 분석</h3>
+                <div class="ai-content">
+                    <p>훌륭한 진전을 보이고 계시네요! 최근 데이터를 분석한 결과:</p>
+                    <br>
+                    <p>✅ <strong>체중 감소:</strong> 건강한 속도로 감소하고 있으며, 근육량은 오히려 증가했습니다.</p>
+                    <p>💪 <strong>근육 발달:</strong> 골격근량 증가는 규칙적인 근력 운동의 결과입니다.</p>
+                    <p>🎯 <strong>목표 달성:</strong> 현재 진행 속도로 8-10주 후 목표 달성 예상됩니다.</p>
+                    <p>⚠️ <strong>주의사항:</strong> 단백질 섭취량을 늘려 근육 손실을 방지하세요.</p>
+                    <br>
+                    <p><strong>다음 주 권장사항:</strong> 현재 운동 루틴 유지, 단백질 하루 120g 섭취, 충분한 수면</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BodyTrackingSystem {
+            constructor() {
+                this.bodyPhotos = [];
+                this.inbodyData = [];
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadStoredData();
+            }
+
+            setupEventListeners() {
+                const uploadArea = document.getElementById('body-photo-upload');
+                
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files);
+                });
+            }
+
+            handleFiles(files) {
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        this.previewImage(file);
+                    }
+                });
+            }
+
+            previewImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('preview-img').src = e.target.result;
+                    document.getElementById('body-photo-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            analyzeBodyPhoto() {
+                const analysisResults = document.getElementById('body-analysis-results');
+                const analysisContent = document.getElementById('body-analysis-content');
+                
+                analysisContent.innerHTML = `
+                    <div style="margin: 15px 0;">
+                        <h5>📊 자세 분석</h5>
+                        <p>• 어깨 높이: 좌우 균형 양호</p>
+                        <p>• 골반 정렬: 약간 앞으로 기울어짐 (개선 권장)</p>
+                        <p>• 전체적인 자세: B+ 등급</p>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <h5>💪 체형 변화 감지</h5>
+                        <p>• 복부 둘레: 이전 대비 약 3cm 감소 추정</p>
+                        <p>• 허벅지 근육: 선명도 증가</p>
+                        <p>• 전체적인 변화: 긍정적 발전</p>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <h5>🎯 개선 제안</h5>
+                        <p>• 코어 강화 운동 추가 권장</p>
+                        <p>• 하체 근력 운동 지속</p>
+                        <p>• 정기적인 스트레칭으로 자세 교정</p>
+                    </div>
+                `;
+                
+                analysisResults.style.display = 'block';
+                
+                this.bodyPhotos.push({
+                    image: document.getElementById('preview-img').src,
+                    analysis: analysisContent.innerHTML,
+                    date: new Date(),
+                    id: Date.now()
+                });
+                
+                this.saveData();
+                this.sendToMyDiet();
+            }
+
+            sendToMyDiet() {
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'BODY_PHOTO_SAVED',
+                        data: this.bodyPhotos[this.bodyPhotos.length - 1]
+                    }, '*');
+                }
+            }
+
+            saveInbodyData(event) {
+                event.preventDefault();
+                
+                const data = {
+                    weight: parseFloat(document.getElementById('weight').value),
+                    bodyFat: parseFloat(document.getElementById('body-fat').value) || null,
+                    muscleMass: parseFloat(document.getElementById('muscle-mass').value) || null,
+                    waterContent: parseFloat(document.getElementById('water-content').value) || null,
+                    bmr: parseInt(document.getElementById('bmr').value) || null,
+                    visceralFat: parseInt(document.getElementById('visceral-fat').value) || null,
+                    memo: document.getElementById('inbody-memo').value,
+                    date: new Date(),
+                    id: Date.now()
+                };
+
+                this.inbodyData.push(data);
+                this.saveData();
+                this.updateComparison();
+                this.showToast('인바디 데이터가 저장되었습니다!');
+                
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'INBODY_DATA_SAVED',
+                        data: data
+                    }, '*');
+                }
+                
+                event.target.reset();
+            }
+
+            updateComparison() {
+                if (this.inbodyData.length < 2) return;
+
+                const first = this.inbodyData[0];
+                const latest = this.inbodyData[this.inbodyData.length - 1];
+                const tbody = document.getElementById('comparison-data');
+
+                const rows = [
+                    {
+                        item: '체중',
+                        first: first.weight + 'kg',
+                        latest: latest.weight + 'kg',
+                        change: (latest.weight - first.weight).toFixed(1) + 'kg',
+                        trend: latest.weight < first.weight ? 'down' : latest.weight > first.weight ? 'up' : 'stable'
+                    },
+                    {
+                        item: '체지방률',
+                        first: (first.bodyFat || 0) + '%',
+                        latest: (latest.bodyFat || 0) + '%',
+                        change: ((latest.bodyFat || 0) - (first.bodyFat || 0)).toFixed(1) + '%',
+                        trend: (latest.bodyFat || 0) < (first.bodyFat || 0) ? 'down' : (latest.bodyFat || 0) > (first.bodyFat || 0) ? 'up' : 'stable'
+                    },
+                    {
+                        item: '골격근량',
+                        first: (first.muscleMass || 0) + 'kg',
+                        latest: (latest.muscleMass || 0) + 'kg',
+                        change: ((latest.muscleMass || 0) - (first.muscleMass || 0)).toFixed(1) + 'kg',
+                        trend: (latest.muscleMass || 0) > (first.muscleMass || 0) ? 'up' : (latest.muscleMass || 0) < (first.muscleMass || 0) ? 'down' : 'stable'
+                    }
+                ];
+
+                tbody.innerHTML = rows.map(row => `
+                    <tr>
+                        <td>${row.item}</td>
+                        <td>${row.first}</td>
+                        <td>${row.latest}</td>
+                        <td>${row.change.startsWith('-') ? '' : row.change.startsWith('0') ? '' : '+'}${row.change}</td>
+                        <td><span class="trend-indicator trend-${row.trend}">
+                            ${row.trend === 'up' ? '⬆️ 증가' : row.trend === 'down' ? '⬇️ 감소' : '➖ 유지'}
+                        </span></td>
+                    </tr>
+                `).join('');
+            }
+
+            showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    font-weight: 500;
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            saveData() {
+                localStorage.setItem('mydiet-body-tracking', JSON.stringify({
+                    bodyPhotos: this.bodyPhotos,
+                    inbodyData: this.inbodyData
+                }));
+            }
+
+            loadStoredData() {
+                const stored = localStorage.getItem('mydiet-body-tracking');
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    this.bodyPhotos = data.bodyPhotos || [];
+                    this.inbodyData = data.inbodyData || [];
+                    this.updateComparison();
+                }
+            }
+        }
+
+        function triggerFileInput(inputId) {
+            document.getElementById(inputId).click();
+        }
+
+        function handleBodyPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                bodyTracking.previewImage(file);
+            }
+        }
+
+        function analyzeBodyPhoto() {
+            bodyTracking.analyzeBodyPhoto();
+        }
+
+        function retakePhoto() {
+            document.getElementById('body-photo-input').click();
+        }
+
+        function deletePhoto() {
+            document.getElementById('body-photo-preview').style.display = 'none';
+            document.getElementById('body-analysis-results').style.display = 'none';
+            document.getElementById('body-photo-input').value = '';
+        }
+
+        function saveInbodyData(event) {
+            bodyTracking.saveInbodyData(event);
+        }
+
+        const bodyTracking = new BodyTrackingSystem();
+    </script>
+</body>
+</html>
