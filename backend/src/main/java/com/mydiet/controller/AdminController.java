@@ -21,8 +21,11 @@ public class AdminController {
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        log.info("=== 관리자 통계 요청 ===");
+        
         try {
             Map<String, Object> stats = adminService.getDashboardStats();
+            log.info("관리자 통계 조회 성공");
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             log.error("관리자 통계 조회 실패", e);
@@ -32,10 +35,29 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/data")
+    public ResponseEntity<Map<String, Object>> getAllData() {
+        log.info("=== 관리자 전체 데이터 요청 ===");
+        
+        try {
+            Map<String, Object> data = adminService.getAllData();
+            log.info("전체 데이터 조회 성공");
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            log.error("전체 데이터 조회 실패", e);
+            return ResponseEntity.status(500).body(
+                Map.of("error", "데이터 조회 실패: " + e.getMessage())
+            );
+        }
+    }
+
     @GetMapping("/users")
     public ResponseEntity<List<Map<String, Object>>> getAllUsers() {
+        log.info("=== 관리자 사용자 목록 요청 ===");
+        
         try {
             List<Map<String, Object>> users = adminService.getAllUsers();
+            log.info("사용자 목록 조회 성공: {} 명", users.size());
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             log.error("사용자 목록 조회 실패", e);
@@ -45,10 +67,11 @@ public class AdminController {
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long userId) {
-        log.info("=== 관리자 사용자 삭제: userId={} ===", userId);
+        log.info("=== 관리자 사용자 삭제 요청: userId={} ===", userId);
         
         try {
             if (!userRepository.existsById(userId)) {
+                log.warn("삭제 요청된 사용자가 존재하지 않음: userId={}", userId);
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "message", "사용자를 찾을 수 없습니다"
@@ -75,13 +98,37 @@ public class AdminController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<Map<String, Object>> getUserDetail(@PathVariable Long userId) {
+        log.info("=== 관리자 사용자 상세 조회: userId={} ===", userId);
+        
         try {
             Map<String, Object> userDetail = adminService.getUserDetail(userId);
+            log.info("사용자 상세 조회 성공: userId={}", userId);
             return ResponseEntity.ok(userDetail);
         } catch (Exception e) {
             log.error("사용자 상세 조회 실패: userId={}", userId, e);
             return ResponseEntity.status(500).body(Map.of(
                 "error", "사용자 상세 조회 실패: " + e.getMessage()
+            ));
+        }
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        log.info("=== 관리자 API 상태 확인 ===");
+        
+        try {
+            long userCount = userRepository.count();
+            
+            return ResponseEntity.ok(Map.of(
+                "status", "healthy",
+                "timestamp", System.currentTimeMillis(),
+                "userCount", userCount
+            ));
+        } catch (Exception e) {
+            log.error("헬스체크 실패", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "status", "unhealthy",
+                "error", e.getMessage()
             ));
         }
     }

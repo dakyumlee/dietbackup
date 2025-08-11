@@ -357,29 +357,52 @@
         }
 
         async function loadAdminStats() {
-            console.log('Loading admin stats...');
+            console.log('=== 관리자 통계 로드 시작 ===');
             
             try {
-                const response = await fetch('/api/debug/all-data');
+                const response = await fetch('/api/admin/data');
+                console.log('API 응답 상태:', response.status);
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('받은 데이터:', data);
                     
                     document.getElementById('total-users').textContent = data.users?.length || 0;
                     document.getElementById('active-users').textContent = data.users?.length || 0;
                     document.getElementById('total-meals').textContent = data.meals?.length || 0;
                     document.getElementById('total-workouts').textContent = data.workouts?.length || 0;
                     
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayMeals = data.meals?.filter(meal => meal.date === today) || [];
+                    const todayWorkouts = data.workouts?.filter(workout => workout.date === today) || [];
+                    
                     displayUsers(data.users || []);
                     addActivity('통계가 업데이트되었습니다');
+                    
+                    console.log('통계 업데이트 완료');
                 } else {
-                    console.error('Failed to load stats:', response.statusText);
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API 응답 오류:', response.status, errorData);
                     setDefaultStats();
+                    addActivity('통계 로드 실패: ' + (errorData.error || response.statusText));
                 }
             } catch (error) {
-                console.error('Error loading admin stats:', error);
+                console.error('통계 로드 중 오류:', error);
                 setDefaultStats();
                 addActivity('통계 로드 실패: ' + error.message);
+                
+                try {
+                    const healthResponse = await fetch('/api/admin/health');
+                    const healthData = await healthResponse.json();
+                    console.log('서버 상태:', healthData);
+                    
+                    if (healthData.status === 'healthy') {
+                        addActivity('서버는 정상 작동 중입니다');
+                    }
+                } catch (healthError) {
+                    console.error('서버 상태 확인 실패:', healthError);
+                    addActivity('서버 연결에 문제가 있습니다');
+                }
             }
         }
 
@@ -394,23 +417,40 @@
             const tbody = document.getElementById('users-list');
             
             if (!users || users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">등록된 사용자가 없습니다.</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            <div style="color: #999;">
+                                <p>📝 등록된 사용자가 없습니다</p>
+                                <p style="font-size: 0.9rem; margin-top: 8px;">사용자가 회원가입하면 여기에 표시됩니다</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td>${user.id}</td>
-                    <td>${user.nickname || '-'}</td>
-                    <td>${user.email || '-'}</td>
-                    <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td>
-                    <td>
-                        <button class="delete-btn" onclick="confirmDeleteUser(${user.id}, '${user.nickname}')">
-                            삭제
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = users.map(user => {
+                const createdDate = user.createdAt ? 
+                    new Date(user.createdAt).toLocaleDateString('ko-KR') : '-';
+                const safeNickname = (user.nickname || '미설정').replace(/'/g, "\\'");
+                
+                return `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.nickname || '미설정'}</td>
+                        <td>${user.email || '-'}</td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="delete-btn" onclick="confirmDeleteUser(${user.id}, '${safeNickname}')">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            console.log('사용자 목록 표시 완료:', users.length, '명');
         }
 
         function confirmDeleteUser(userId, nickname) {
