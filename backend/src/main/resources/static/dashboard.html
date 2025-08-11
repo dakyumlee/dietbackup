@@ -464,7 +464,7 @@
         async function loadDashboardStats() {
             try {
                 console.log('통계 로드 중...');
-                const response = await fetch('/api/user/stats');
+                const response = await fetch('/api/dashboard/stats');
                 if (response.ok) {
                     const stats = await response.json();
                     console.log('통계 로드 성공:', stats);
@@ -504,7 +504,7 @@
         async function loadClaudeResponse() {
             try {
                 console.log('Claude 응답 로드 중...');
-                const response = await fetch('/api/claude/message');
+                const response = await fetch('/api/ai/daily-advice');
                 if (response.ok) {
                     const message = await response.text();
                     console.log('Claude 응답 로드 성공');

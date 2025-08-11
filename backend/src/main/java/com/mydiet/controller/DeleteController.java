@@ -1,266 +1,222 @@
 package com.mydiet.controller;
-import com.mydiet.model.Role;
-import com.mydiet.repository.MealLogRepository;
-import com.mydiet.repository.WorkoutLogRepository;
-import com.mydiet.repository.EmotionLogRepository;
+
+import com.mydiet.model.*;
+import com.mydiet.repository.*;
+import com.mydiet.util.SessionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/delete")
+@RequestMapping("/api/data")
 @RequiredArgsConstructor
 public class DeleteController {
 
+    private final SessionUtil sessionUtil;
     private final MealLogRepository mealLogRepository;
     private final WorkoutLogRepository workoutLogRepository;
     private final EmotionLogRepository emotionLogRepository;
 
-    @DeleteMapping("/meal/{id}")
-    public ResponseEntity<Map<String, Object>> deleteMeal(@PathVariable Long id) {
-        log.info("=== 식단 삭제: ID={} ===", id);
-        
+    @DeleteMapping("/meal/{mealId}")
+    public ResponseEntity<Map<String, Object>> deleteMeal(@PathVariable Long mealId, HttpServletRequest request) {
+        log.info("식단 삭제 요청: mealId={}", mealId);
+
         try {
-            if (mealLogRepository.existsById(id)) {
-                mealLogRepository.deleteById(id);
-                log.info("식단 삭제 완료: ID={}", id);
-                
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "식단이 삭제되었습니다"
+            Long userId = sessionUtil.getCurrentUserId(request);
+            if (userId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "로그인이 필요합니다."
                 ));
-            } else {
+            }
+            
+            Optional<MealLog> mealOpt = mealLogRepository.findById(mealId);
+            if (mealOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", "삭제할 식단을 찾을 수 없습니다"
+                    "message", "식단을 찾을 수 없습니다."
                 ));
             }
+
+            MealLog meal = mealOpt.get();
+            
+            if (!meal.getUser().getId().equals(userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "삭제 권한이 없습니다."
+                ));
+            }
+
+            String description = meal.getDescription();
+            mealLogRepository.delete(meal);
+            
+            log.info("식단 삭제 완료: {}", description);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "식단이 삭제되었습니다: " + description
+            ));
+
         } catch (Exception e) {
-            log.error("식단 삭제 실패: ID={}", id, e);
+            log.error("식단 삭제 실패: mealId={}", mealId, e);
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
-                "message", "식단 삭제에 실패했습니다"
+                "error", e.getMessage()
             ));
         }
     }
 
-    @DeleteMapping("/workout/{id}")
-    public ResponseEntity<Map<String, Object>> deleteWorkout(@PathVariable Long id) {
-        log.info("=== 운동 삭제: ID={} ===", id);
-        
+    @DeleteMapping("/workout/{workoutId}")
+    public ResponseEntity<Map<String, Object>> deleteWorkout(@PathVariable Long workoutId, HttpServletRequest request) {
+        log.info("운동 삭제 요청: workoutId={}", workoutId);
+
         try {
-            if (workoutLogRepository.existsById(id)) {
-                workoutLogRepository.deleteById(id);
-                log.info("운동 삭제 완료: ID={}", id);
-                
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "운동이 삭제되었습니다"
+            Long userId = sessionUtil.getCurrentUserId(request);
+            if (userId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "로그인이 필요합니다."
                 ));
-            } else {
+            }
+            
+            Optional<WorkoutLog> workoutOpt = workoutLogRepository.findById(workoutId);
+            if (workoutOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", "삭제할 운동을 찾을 수 없습니다"
+                    "message", "운동을 찾을 수 없습니다."
                 ));
             }
+
+            WorkoutLog workout = workoutOpt.get();
+            
+            if (!workout.getUser().getId().equals(userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "삭제 권한이 없습니다."
+                ));
+            }
+
+            String type = workout.getType();
+            workoutLogRepository.delete(workout);
+            
+            log.info("운동 삭제 완료: {}", type);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "운동이 삭제되었습니다: " + type
+            ));
+
         } catch (Exception e) {
-            log.error("운동 삭제 실패: ID={}", id, e);
+            log.error("운동 삭제 실패: workoutId={}", workoutId, e);
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
-                "message", "운동 삭제에 실패했습니다"
+                "error", e.getMessage()
             ));
         }
     }
 
-    @DeleteMapping("/emotion/{id}")
-    public ResponseEntity<Map<String, Object>> deleteEmotion(@PathVariable Long id) {
-        log.info("=== 감정 삭제: ID={} ===", id);
-        
+    @DeleteMapping("/emotion/{emotionId}")
+    public ResponseEntity<Map<String, Object>> deleteEmotion(@PathVariable Long emotionId, HttpServletRequest request) {
+        log.info("감정 삭제 요청: emotionId={}", emotionId);
+
         try {
-            if (emotionLogRepository.existsById(id)) {
-                emotionLogRepository.deleteById(id);
-                log.info("감정 삭제 완료: ID={}", id);
-                
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "감정이 삭제되었습니다"
+            Long userId = sessionUtil.getCurrentUserId(request);
+            if (userId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "로그인이 필요합니다."
                 ));
-            } else {
+            }
+            
+            Optional<EmotionLog> emotionOpt = emotionLogRepository.findById(emotionId);
+            if (emotionOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", "삭제할 감정을 찾을 수 없습니다"
+                    "message", "감정 기록을 찾을 수 없습니다."
                 ));
             }
+
+            EmotionLog emotion = emotionOpt.get();
+            
+            if (!emotion.getUser().getId().equals(userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "삭제 권한이 없습니다."
+                ));
+            }
+
+            String mood = emotion.getMood();
+            emotionLogRepository.delete(emotion);
+            
+            log.info("감정 삭제 완료: {}", mood);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "감정 기록이 삭제되었습니다: " + mood
+            ));
+
         } catch (Exception e) {
-            log.error("감정 삭제 실패: ID={}", id, e);
+            log.error("감정 삭제 실패: emotionId={}", emotionId, e);
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
-                "message", "감정 삭제에 실패했습니다"
+                "error", e.getMessage()
             ));
         }
     }
 
-    @DeleteMapping("/meals/today")
-    public ResponseEntity<Map<String, Object>> deleteAllTodayMeals() {
-        log.info("=== 오늘의 모든 식단 삭제 ===");
-        
-        try {
-            Long userId = 1L;
-            LocalDate today = LocalDate.now();
-            
-            var meals = mealLogRepository.findByUserIdAndDate(userId, today);
-            int count = meals.size();
-            
-            if (count == 0) {
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "삭제할 식단이 없습니다",
-                    "deletedCount", 0
-                ));
-            }
-            
-            mealLogRepository.deleteAll(meals);
-            log.info("오늘의 식단 {}개 삭제 완료", count);
-            
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "오늘의 모든 식단이 삭제되었습니다",
-                "deletedCount", count
-            ));
-            
-        } catch (Exception e) {
-            log.error("오늘의 식단 일괄 삭제 실패", e);
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false,
-                "message", "식단 삭제에 실패했습니다"
-            ));
-        }
-    }
+    @DeleteMapping("/today-all")
+    public ResponseEntity<Map<String, Object>> deleteTodayAll(HttpServletRequest request) {
+        log.info("오늘 데이터 전체 삭제 요청");
 
-    @DeleteMapping("/workouts/today")
-    public ResponseEntity<Map<String, Object>> deleteAllTodayWorkouts() {
-        log.info("=== 오늘의 모든 운동 삭제 ===");
-        
         try {
-            Long userId = 1L;
-            LocalDate today = LocalDate.now();
-            
-            var workouts = workoutLogRepository.findByUserIdAndDate(userId, today);
-            int count = workouts.size();
-            
-            if (count == 0) {
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "삭제할 운동이 없습니다",
-                    "deletedCount", 0
+            Long userId = sessionUtil.getCurrentUserId(request);
+            if (userId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "로그인이 필요합니다."
                 ));
             }
-            
-            workoutLogRepository.deleteAll(workouts);
-            log.info("오늘의 운동 {}개 삭제 완료", count);
-            
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "오늘의 모든 운동이 삭제되었습니다",
-                "deletedCount", count
-            ));
-            
-        } catch (Exception e) {
-            log.error("오늘의 운동 일괄 삭제 실패", e);
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false,
-                "message", "운동 삭제에 실패했습니다"
-            ));
-        }
-    }
 
-    @DeleteMapping("/emotions/today")
-    public ResponseEntity<Map<String, Object>> deleteAllTodayEmotions() {
-        log.info("=== 오늘의 모든 감정 삭제 ===");
-        
-        try {
-            Long userId = 1L;
             LocalDate today = LocalDate.now();
             
-            var emotions = emotionLogRepository.findByUserIdAndDate(userId, today);
-            int count = emotions.size();
+            var todayMeals = mealLogRepository.findByUserIdAndDate(userId, today);
+            var todayWorkouts = workoutLogRepository.findByUserIdAndDate(userId, today);
+            var todayEmotions = emotionLogRepository.findByUserIdAndDate(userId, today);
             
-            if (count == 0) {
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "삭제할 감정이 없습니다",
-                    "deletedCount", 0
-                ));
-            }
+            int deletedMeals = todayMeals.size();
+            int deletedWorkouts = todayWorkouts.size();
+            int deletedEmotions = todayEmotions.size();
             
-            emotionLogRepository.deleteAll(emotions);
-            log.info("오늘의 감정 {}개 삭제 완료", count);
+            mealLogRepository.deleteAll(todayMeals);
+            workoutLogRepository.deleteAll(todayWorkouts);
+            emotionLogRepository.deleteAll(todayEmotions);
             
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "오늘의 모든 감정이 삭제되었습니다",
-                "deletedCount", count
-            ));
-            
-        } catch (Exception e) {
-            log.error("오늘의 감정 일괄 삭제 실패", e);
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false,
-                "message", "감정 삭제에 실패했습니다"
-            ));
-        }
-    }
+            log.info("오늘 데이터 전체 삭제 완료: 식단={}, 운동={}, 감정={}", 
+                deletedMeals, deletedWorkouts, deletedEmotions);
 
-    @DeleteMapping("/all/today")
-    public ResponseEntity<Map<String, Object>> deleteAllTodayData() {
-        log.info("=== 오늘의 모든 데이터 삭제 ===");
-        
-        try {
-            Long userId = 1L;
-            LocalDate today = LocalDate.now();
-            
-            var meals = mealLogRepository.findByUserIdAndDate(userId, today);
-            var workouts = workoutLogRepository.findByUserIdAndDate(userId, today);
-            var emotions = emotionLogRepository.findByUserIdAndDate(userId, today);
-            
-            int totalCount = meals.size() + workouts.size() + emotions.size();
-            
-            if (totalCount == 0) {
-                return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "삭제할 데이터가 없습니다",
-                    "deletedCount", 0
-                ));
-            }
-            
-            mealLogRepository.deleteAll(meals);
-            workoutLogRepository.deleteAll(workouts);
-            emotionLogRepository.deleteAll(emotions);
-            
-            log.info("오늘의 모든 데이터 {}개 삭제 완료 (식단:{}, 운동:{}, 감정:{})", 
-                    totalCount, meals.size(), workouts.size(), emotions.size());
-            
             return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "오늘의 모든 데이터가 삭제되었습니다",
-                "deletedCount", totalCount,
-                "details", Map.of(
-                    "meals", meals.size(),
-                    "workouts", workouts.size(),
-                    "emotions", emotions.size()
+                "message", String.format("오늘의 모든 데이터가 삭제되었습니다. (식단: %d개, 운동: %d개, 감정: %d개)", 
+                    deletedMeals, deletedWorkouts, deletedEmotions),
+                "deletedCounts", Map.of(
+                    "meals", deletedMeals,
+                    "workouts", deletedWorkouts,
+                    "emotions", deletedEmotions
                 )
             ));
-            
+
         } catch (Exception e) {
-            log.error("오늘의 모든 데이터 삭제 실패", e);
+            log.error("오늘 데이터 전체 삭제 실패", e);
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
-                "message", "데이터 삭제에 실패했습니다"
+                "error", e.getMessage()
             ));
         }
     }
