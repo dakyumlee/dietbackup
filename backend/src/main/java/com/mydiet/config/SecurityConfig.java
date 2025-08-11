@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -18,7 +17,6 @@ public class SecurityConfig {
 
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final SessionAuthenticationFilter sessionAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -29,11 +27,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-            .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-                .antMatchers("/", "/index.html", "/auth.html", "/admin-login.html",
-                    "/api/auth/**", "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
-                .antMatchers("/admin/**", "/admin-dashboard.html").permitAll()
+                .antMatchers("/", "/index.html", "/auth.html", "/error",
+                    "/api/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .antMatchers("/admin/**", "/api/admin/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .oauth2Login()
@@ -42,13 +39,17 @@ public class SecurityConfig {
                     .userService(oAuth2UserService)
                     .and()
                 .successHandler(oAuth2LoginSuccessHandler)
-                .failureUrl("/auth.html?error=true")
+                .failureHandler((request, response, exception) -> {
+                    exception.printStackTrace();
+                    response.sendRedirect("/auth.html?error=oauth");
+                })
                 .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
+                .clearAuthentication(true)
                 .permitAll();
 
         return http.build();

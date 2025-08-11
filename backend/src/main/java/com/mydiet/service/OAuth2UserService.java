@@ -30,15 +30,22 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
  
-        String email = extractEmail(oauth2User, registrationId);
-        String nickname = extractNickname(oauth2User, registrationId);
-        String providerId = oauth2User.getAttribute(userNameAttributeName).toString();
- 
-        User user = userRepository.findByEmail(email)
-            .map(existingUser -> updateExistingUser(existingUser, nickname, providerId, registrationId))
-            .orElse(createNewUser(email, nickname, providerId, registrationId));
- 
-        return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), userNameAttributeName);
+        try {
+            String email = extractEmail(oauth2User, registrationId);
+            String nickname = extractNickname(oauth2User, registrationId);
+            String providerId = oauth2User.getAttribute(userNameAttributeName).toString();
+            
+            log.info("OAuth2 로그인 시도: email={}, provider={}", email, registrationId);
+     
+            User user = userRepository.findByEmail(email)
+                .map(existingUser -> updateExistingUser(existingUser, nickname, providerId, registrationId))
+                .orElse(createNewUser(email, nickname, providerId, registrationId));
+     
+            return new OAuth2UserPrincipal(user, oauth2User.getAttributes(), userNameAttributeName);
+        } catch (Exception e) {
+            log.error("OAuth2 사용자 로드 실패", e);
+            throw new OAuth2AuthenticationException("OAuth2 사용자 로드 실패: " + e.getMessage());
+        }
     }
 
     private User updateExistingUser(User user, String nickname, String providerId, String provider) {
@@ -47,6 +54,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         user.setProvider(provider);
         user.setUpdatedAt(LocalDateTime.now());
         
+        log.info("기존 사용자 업데이트: userId={}, email={}", user.getId(), user.getEmail());
         return userRepository.save(user);
     }
 
@@ -60,9 +68,10 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         newUser.setEmotionMode("다정함"); 
         newUser.setWeightGoal(70.0);
         newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setUpdatedAt(LocalDateTime.now());
         
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        log.info("새 OAuth2 사용자 생성: userId={}, email={}", savedUser.getId(), savedUser.getEmail());
+        return savedUser;
     }
 
     @SuppressWarnings("unchecked")
@@ -71,9 +80,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return oauth2User.getAttribute("email");
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> kakaoAccount = (Map<String, Object>) oauth2User.getAttribute("kakao_account");
-            return (String) kakaoAccount.get("email");
+            if (kakaoAccount != null) {
+                return (String) kakaoAccount.get("email");
+            }
         }
-        throw new OAuth2AuthenticationException("지원하지 않는 OAuth 제공자입니다.");
+        throw new OAuth2AuthenticationException("이메일을 추출할 수 없습니다.");
     }
 
     @SuppressWarnings("unchecked")
@@ -82,7 +93,9 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             return oauth2User.getAttribute("name");
         } else if ("kakao".equals(registrationId)) {
             Map<String, Object> properties = (Map<String, Object>) oauth2User.getAttribute("properties");
-            return (String) properties.get("nickname");
+            if (properties != null) {
+                return (String) properties.get("nickname");
+            }
         }
         return "사용자";
     }

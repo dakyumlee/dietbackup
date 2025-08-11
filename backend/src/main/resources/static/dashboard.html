@@ -1540,580 +1540,691 @@
     </div>
 
     <script>
-        let currentData = { meals: [], workouts: [], emotions: [] };
-        let userProfile = {
-            nickname: '사용자',
-            currentWeight: 70,
-            targetWeight: 65,
-            height: 170,
-            age: 25,
-            calorieTarget: 2000
-        };
+        let currentUser = null;
+let currentData = {
+    meals: [],
+    workouts: [],
+    emotions: []
+};
 
-        document.addEventListener('DOMContentLoaded', function() {
-            refreshDashboard();
-            loadUserProfile();
-            updateBMI();
-            updateUserStatus();
-            initializeTheme();
-        });
+async function getCurrentUser() {
+    try {
+        const response = await fetch('/api/auth/current-user');
+        if (response.ok) {
+            currentUser = await response.json();
+            console.log('현재 로그인된 사용자:', currentUser);
+            return currentUser;
+        } else if (response.status === 401) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/auth.html';
+            return null;
+        }
+    } catch (error) {
+        console.error('사용자 정보 로드 에러:', error);
+        return null;
+    }
+}
 
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark');
+function updateUserUI(user) {
+    const userNicknameElements = document.querySelectorAll('[data-user="nickname"]');
+    const userEmailElements = document.querySelectorAll('[data-user="email"]');
+    
+    userNicknameElements.forEach(el => {
+        el.textContent = user.nickname || '사용자';
+    });
+    
+    userEmailElements.forEach(el => {
+        el.textContent = user.email || '';
+    });
+    
+    document.title = `MyDiet - ${user.nickname || '사용자'}`;
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('Dashboard loading...');
+    
+    const user = await getCurrentUser();
+    if (!user) return;
+    
+    updateUserUI(user);
+    
+    refreshDashboard();
+    
+    document.getElementById('workout-type').addEventListener('change', calculateWorkoutCalories);
+    document.getElementById('workout-duration').addEventListener('input', calculateWorkoutCalories);
+    
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            closeModal();
+            closeProfileModal();
+        }
+    });
+});
+
+async function loadUserProfile() {
+    if (!currentUser) {
+        const user = await getCurrentUser();
+        if (!user) return;
+    }
+    
+    try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+            const profile = await response.json();
+            
+            document.getElementById('user-nickname').textContent = profile.nickname || '사용자';
+            document.getElementById('user-email').textContent = profile.email || '';
+            document.getElementById('user-weight-goal').textContent = profile.weightGoal ? `${profile.weightGoal}kg` : '미설정';
+            document.getElementById('user-emotion-mode').textContent = profile.emotionMode || '다정함';
+            
+            console.log('User profile loaded:', profile);
+        }
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+    }
+}
+
+async function loadDashboardStats() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`/api/dashboard/stats/${currentUser.id}`);
+        if (response.ok) {
+            const stats = await response.json();
+            
+            document.getElementById('total-calories').textContent = stats.totalCalories || 0;
+            document.getElementById('calories-burned').textContent = stats.caloriesBurned || 0;
+            document.getElementById('net-calories').textContent = stats.netCalories || 0;
+            document.getElementById('workout-time').textContent = stats.workoutTime || 0;
+            
+            if (stats.streak && stats.streak > 0) {
+                document.getElementById('streak-badge').textContent = `${stats.streak}일 연속 🎉`;
             }
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-
-        function calculateBMI(weight, height) {
-            const heightInM = height / 100;
-            return (weight / (heightInM * heightInM)).toFixed(1);
-        }
-
-        function getBMIStatus(bmi) {
-            if (bmi < 18.5) return { status: '저체중', class: 'bmi-underweight' };
-            if (bmi < 25) return { status: '정상 체중', class: 'bmi-normal' };
-            if (bmi < 30) return { status: '과체중', class: 'bmi-overweight' };
-            return { status: '비만', class: 'bmi-obese' };
-        }
-
-        function updateBMI() {
-            const bmi = calculateBMI(userProfile.currentWeight, userProfile.height);
-            const bmiInfo = getBMIStatus(bmi);
             
-            document.getElementById('bmi-value').textContent = bmi;
-            document.getElementById('bmi-value').className = `bmi-value ${bmiInfo.class}`;
-            document.getElementById('bmi-status').textContent = bmiInfo.status;
-            document.getElementById('bmi-status').className = `bmi-status ${bmiInfo.class}`;
+            console.log('Dashboard stats loaded:', stats);
         }
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+    }
+}
 
-        function updateUserStatus() {
-            document.getElementById('current-weight').textContent = `${userProfile.currentWeight}kg`;
-            document.getElementById('target-weight').textContent = `${userProfile.targetWeight}kg`;
+async function loadTodayData() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`/api/user/${currentUser.id}/today-data`);
+        if (response.ok) {
+            const data = await response.json();
             
-            const remaining = userProfile.targetWeight - userProfile.currentWeight;
-            const remainingEl = document.getElementById('remaining-weight');
-            remainingEl.textContent = `${remaining > 0 ? '+' : ''}${remaining}kg`;
-            remainingEl.style.color = remaining > 0 ? '#ef4444' : '#10b981';
-
-            const startWeight = userProfile.currentWeight + Math.abs(remaining);
-            const weightProgress = Math.abs(remaining) / Math.abs(userProfile.targetWeight - startWeight) * 100;
-            document.getElementById('weight-goal-current').textContent = Math.round(100 - weightProgress) + '%';
-            document.getElementById('weight-goal-fill').style.width = (100 - weightProgress) + '%';
-        }
-
-        function updateGoalProgress() {
-            const totalCalories = currentData.meals ? 
-                currentData.meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0) : 0;
+            currentData = data;
             
-            const mealCount = currentData.meals ? currentData.meals.length : 0;
+            displayMeals(data.meals || []);
+            displayWorkouts(data.workouts || []);
+            displayEmotions(data.emotions || []);
             
-            const totalWorkoutTime = currentData.workouts ? 
-                currentData.workouts.reduce((sum, workout) => sum + (workout.duration || 0), 0) : 0;
-
-            const calorieProgress = Math.min((totalCalories / userProfile.calorieTarget) * 100, 100);
-            document.getElementById('calorie-goal-current').textContent = totalCalories + ' kcal';
-            document.getElementById('calorie-goal-fill').style.width = calorieProgress + '%';
-
-            const mealProgress = Math.min((mealCount / 3) * 100, 100);
-            document.getElementById('meal-goal-current').textContent = mealCount + '회';
-            document.getElementById('meal-goal-fill').style.width = mealProgress + '%';
-
-            const workoutProgress = Math.min((totalWorkoutTime / 60) * 100, 100);
-            document.getElementById('workout-goal-current').textContent = totalWorkoutTime + '분';
-            document.getElementById('workout-goal-fill').style.width = workoutProgress + '%';
-
-            document.getElementById('workout-time').textContent = totalWorkoutTime + '분';
-            document.getElementById('workout-progress').style.width = workoutProgress + '%';
+            console.log('Today data loaded:', data);
         }
+    } catch (error) {
+        console.error('Error loading today data:', error);
+    }
+}
 
-        function updateProgressBars() {
-            const totalCalories = currentData.meals ? 
-                currentData.meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0) : 0;
-            
-            const calorieProgress = Math.min((totalCalories / userProfile.calorieTarget) * 100, 100);
-            const mealProgress = Math.min((currentData.meals?.length || 0) * 33.33, 100);
-            
-            document.getElementById('calorie-progress').style.width = calorieProgress + '%';
-            document.getElementById('meal-progress').style.width = mealProgress + '%';
-            
-            updateGoalProgress();
-        }
+function displayMeals(meals) {
+    const mealList = document.getElementById('meal-list');
+    
+    if (meals.length === 0) {
+        mealList.innerHTML = `
+            <li class="empty-state">
+                <div class="emoji">🍽️</div>
+                <p>아직 기록된 식단이 없습니다</p>
+            </li>
+        `;
+        return;
+    }
+    
+    mealList.innerHTML = meals.map(meal => `
+        <li class="data-item">
+            <div class="data-info">
+                <h4>${meal.description || '식단'}</h4>
+                <p>칼로리: ${meal.caloriesEstimate || 0} kcal</p>
+            </div>
+            <button class="delete-btn" onclick="deleteMeal(${meal.id})">삭제</button>
+        </li>
+    `).join('');
+}
 
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        }
+function displayWorkouts(workouts) {
+    const workoutList = document.getElementById('workout-list');
+    
+    if (workouts.length === 0) {
+        workoutList.innerHTML = `
+            <li class="empty-state">
+                <div class="emoji">🏃</div>
+                <p>아직 기록된 운동이 없습니다</p>
+            </li>
+        `;
+        return;
+    }
+    
+    workoutList.innerHTML = workouts.map(workout => `
+        <li class="data-item">
+            <div class="data-info">
+                <h4>${workout.type || '운동'}</h4>
+                <p>${workout.duration || 0}분 | ${workout.caloriesBurned || 0} kcal 소모</p>
+            </div>
+            <button class="delete-btn" onclick="deleteWorkout(${workout.id})">삭제</button>
+        </li>
+    `).join('');
+}
 
-        function openMealModal() {
-            document.getElementById('meal-modal').style.display = 'block';
-            clearMealForm();
-        }
+function displayEmotions(emotions) {
+    const emotionList = document.getElementById('emotion-list');
+    
+    if (emotions.length === 0) {
+        emotionList.innerHTML = `
+            <li class="empty-state">
+                <div class="emoji">😊</div>
+                <p>아직 기록된 감정이 없습니다</p>
+            </li>
+        `;
+        return;
+    }
+    
+    emotionList.innerHTML = emotions.map(emotion => `
+        <li class="data-item">
+            <div class="data-info">
+                <h4>${getEmotionEmoji(emotion.mood)} ${emotion.mood || '기분'}</h4>
+                <p>${emotion.note || '메모 없음'}</p>
+            </div>
+            <button class="delete-btn" onclick="deleteEmotion(${emotion.id})">삭제</button>
+        </li>
+    `).join('');
+}
 
-        function closeMealModal() {
-            document.getElementById('meal-modal').style.display = 'none';
-        }
+function getEmotionEmoji(mood) {
+    const emojiMap = {
+        '매우 좋음': '😄',
+        '좋음': '😊',
+        '보통': '😐',
+        '나쁨': '😞',
+        '매우 나쁨': '😢'
+    };
+    return emojiMap[mood] || '😊';
+}
 
-        function openWorkoutModal() {
-            document.getElementById('workout-modal').style.display = 'block';
-            clearWorkoutForm();
-        }
-
-        function closeWorkoutModal() {
-            document.getElementById('workout-modal').style.display = 'none';
-        }
-
-        function openEmotionModal() {
-            document.getElementById('emotion-modal').style.display = 'block';
-            clearEmotionForm();
-        }
-
-        function closeEmotionModal() {
-            document.getElementById('emotion-modal').style.display = 'none';
-        }
-
-        function openProfileModal() {
-            document.getElementById('profile-modal').style.display = 'block';
-            loadCurrentProfile();
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profile-modal').style.display = 'none';
-        }
-
-        function clearMealForm() {
+async function saveMeal() {
+    if (!currentUser) return;
+    
+    const description = document.getElementById('meal-description').value;
+    const calories = parseInt(document.getElementById('meal-calories').value);
+    
+    if (!description || !calories) {
+        alert('식단 설명과 칼로리를 입력해주세요.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/meals', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                description: description,
+                caloriesEstimate: calories,
+                date: new Date().toISOString().split('T')[0],
+                userId: currentUser.id
+            })
+        });
+        
+        if (response.ok) {
             document.getElementById('meal-description').value = '';
             document.getElementById('meal-calories').value = '';
+            closeModal();
+            loadTodayData();
+            loadDashboardStats();
+            showToast('식단이 저장되었습니다!');
         }
+    } catch (error) {
+        console.error('Error saving meal:', error);
+        showToast('식단 저장 중 오류가 발생했습니다.', 'error');
+    }
+}
 
-        function clearWorkoutForm() {
+async function saveWorkout() {
+    if (!currentUser) return;
+    
+    const type = document.getElementById('workout-type').value;
+    const duration = parseInt(document.getElementById('workout-duration').value);
+    const calories = parseInt(document.getElementById('workout-calories').value);
+    
+    if (!type || !duration) {
+        alert('운동 종류와 시간을 입력해주세요.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/workouts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                type: type,
+                duration: duration,
+                caloriesBurned: calories || 0,
+                date: new Date().toISOString().split('T')[0],
+                userId: currentUser.id
+            })
+        });
+        
+        if (response.ok) {
             document.getElementById('workout-type').value = '';
             document.getElementById('workout-duration').value = '';
             document.getElementById('workout-calories').value = '';
+            closeModal();
+            loadTodayData();
+            loadDashboardStats();
+            showToast('운동이 저장되었습니다!');
         }
+    } catch (error) {
+        console.error('Error saving workout:', error);
+        showToast('운동 저장 중 오류가 발생했습니다.', 'error');
+    }
+}
 
-        function clearEmotionForm() {
+async function saveEmotion() {
+    if (!currentUser) return;
+    
+    const mood = document.getElementById('emotion-mood').value;
+    const note = document.getElementById('emotion-note').value;
+    
+    if (!mood) {
+        alert('기분을 선택해주세요.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/emotions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mood: mood,
+                note: note || '',
+                date: new Date().toISOString().split('T')[0],
+                userId: currentUser.id
+            })
+        });
+        
+        if (response.ok) {
             document.getElementById('emotion-mood').value = '';
             document.getElementById('emotion-note').value = '';
+            closeModal();
+            loadTodayData();
+            showToast('감정이 저장되었습니다!');
         }
+    } catch (error) {
+        console.error('Error saving emotion:', error);
+        showToast('감정 저장 중 오류가 발생했습니다.', 'error');
+    }
+}
 
-        function calculateWorkoutCalories() {
-            const type = document.getElementById('workout-type').value;
-            const duration = parseInt(document.getElementById('workout-duration').value) || 0;
-            
-            const caloriesPerMinute = {
-                '걷기': 3.5, '조깅': 7, '달리기': 10, '자전거': 6,
-                '수영': 8, '헬스': 5, '요가': 2.5, '필라테스': 3, '기타': 4
-            };
-            
-            if (type && duration > 0) {
-                const calories = Math.round(duration * (caloriesPerMinute[type] || 4));
-                document.getElementById('workout-calories').value = calories;
-            }
-        }
+function calculateWorkoutCalories() {
+    const type = document.getElementById('workout-type').value;
+    const duration = parseInt(document.getElementById('workout-duration').value) || 0;
+    
+    const caloriesPerMinute = {
+        '유산소': 8,
+        '근력': 6,
+        '요가': 3,
+        '수영': 10,
+        '사이클링': 9,
+        '러닝': 12,
+        '걷기': 4
+    };
+    
+    const calories = (caloriesPerMinute[type] || 5) * duration;
+    document.getElementById('workout-calories').value = calories;
+}
 
-        async function saveMeal() {
-            const description = document.getElementById('meal-description').value.trim();
-            const calories = parseInt(document.getElementById('meal-calories').value) || 0;
-            
-            if (!description) {
-                showToast('음식명을 입력해주세요', 'error');
-                return;
-            }
-            
-            if (calories <= 0) {
-                showToast('칼로리를 입력해주세요', 'error');
-                return;
-            }
-
-            try {
-                showToast('식단이 기록되었습니다! 🍽️');
-                closeMealModal();
-                
-                if (!currentData.meals) currentData.meals = [];
-                currentData.meals.push({
-                    id: Date.now(),
-                    description: description,
-                    caloriesEstimate: calories,
-                    timestamp: new Date().toLocaleTimeString()
-                });
-                
-                displayMeals(currentData.meals);
-                updateStats();
-            } catch (error) {
-                showToast('저장 중 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
-        }
-
-        async function saveWorkout() {
-            const type = document.getElementById('workout-type').value;
-            const duration = parseInt(document.getElementById('workout-duration').value) || 0;
-            const calories = parseInt(document.getElementById('workout-calories').value) || 0;
-            
-            if (!type) {
-                showToast('운동 종류를 선택해주세요', 'error');
-                return;
-            }
-            
-            if (duration <= 0) {
-                showToast('운동 시간을 입력해주세요', 'error');
-                return;
-            }
-
-            try {
-                showToast('운동이 기록되었습니다! 🏃');
-                closeWorkoutModal();
-                
-                if (!currentData.workouts) currentData.workouts = [];
-                currentData.workouts.push({
-                    id: Date.now(),
-                    type: type,
-                    duration: duration,
-                    caloriesBurned: calories,
-                    timestamp: new Date().toLocaleTimeString()
-                });
-                
-                displayWorkouts(currentData.workouts);
-                updateStats();
-            } catch (error) {
-                showToast('저장 중 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
-        }
-
-        async function saveEmotion() {
-            const mood = document.getElementById('emotion-mood').value;
-            const note = document.getElementById('emotion-note').value.trim();
-            
-            if (!mood) {
-                showToast('감정 상태를 선택해주세요', 'error');
-                return;
-            }
-
-            try {
-                showToast('감정이 기록되었습니다! 😊');
-                closeEmotionModal();
-                
-                if (!currentData.emotions) currentData.emotions = [];
-                currentData.emotions.push({
-                    id: Date.now(),
-                    mood: mood,
-                    note: note || '메모 없음',
-                    timestamp: new Date().toLocaleTimeString()
-                });
-                
-                displayEmotions(currentData.emotions);
-                updateStats();
-            } catch (error) {
-                showToast('저장 중 오류가 발생했습니다', 'error');
-                console.error('Error:', error);
-            }
-        }
-
-        async function saveProfile() {
-            const nickname = document.getElementById('user-nickname').value.trim();
-            const email = document.getElementById('user-email').value.trim();
-            const currentWeight = parseFloat(document.getElementById('current-weight-input').value) || 0;
-            const weightGoal = parseFloat(document.getElementById('weight-goal').value) || 0;
-            const height = parseInt(document.getElementById('user-height').value) || 0;
-            const age = parseInt(document.getElementById('user-age').value) || 0;
-            const calorieTarget = parseInt(document.getElementById('calorie-target').value) || 2000;
-            const emotionMode = document.getElementById('emotion-mode').value;
-            
-            if (!nickname) {
-                showToast('닉네임을 입력해주세요', 'error');
-                return;
-            }
-            
-            if (weightGoal <= 0 || currentWeight <= 0) {
-                showToast('체중을 정확히 입력해주세요', 'error');
-                return;
-            }
-
-            userProfile.nickname = nickname;
-            userProfile.currentWeight = currentWeight;
-            userProfile.targetWeight = weightGoal;
-            userProfile.height = height;
-            userProfile.age = age;
-            userProfile.calorieTarget = calorieTarget;
-
-            showToast('프로필이 업데이트되었습니다! ⚙️');
-            closeProfileModal();
-            updateBMI();
-            updateUserStatus();
-            updateGoalProgress();
-            document.getElementById('user-welcome').textContent = `안녕하세요, ${nickname}님!`;
-        }
-
-        async function loadCurrentProfile() {
-            document.getElementById('user-nickname').value = userProfile.nickname;
-            document.getElementById('current-weight-input').value = userProfile.currentWeight;
-            document.getElementById('weight-goal').value = userProfile.targetWeight;
-            document.getElementById('user-height').value = userProfile.height;
-            document.getElementById('user-age').value = userProfile.age;
-            document.getElementById('calorie-target').value = userProfile.calorieTarget;
-            document.getElementById('emotion-mode').value = '다정함';
-        }
-
-        async function refreshDashboard() {
-            await loadTodayData();
-            updateStats();
-        }
-
-        function updateStats() {
-            if (!currentData) return;
-            
-            const totalCalories = currentData.meals ? 
-                currentData.meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0) : 0;
-            
-            const mealCount = currentData.meals ? currentData.meals.length : 0;
-            const workoutCount = currentData.workouts ? currentData.workouts.length : 0;
-            const emotionCount = currentData.emotions ? currentData.emotions.length : 0;
-            
-            document.getElementById('total-calories').textContent = totalCalories;
-            document.getElementById('meal-count').textContent = mealCount;
-            
-            const progress = totalCalories > 0 ? Math.min(Math.round((totalCalories / userProfile.calorieTarget) * 100), 100) : 0;
-            
-            if (currentData.emotions && currentData.emotions.length > 0) {
-                const lastEmotion = currentData.emotions[currentData.emotions.length - 1];
-                document.getElementById('mood-status').textContent = lastEmotion.mood || '좋음';
-            }
-
-            document.getElementById('week-calories').textContent = totalCalories;
-            document.getElementById('week-workouts').textContent = workoutCount + '회';
-            document.getElementById('week-progress').textContent = progress + '%';
-
-            updateProgressBars();
-        }
-
-        async function loadTodayData() {
-            currentData = { meals: [], workouts: [], emotions: [] };
-            
-            displayMeals([]);
-            displayWorkouts([]);
-            displayEmotions([]);
-        }
-
-        function displayMeals(meals) {
-            const mealList = document.getElementById('meal-list');
-            
-            if (!meals || meals.length === 0) {
-                mealList.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-emoji">🍽️</div>
-                        <p>아직 기록된 식단이 없습니다</p>
-                    </li>
-                `;
-                return;
-            }
-            
-            mealList.innerHTML = meals.map(meal => `
-                <li class="data-item">
-                    <div class="data-info">
-                        <h4>${meal.description || '식단'}</h4>
-                        <p>${meal.caloriesEstimate || 0} kcal | ${meal.timestamp || '방금 전'}</p>
-                    </div>
-                    <button class="delete-btn" onclick="deleteMeal(${meal.id})">삭제</button>
-                </li>
-            `).join('');
-        }
-
-        function displayWorkouts(workouts) {
-            const workoutList = document.getElementById('workout-list');
-            
-            if (!workouts || workouts.length === 0) {
-                workoutList.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-emoji">🏃</div>
-                        <p>아직 기록된 운동이 없습니다</p>
-                    </li>
-                `;
-                return;
-            }
-            
-            workoutList.innerHTML = workouts.map(workout => `
-                <li class="data-item">
-                    <div class="data-info">
-                        <h4>${workout.type || '운동'}</h4>
-                        <p>${workout.duration || 0}분 | ${workout.caloriesBurned || 0} kcal | ${workout.timestamp || '방금 전'}</p>
-                    </div>
-                    <button class="delete-btn" onclick="deleteWorkout(${workout.id})">삭제</button>
-                </li>
-            `).join('');
-        }
-
-        function displayEmotions(emotions) {
-            const emotionList = document.getElementById('emotion-list');
-            
-            if (!emotions || emotions.length === 0) {
-                emotionList.innerHTML = `
-                    <li class="empty-state">
-                        <div class="empty-emoji">😊</div>
-                        <p>아직 기록된 감정이 없습니다</p>
-                    </li>
-                `;
-                return;
-            }
-            
-            emotionList.innerHTML = emotions.map(emotion => `
-                <li class="data-item">
-                    <div class="data-info">
-                        <h4>${emotion.mood || '감정'}</h4>
-                        <p>${emotion.note || '메모 없음'} | ${emotion.timestamp || '방금 전'}</p>
-                    </div>
-                    <button class="delete-btn" onclick="deleteEmotion(${emotion.id})">삭제</button>
-                </li>
-            `).join('');
-        }
-
-        async function deleteMeal(id) {
-            if (!confirm('이 식단을 삭제하시겠습니까?')) return;
-            
-            try {
-                currentData.meals = currentData.meals.filter(meal => meal.id !== id);
-                displayMeals(currentData.meals);
-                updateStats();
-                showToast('삭제되었습니다');
-            } catch (error) {
-                showToast('삭제 중 오류가 발생했습니다', 'error');
-            }
-        }
-
-        async function deleteWorkout(id) {
-            if (!confirm('이 운동을 삭제하시겠습니까?')) return;
-            
-            try {
-                currentData.workouts = currentData.workouts.filter(workout => workout.id !== id);
-                displayWorkouts(currentData.workouts);
-                updateStats();
-                showToast('삭제되었습니다');
-            } catch (error) {
-                showToast('삭제 중 오류가 발생했습니다', 'error');
-            }
-        }
-
-        async function deleteEmotion(id) {
-            if (!confirm('이 감정 기록을 삭제하시겠습니까?')) return;
-            
-            try {
-                currentData.emotions = currentData.emotions.filter(emotion => emotion.id !== id);
-                displayEmotions(currentData.emotions);
-                updateStats();
-                showToast('삭제되었습니다');
-            } catch (error) {
-                showToast('삭제 중 오류가 발생했습니다', 'error');
-            }
-        }
-
-        function loadUserProfile() {
-            const savedProfile = localStorage.getItem('userProfile');
-            if (savedProfile) {
-                userProfile = { ...userProfile, ...JSON.parse(savedProfile) };
-                document.getElementById('user-welcome').textContent = `안녕하세요, ${userProfile.nickname}님!`;
-            }
-        }
-
-        function logout() {
-            if (confirm('로그아웃 하시겠습니까?')) {
-                localStorage.removeItem('userProfile');
-                window.location.href = 'auth.html';
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('ai-input');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            const chatContainer = document.getElementById('ai-chat');
-            
-            const userMessage = document.createElement('div');
-            userMessage.className = 'ai-message user';
-            userMessage.innerHTML = `<strong>나:</strong> ${message}`;
-            chatContainer.appendChild(userMessage);
-            
-            input.value = '';
-            
-            setTimeout(() => {
-                const aiResponse = getAIResponse(message);
-                const aiMessage = document.createElement('div');
-                aiMessage.className = 'ai-message';
-                aiMessage.innerHTML = `<strong>Claude:</strong> ${aiResponse}`;
-                chatContainer.appendChild(aiMessage);
-                
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 1000);
-            
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function getAIResponse(message) {
-            const responses = [
-                "좋은 질문이네요! 건강한 식습관을 위해서는 균형 잡힌 영양소 섭취가 중요해요. 🥗",
-                "운동을 꾸준히 하시는 모습이 정말 멋져요! 오늘도 화이팅! 💪",
-                "감정 관리도 건강의 중요한 부분이에요. 스트레스 받을 때는 깊게 숨을 쉬어보세요. 😌",
-                "물을 충분히 마시는 것도 잊지 마세요! 하루 8잔 정도가 좋아요. 💧",
-                "목표 달성을 위해 조금씩이라도 꾸준히 하는 것이 중요해요. 화이팅! 🎯",
-                "수면도 건강 관리의 핵심이에요. 7-8시간 정도 자는 것을 추천드려요. 😴",
-                "오늘 하루도 건강하게 보내세요! 언제든 도움이 필요하면 말씀해주세요. 🌟"
-            ];
-            
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
-
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
+async function deleteMeal(id) {
+    if (confirm('이 식단 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/meals/${id}`, {
+                method: 'DELETE'
             });
+            
+            if (response.ok) {
+                loadTodayData();
+                loadDashboardStats();
+                showToast('식단이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting meal:', error);
         }
+    }
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                currentData.meals = [
-                    { id: 1, description: '아침 - 오트밀', caloriesEstimate: 350, timestamp: '08:30' },
-                    { id: 2, description: '점심 - 닭가슴살 샐러드', caloriesEstimate: 450, timestamp: '12:30' }
-                ];
-                
-                currentData.workouts = [
-                    { id: 1, type: '조깅', duration: 30, caloriesBurned: 210, timestamp: '07:00' }
-                ];
-                
-                currentData.emotions = [
-                    { id: 1, mood: '좋음', note: '상쾌한 아침!', timestamp: '09:00' }
-                ];
-                
-                displayMeals(currentData.meals);
-                displayWorkouts(currentData.workouts);
-                displayEmotions(currentData.emotions);
-                updateStats();
-            }, 1000);
+async function deleteWorkout(id) {
+    if (confirm('이 운동 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/workouts/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadTodayData();
+                loadDashboardStats();
+                showToast('운동이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting workout:', error);
+        }
+    }
+}
+
+async function deleteEmotion(id) {
+    if (confirm('이 감정 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/emotions/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadTodayData();
+                showToast('감정이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting emotion:', error);
+        }
+    }
+}
+
+async function deleteAllTodayMeals() {
+    if (confirm('오늘의 모든 식단 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/meals/today/all/${currentUser.id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadTodayData();
+                loadDashboardStats();
+                showToast('오늘의 모든 식단이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting all meals:', error);
+        }
+    }
+}
+
+async function deleteAllTodayWorkouts() {
+    if (confirm('오늘의 모든 운동 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/workouts/today/all/${currentUser.id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadTodayData();
+                loadDashboardStats();
+                showToast('오늘의 모든 운동이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting all workouts:', error);
+        }
+    }
+}
+
+async function deleteAllTodayEmotions() {
+    if (confirm('오늘의 모든 감정 기록을 삭제하시겠습니까?')) {
+        try {
+            const response = await fetch(`/api/emotions/today/all/${currentUser.id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                loadTodayData();
+                showToast('오늘의 모든 감정이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error('Error deleting all emotions:', error);
+        }
+    }
+}
+
+async function deleteAllTodayData() {
+    if (confirm('오늘의 모든 데이터(식단, 운동, 감정)를 삭제하시겠습니까?')) {
+        await Promise.all([
+            deleteAllTodayMeals(),
+            deleteAllTodayWorkouts(),
+            deleteAllTodayEmotions()
+        ]);
+    }
+}
+
+function openModal(modalType) {
+    const modal = document.getElementById(`${modalType}-modal`);
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+function closeModal() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => modal.style.display = 'none');
+}
+
+function openProfileModal() {
+    if (!currentUser) return;
+    
+    document.getElementById('user-nickname').value = currentUser.nickname || '';
+    document.getElementById('user-email').value = currentUser.email || '';
+    document.getElementById('weight-goal').value = currentUser.weightGoal || '';
+    document.getElementById('emotion-mode').value = currentUser.emotionMode || '';
+    
+    document.getElementById('profile-modal').style.display = 'block';
+}
+
+function closeProfileModal() {
+    document.getElementById('profile-modal').style.display = 'none';
+}
+
+async function saveProfile() {
+    const nickname = document.getElementById('user-nickname').value;
+    const weightGoal = parseFloat(document.getElementById('weight-goal').value);
+    const emotionMode = document.getElementById('emotion-mode').value;
+    
+    try {
+        const response = await fetch('/api/user/profile', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nickname: nickname,
+                weightGoal: weightGoal,
+                emotionMode: emotionMode
+            })
         });
+        
+        if (response.ok) {
+            closeProfileModal();
+            loadUserProfile();
+            showToast('프로필이 업데이트되었습니다!');
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        showToast('프로필 업데이트 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+async function loadClaudeResponse() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`/api/ai/daily-feedback/${currentUser.id}`);
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('claude-response').textContent = data.feedback || '오늘도 건강한 하루 보내세요! 🌟';
+        } else {
+            document.getElementById('claude-response').textContent = '프로필을 설정해주세요!';
+        }
+    } catch (error) {
+        console.error('Error loading Claude response:', error);
+        document.getElementById('claude-response').textContent = 'Claude 응답을 불러올 수 없습니다.';
+    }
+}
+
+function handleEnterKey(event) {
+    if (event.key === 'Enter') {
+        askClaude();
+    }
+}
+
+async function askClaude() {
+    const input = document.getElementById('ai-question-input');
+    const question = input.value.trim();
+    
+    if (!question) return;
+    
+    if (!currentUser) {
+        const user = await getCurrentUser();
+        if (!user) return;
+    }
+    
+    addMessage(question, 'user');
+    input.value = '';
+    
+    const sendBtn = document.querySelector('.ai-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    
+    showTypingIndicator();
+    
+    try {
+        const response = await fetch('/api/chat/ask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                question: question,
+                userId: currentUser.id
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            hideTypingIndicator();
+            addMessage(data.answer || '죄송합니다. 응답을 생성할 수 없습니다.', 'ai');
+        } else {
+            hideTypingIndicator();
+            addMessage('죄송합니다. 현재 응답을 생성할 수 없습니다.', 'ai');
+        }
+    } catch (error) {
+        console.error('Error asking Claude:', error);
+        hideTypingIndicator();
+        addMessage('오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'ai');
+    } finally {
+        if (sendBtn) sendBtn.disabled = false;
+    }
+}
+
+function addMessage(text, sender) {
+    const messagesContainer = document.getElementById('ai-chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `ai-message ${sender === 'user' ? 'user-message' : ''}`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = `ai-avatar ${sender === 'user' ? 'user-avatar' : ''}`;
+    avatar.textContent = sender === 'user' ? '👤' : '🤖';
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = `ai-text ${sender === 'user' ? 'user-text' : ''}`;
+    textDiv.textContent = text;
+    
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(textDiv);
+    
+    messagesContainer.appendChild(messageDiv);
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const messagesContainer = document.getElementById('ai-chat-messages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'ai-message typing-message';
+    typingDiv.innerHTML = `
+        <div class="ai-avatar">🤖</div>
+        <div class="typing-indicator">
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(typingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function hideTypingIndicator() {
+    const typingMessage = document.querySelector('.typing-message');
+    if (typingMessage) {
+        typingMessage.remove();
+    }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+async function logout() {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            window.location.href = '/auth.html';
+        }
+    } catch (error) {
+        console.error('로그아웃 에러:', error);
+    }
+}
+
+async function refreshDashboard() {
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.innerHTML = '<div class="loading"></div>';
+    }
+    
+    try {
+        await Promise.all([
+            loadUserProfile(),
+            loadDashboardStats(),
+            loadTodayData(),
+            loadClaudeResponse()
+        ]);
+        
+        console.log('Dashboard refreshed successfully');
+    } catch (error) {
+        console.error('Error refreshing dashboard:', error);
+    } finally {
+        if (refreshBtn) {
+            refreshBtn.innerHTML = '🔄';
+        }
+    }
+}
     </script>
 </body>
 </html>

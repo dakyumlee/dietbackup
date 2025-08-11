@@ -23,20 +23,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         OAuth2UserPrincipal principal = (OAuth2UserPrincipal) authentication.getPrincipal();
         
         HttpSession session = request.getSession(true);
-        
         session.setAttribute("userId", principal.getUser().getId());
         session.setAttribute("userEmail", principal.getUser().getEmail());
         session.setAttribute("userNickname", principal.getUser().getNickname());
         session.setAttribute("authenticated", true);
-        session.setAttribute("userRole", principal.getUser().getRole() != null ? 
-                           principal.getUser().getRole() : "USER");
         
-        session.setMaxInactiveInterval(86400);
-        
-        log.info("OAuth2 로그인 성공: {} (세션ID: {})", 
-                principal.getUser().getEmail(), session.getId());
-        log.debug("세션 속성 설정 완료 - authenticated: true, userRole: {}", 
-                 session.getAttribute("userRole"));
+        log.info("OAuth2 로그인 성공: {} (userId: {})", principal.getUser().getEmail(), principal.getUser().getId());
         
         response.sendRedirect("/dashboard.html");
     }

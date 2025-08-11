@@ -26,26 +26,27 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient를 위한 추가
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     
-    // JWT 라이브러리 추가
+    // JWT 라이브러리
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    // Lombok - 최신 버전 단일 설정
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     
     // PostgreSQL Database
     runtimeOnly 'org.postgresql:postgresql'
     
-    // Lombok - 최신 버전으로 업그레이드
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    
+    // 테스트에서도 Lombok 사용
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 tasks.named('test') {
@@ -56,7 +57,8 @@ jar {
     enabled = false
 }
 
-// Lombok 컴파일 옵션 추가
+// 컴파일러 옵션
 tasks.withType(JavaCompile) {
     options.compilerArgs += ['-parameters']
+    options.encoding = 'UTF-8'
 }
