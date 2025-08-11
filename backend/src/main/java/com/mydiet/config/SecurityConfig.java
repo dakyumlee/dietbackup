@@ -30,8 +30,8 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeRequests()
-                .antMatchers("/", "/index.html", "/auth.html", 
-                    "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+            .antMatchers("/", "/index.html", "/auth.html", 
+            "/api/auth/**", "/api/session/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/api/auth/register", "/api/auth/login", "/api/test/simple").permitAll()
                 .antMatchers("/admin/**", "/api/admin/**").permitAll()
                 .antMatchers("/login/oauth2/**", "/oauth2/**").permitAll()
