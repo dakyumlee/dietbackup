@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyDiet - 스마트 대시보드</title>
     <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: white;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e2e8f0;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,39 +33,49 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
+        .navbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header-content {
+        [data-theme="dark"] .navbar {
+            background: rgba(45, 45, 45, 0.95);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
         }
 
-        .logo {
+        .nav-brand {
             font-size: 28px;
             font-weight: 700;
-            color: #667eea;
+            color: var(--primary-color);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .user-info {
@@ -55,20 +85,20 @@
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .profile-btn {
-            background: #667eea;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -83,20 +113,61 @@
             transform: translateY(-2px);
         }
 
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            content: '🌙';
+            transform: translateX(30px);
+            background: #1e293b;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 400px;
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-secondary);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
 
         .card:hover {
@@ -107,7 +178,7 @@
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 20px;
-            color: #2d3748;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -123,13 +194,13 @@
         .stat-item {
             text-align: center;
             padding: 20px;
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            background: var(--bg-primary);
             border-radius: 15px;
             transition: all 0.3s ease;
         }
 
         .stat-item:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             transform: scale(1.05);
         }
@@ -146,14 +217,13 @@
         }
 
         .progress-container {
-            background: #f7fafc;
-            border-radius: 25px;
+            background: var(--bg-primary);
+            border-radius: 15px;
             padding: 20px;
-            margin-top: 15px;
         }
 
         .progress-bar {
-            background: #e2e8f0;
+            background: var(--border-color);
             border-radius: 10px;
             height: 8px;
             overflow: hidden;
@@ -161,7 +231,7 @@
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             height: 100%;
             border-radius: 10px;
             transition: width 0.5s ease;
@@ -171,11 +241,11 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin-top: 20px;
+            margin-bottom: 25px;
         }
 
         .action-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             padding: 15px;
@@ -184,6 +254,7 @@
             font-weight: 500;
             transition: all 0.3s ease;
             text-align: center;
+            font-size: 14px;
         }
 
         .action-btn:hover {
@@ -191,8 +262,54 @@
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
+        .recent-activities {
+            margin-top: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: var(--border-color);
+            transform: translateX(5px);
+        }
+
+        .activity-item-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .activity-item-content {
+            flex: 1;
+        }
+
+        .activity-item-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .activity-item-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .activity-item-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         .ai-chat-container {
             grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
         }
 
         .chat-header {
@@ -204,16 +321,22 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin: -25px -25px 0 -25px;
         }
 
         .chat-messages {
-            height: 400px;
+            flex: 1;
             overflow-y: auto;
             padding: 20px;
             background: #B3C7F7;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin: 0 -25px;
+        }
+
+        [data-theme="dark"] .chat-messages {
+            background: #4a5568;
         }
 
         .message {
@@ -239,6 +362,11 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        [data-theme="dark"] .message.ai {
+            background: #2d3748;
+            color: white;
+        }
+
         .message-time {
             font-size: 10px;
             opacity: 0.6;
@@ -255,6 +383,10 @@
             animation: pulse 1.5s infinite;
         }
 
+        [data-theme="dark"] .typing-indicator {
+            background: #2d3748;
+        }
+
         .typing-dot {
             width: 6px;
             height: 6px;
@@ -267,12 +399,13 @@
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
         .chat-input-container {
-            background: white;
+            background: var(--bg-secondary);
             padding: 15px 20px;
             border-radius: 0 0 20px 20px;
             display: flex;
             gap: 10px;
             align-items: center;
+            margin: 0 -25px -25px -25px;
         }
 
         .chat-input {
@@ -280,13 +413,14 @@
             border: none;
             padding: 12px 16px;
             border-radius: 20px;
-            background: #f8f9fa;
+            background: var(--bg-primary);
             outline: none;
             font-size: 14px;
+            color: var(--text-primary);
         }
 
         .chat-input:focus {
-            background: #e9ecef;
+            background: var(--border-color);
         }
 
         .send-btn {
@@ -298,6 +432,9 @@
             cursor: pointer;
             font-size: 18px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .send-btn:hover {
@@ -305,259 +442,18 @@
             transform: scale(1.1);
         }
 
-        .activities-section {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .activity-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .activity-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        }
-
-        .activity-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .activity-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #2d3748;
-        }
-
-        .activity-desc {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .activity-stats {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .activity-stat {
-            flex: 1;
-        }
-
-        .activity-stat-value {
-            font-size: 18px;
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .activity-stat-label {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 25px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn:hover {
-            background: #f7fafc;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #2d3748;
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .recent-activities {
-            margin-top: 25px;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-
-        .activity-item-icon {
-            font-size: 24px;
-            margin-right: 15px;
-        }
-
-        .activity-item-content {
-            flex: 1;
-        }
-
-        .activity-item-title {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .activity-item-details {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .activity-item-time {
-            font-size: 12px;
-            color: #999;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #48bb78;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 12px;
-            z-index: 2000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.error {
-            background: #f56565;
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .enhanced-profile-section {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-secondary);
             border-radius: 20px;
             padding: 25px;
-            margin-top: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
         }
 
         .profile-grid {
@@ -568,22 +464,28 @@
         }
 
         .profile-card {
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            background: var(--bg-primary);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .profile-value {
             font-size: 32px;
             font-weight: 700;
-            color: #667eea;
+            color: var(--primary-color);
             margin-bottom: 5px;
         }
 
         .profile-label {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 10px;
         }
 
@@ -611,18 +513,244 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .composition-item {
+            background: var(--bg-secondary);
+        }
+
+        .composition-item:hover {
+            transform: translateY(-3px);
         }
 
         .composition-value {
             font-size: 24px;
             font-weight: 600;
-            color: #667eea;
+            color: var(--primary-color);
         }
 
         .composition-label {
             font-size: 12px;
-            color: #666;
+            color: var(--text-secondary);
             margin-top: 5px;
+        }
+
+        .activities-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .activity-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .activity-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .activity-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .activity-stats {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .activity-stat {
+            flex: 1;
+        }
+
+        .activity-stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .activity-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .body-tracking-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .body-tracking-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #f56565;
+        }
+
+        .toast.info {
+            background: #3182ce;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
         }
 
         @media (max-width: 1200px) {
@@ -641,36 +769,40 @@
                 grid-template-columns: 1fr;
             }
             
-            .activities-section {
-                grid-template-columns: 1fr;
-            }
-            
             .stats-grid {
                 grid-template-columns: 1fr;
             }
             
-            .header-content {
+            .nav-content {
                 flex-direction: column;
                 gap: 15px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <div class="logo">
-                    🍎 MyDiet
-                </div>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="nav-brand">
+                <span>🍎</span>
+                MyDiet
+            </a>
+            <div class="nav-actions">
                 <div class="user-info">
                     <div class="user-avatar" id="user-avatar">👤</div>
                     <span id="user-name">사용자님</span>
                     <button class="profile-btn" onclick="openProfileModal()">⚙️ 프로필</button>
                 </div>
+                <div class="theme-toggle" onclick="toggleTheme()" id="theme-toggle"></div>
             </div>
         </div>
+    </nav>
 
+    <div class="container">
         <div class="dashboard-grid">
             <div class="card">
                 <h3 class="card-title">📊 오늘의 통계</h3>
@@ -746,7 +878,7 @@
                 </div>
                 <div class="chat-input-container">
                     <input type="text" class="chat-input" id="chat-input" placeholder="Claude에게 메시지 보내기..." onkeypress="handleChatEnter(event)">
-                    <button class="send-btn" onclick="sendMessage()">📤</button>
+                    <button class="send-btn" onclick="sendMessage()" id="send-btn">📤</button>
                 </div>
             </div>
         </div>
@@ -772,7 +904,7 @@
             </div>
 
             <div style="margin-top: 25px;">
-                <h4 style="margin-bottom: 15px; color: #2d3748;">📷 눈바디 & 체성분 기록</h4>
+                <h4 style="margin-bottom: 15px; color: var(--text-primary);">📷 눈바디 & 체성분 기록</h4>
                 <div class="body-composition">
                     <div class="composition-item">
                         <div class="composition-value">18%</div>
@@ -789,11 +921,8 @@
                 </div>
                 
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
-                    <button class="action-btn" style="flex: 1;" onclick="openBodyPhotoModal()">
-                        📸 눈바디 촬영
-                    </button>
-                    <button class="action-btn" style="flex: 1;" onclick="openInbodyModal()">
-                        📊 인바디 기록
+                    <button class="action-btn" style="flex: 1;" onclick="openBodyTracking()">
+                        📸 바디 트래킹
                     </button>
                 </div>
             </div>
@@ -832,63 +961,21 @@
                 </div>
             </div>
 
-            <div class="activity-card" onclick="openEmotionModal()">
-                <div class="activity-icon">😊</div>
-                <div class="activity-title">감정 관리</div>
-                <div class="activity-desc">하루의 감정을 기록하고<br>스트레스를 관리하세요</div>
+            <div class="activity-card body-tracking-card" onclick="openBodyTracking()">
+                <div class="activity-icon">📸</div>
+                <div class="activity-title">바디 트래킹</div>
+                <div class="activity-desc">눈바디 촬영과 인바디<br>데이터를 관리하세요</div>
                 <div class="activity-stats">
                     <div class="activity-stat">
-                        <div class="activity-stat-value" id="mood-score">😊</div>
-                        <div class="activity-stat-label">오늘 기분</div>
+                        <div class="activity-stat-value" id="body-photos">0</div>
+                        <div class="activity-stat-label">촬영 횟수</div>
                     </div>
                     <div class="activity-stat">
-                        <div class="activity-stat-value" id="stress-level">낮음</div>
-                        <div class="activity-stat-label">스트레스</div>
+                        <div class="activity-stat-value" id="inbody-records">0</div>
+                        <div class="activity-stat-label">인바디 기록</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="workout-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">🏃‍♂️ 운동 기록</h2>
-                <button class="close-btn" onclick="closeModal('workout-modal')">&times;</button>
-            </div>
-            <form onsubmit="saveWorkout(event)">
-                <div class="form-group">
-                    <label class="form-label">운동 종류</label>
-                    <select id="workout-type" class="form-select" required>
-                        <option value="">선택하세요</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">운동 강도</label>
-                    <select id="workout-intensity" class="form-select" required>
-                        <option value="">강도를 선택하세요</option>
-                    </select>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">운동 시간 (분)</label>
-                        <input type="number" id="workout-duration" class="form-input" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">소모 칼로리</label>
-                        <input type="number" id="workout-calories" class="form-input" readonly>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">메모 (선택)</label>
-                    <input type="text" id="workout-note" class="form-input" placeholder="운동 후 느낌이나 특이사항">
-                </div>
-                
-                <button type="submit" class="submit-btn">운동 기록하기</button>
-            </form>
         </div>
     </div>
 
@@ -908,6 +995,40 @@
                     <input type="number" id="meal-calories" class="form-input" placeholder="예: 650" min="0" required>
                 </div>
                 <button type="submit" class="submit-btn">식단 기록하기</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="workout-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🏃‍♂️ 운동 기록</h2>
+                <button class="close-btn" onclick="closeModal('workout-modal')">&times;</button>
+            </div>
+            <form onsubmit="saveWorkout(event)">
+                <div class="form-group">
+                    <label class="form-label">운동 종류</label>
+                    <select id="workout-type" class="form-select" required>
+                        <option value="">선택하세요</option>
+                        <option value="걷기">걷기</option>
+                        <option value="조깅">조깅</option>
+                        <option value="달리기">달리기</option>
+                        <option value="자전거">자전거</option>
+                        <option value="수영">수영</option>
+                        <option value="헬스">헬스</option>
+                        <option value="요가">요가</option>
+                        <option value="필라테스">필라테스</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">운동 시간 (분)</label>
+                    <input type="number" id="workout-duration" class="form-input" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">소모 칼로리</label>
+                    <input type="number" id="workout-calories" class="form-input" placeholder="예: 200">
+                </div>
+                <button type="submit" class="submit-btn">운동 기록하기</button>
             </form>
         </div>
     </div>
@@ -939,67 +1060,6 @@
         </div>
     </div>
 
-    <div id="body-photo-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">📸 눈바디 촬영</h2>
-                <button class="close-btn" onclick="closeModal('body-photo-modal')">&times;</button>
-            </div>
-            <div style="text-align: center;">
-                <div style="background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 12px; padding: 40px; margin-bottom: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">📷</div>
-                    <p style="color: #666; margin-bottom: 15px;">전신 사진을 업로드하세요</p>
-                    <input type="file" id="body-photo" accept="image/*" style="display: none;" onchange="previewBodyPhoto(event)">
-                    <button type="button" class="action-btn" onclick="document.getElementById('body-photo').click()">
-                        사진 선택
-                    </button>
-                </div>
-                <div id="photo-preview" style="display: none;">
-                    <img id="preview-image" style="max-width: 100%; max-height: 300px; border-radius: 12px;">
-                </div>
-                <button type="button" class="submit-btn" onclick="saveBodyPhoto()">눈바디 저장하기</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="inbody-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">📊 인바디 기록</h2>
-                <button class="close-btn" onclick="closeModal('inbody-modal')">&times;</button>
-            </div>
-            <form onsubmit="saveInbodyData(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">체중 (kg)</label>
-                        <input type="number" id="inbody-weight" class="form-input" step="0.1" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">체지방률 (%)</label>
-                        <input type="number" id="inbody-body-fat" class="form-input" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">골격근량 (kg)</label>
-                        <input type="number" id="inbody-muscle-mass" class="form-input" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">수분량 (%)</label>
-                        <input type="number" id="inbody-water" class="form-input" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">기초대사율 (kcal)</label>
-                        <input type="number" id="inbody-bmr" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">내장지방 레벨</label>
-                        <input type="number" id="inbody-visceral-fat" class="form-input" min="1" max="20">
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn">인바디 데이터 저장</button>
-            </form>
-        </div>
-    </div>
-
     <div id="profile-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1011,49 +1071,20 @@
                     <label class="form-label">닉네임</label>
                     <input type="text" id="profile-nickname" class="form-input" required>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">키 (cm)</label>
-                        <input type="number" id="profile-height" class="form-input" min="100" max="250">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">나이</label>
-                        <input type="number" id="profile-age" class="form-input" min="10" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">성별</label>
-                        <select id="profile-gender" class="form-select">
-                            <option value="">선택하세요</option>
-                            <option value="male">남성</option>
-                            <option value="female">여성</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">목표 체중 (kg)</label>
-                        <input type="number" id="profile-target-weight" class="form-input" step="0.1">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">목표 체중 (kg)</label>
+                    <input type="number" id="profile-weight" class="form-input" step="0.1">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">활동 수준</label>
-                    <select id="profile-activity-level" class="form-select">
-                        <option value="">선택하세요</option>
-                        <option value="sedentary">거의 운동 안함</option>
-                        <option value="light">가벼운 운동 (주 1-3회)</option>
-                        <option value="moderate">보통 운동 (주 3-5회)</option>
-                        <option value="high">높은 운동 (주 6-7회)</option>
-                        <option value="extreme">매우 높은 운동 (하루 2회)</option>
+                    <label class="form-label">AI 코칭 스타일</label>
+                    <select id="profile-coaching" class="form-select">
+                        <option value="다정함">다정함</option>
+                        <option value="츤데레">츤데레</option>
+                        <option value="무자비">무자비</option>
+                        <option value="격려">격려</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Claude 코칭 스타일</label>
-                    <select id="profile-coaching-style" class="form-select">
-                        <option value="friendly">다정하게</option>
-                        <option value="tough">엄격하게</option>
-                        <option value="motivational">동기부여</option>
-                        <option value="professional">전문적으로</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">프로필 저장하기</button>
+                <button type="submit" class="submit-btn">프로필 저장</button>
             </form>
         </div>
     </div>
@@ -1061,246 +1092,46 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        class WorkoutCalorieCalculator {
-            constructor() {
-                this.metValues = {
-                    '걷기': { 
-                        '느림(3km/h)': 2.5, 
-                        '보통(4-5km/h)': 3.3, 
-                        '빠름(6km/h)': 4.3 
-                    },
-                    '조깅': { 
-                        '느림(6-7km/h)': 6.0, 
-                        '보통(8km/h)': 8.3, 
-                        '빠름(9-10km/h)': 10.5 
-                    },
-                    '달리기': { 
-                        '보통(11km/h)': 11.0, 
-                        '빠름(13km/h)': 13.5, 
-                        '매우빠름(16km/h)': 16.0 
-                    },
-                    '자전거': { 
-                        '느림(15km/h)': 4.0, 
-                        '보통(20km/h)': 6.8, 
-                        '빠름(25km/h)': 8.0 
-                    },
-                    '수영': { 
-                        '자유형 느림': 5.8, 
-                        '자유형 보통': 7.0, 
-                        '자유형 빠름': 10.0 
-                    },
-                    '헬스': { 
-                        '가벼운 웨이트': 3.0, 
-                        '보통 웨이트': 5.0, 
-                        '무거운 웨이트': 6.0 
-                    },
-                    '요가': { '하타요가': 2.5, '빈야사요가': 3.0, '파워요가': 4.0 },
-                    '필라테스': { '초급': 2.5, '중급': 3.5, '고급': 4.5 },
-                    '축구': { '가볍게': 5.0, '일반': 7.0, '격렬하게': 10.0 },
-                    '농구': { '가볍게': 4.5, '일반': 6.0, '격렬하게': 8.0 },
-                    '배드민턴': { '가볍게': 4.5, '일반': 5.5, '격렬하게': 7.0 },
-                    '테니스': { '가볍게': 5.0, '일반': 7.3, '격렬하게': 8.0 },
-                    '계단오르기': { '느림': 4.0, '보통': 8.8, '빠름': 15.0 },
-                    '등산': { '평지': 3.5, '가벼운 경사': 6.0, '가파른 경사': 7.5 },
-                    '줄넘기': { '느림(100회/분)': 8.8, '보통(120회/분)': 11.8, '빠름(140회/분)': 12.3 },
-                    '댄스': { '사교댄스': 3.0, '에어로빅 댄스': 7.3, 'K-POP 댄스': 5.0 }
-                };
-            }
-
-            calculateCalories(workoutType, intensity, duration, userWeight = 65) {
-                if (!this.metValues[workoutType] || !this.metValues[workoutType][intensity]) {
-                    return Math.round(duration * 5);
-                }
-
-                const met = this.metValues[workoutType][intensity];
-                const calories = met * userWeight * (duration / 60);
-                return Math.round(calories);
-            }
-
-            getIntensityOptions(workoutType) {
-                return this.metValues[workoutType] ? Object.keys(this.metValues[workoutType]) : ['보통'];
-            }
-
-            getAllWorkoutTypes() {
-                return Object.keys(this.metValues);
-            }
-        }
-
-        const calculator = new WorkoutCalorieCalculator();
-        let currentData = { meals: [], workouts: [], emotions: [], bodyPhotos: [], inbodyData: [] };
+        let currentTheme = localStorage.getItem('mydiet-theme') || 'light';
 
         document.addEventListener('DOMContentLoaded', function() {
-            initializeWorkoutCalculator();
+            setTheme(currentTheme);
+            loadUserProfile();
             loadDashboardData();
         });
 
-        function initializeWorkoutCalculator() {
-            const workoutTypeSelect = document.getElementById('workout-type');
-            const intensitySelect = document.getElementById('workout-intensity');
-            const durationInput = document.getElementById('workout-duration');
-            const caloriesInput = document.getElementById('workout-calories');
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(currentTheme);
+            localStorage.setItem('mydiet-theme', currentTheme);
+        }
 
-            workoutTypeSelect.innerHTML = '<option value="">운동을 선택하세요</option>';
-            calculator.getAllWorkoutTypes().forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                workoutTypeSelect.appendChild(option);
-            });
-
-            workoutTypeSelect.addEventListener('change', function() {
-                const selectedType = this.value;
-                intensitySelect.innerHTML = '<option value="">강도를 선택하세요</option>';
-                
-                if (selectedType) {
-                    const intensities = calculator.getIntensityOptions(selectedType);
-                    intensities.forEach(intensity => {
-                        const option = document.createElement('option');
-                        option.value = intensity;
-                        option.textContent = intensity;
-                        intensitySelect.appendChild(option);
-                    });
-                    if (intensities.length > 0) {
-                        intensitySelect.selectedIndex = 1;
-                    }
-                }
-                updateCalories();
-            });
-
-            intensitySelect.addEventListener('change', updateCalories);
-            durationInput.addEventListener('input', updateCalories);
-
-            function updateCalories() {
-                const workoutType = workoutTypeSelect.value;
-                const intensity = intensitySelect.value;
-                const duration = parseInt(durationInput.value) || 0;
-                
-                if (workoutType && intensity && duration > 0) {
-                    const calories = calculator.calculateCalories(workoutType, intensity, duration);
-                    caloriesInput.value = calories;
-                    caloriesInput.style.background = '#f0f9ff';
-                    caloriesInput.style.color = '#0369a1';
-                } else {
-                    caloriesInput.value = '';
-                    caloriesInput.style.background = '';
-                    caloriesInput.style.color = '';
-                }
-            }
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
         }
 
         function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error('모달을 찾을 수 없음:', modalId);
+            }
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
         }
 
-        function openWorkoutModal() { openModal('workout-modal'); }
         function openMealModal() { openModal('meal-modal'); }
+        function openWorkoutModal() { openModal('workout-modal'); }
         function openEmotionModal() { openModal('emotion-modal'); }
-        function openBodyPhotoModal() { openModal('body-photo-modal'); }
-        function openInbodyModal() { openModal('inbody-modal'); }
         function openProfileModal() { openModal('profile-modal'); }
-
-        function saveWorkout(event) {
-            event.preventDefault();
-            const workout = {
-                type: document.getElementById('workout-type').value,
-                intensity: document.getElementById('workout-intensity').value,
-                duration: parseInt(document.getElementById('workout-duration').value),
-                calories: parseInt(document.getElementById('workout-calories').value),
-                note: document.getElementById('workout-note').value,
-                timestamp: new Date()
-            };
-            
-            currentData.workouts.push(workout);
-            closeModal('workout-modal');
-            showToast('운동이 기록되었습니다!');
-            updateDashboard();
-            addToRecentActivities('🏃‍♂️', `${workout.type} ${workout.duration}분`, `${workout.calories}kcal 소모`);
-        }
-
-        function saveMeal(event) {
-            event.preventDefault();
-            const meal = {
-                description: document.getElementById('meal-description').value,
-                calories: parseInt(document.getElementById('meal-calories').value),
-                timestamp: new Date()
-            };
-            
-            currentData.meals.push(meal);
-            closeModal('meal-modal');
-            showToast('식단이 기록되었습니다!');
-            updateDashboard();
-            addToRecentActivities('🍽️', meal.description, `${meal.calories}kcal`);
-        }
-
-        function saveEmotion(event) {
-            event.preventDefault();
-            const emotion = {
-                mood: document.getElementById('emotion-mood').value,
-                note: document.getElementById('emotion-note').value,
-                timestamp: new Date()
-            };
-            
-            currentData.emotions.push(emotion);
-            closeModal('emotion-modal');
-            showToast('감정이 기록되었습니다!');
-            updateDashboard();
-            addToRecentActivities('😊', '감정 기록', emotion.mood);
-        }
-
-        function previewBodyPhoto(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview-image').src = e.target.result;
-                    document.getElementById('photo-preview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function saveBodyPhoto() {
-            const photoInput = document.getElementById('body-photo');
-            if (photoInput.files[0]) {
-                const bodyPhoto = {
-                    file: photoInput.files[0],
-                    timestamp: new Date()
-                };
-                currentData.bodyPhotos.push(bodyPhoto);
-                closeModal('body-photo-modal');
-                showToast('눈바디 사진이 저장되었습니다!');
-                addToRecentActivities('📸', '눈바디 촬영', '신체 변화 기록');
-            }
-        }
-
-        function saveInbodyData(event) {
-            event.preventDefault();
-            const inbodyData = {
-                weight: parseFloat(document.getElementById('inbody-weight').value),
-                bodyFat: parseFloat(document.getElementById('inbody-body-fat').value) || null,
-                muscleMass: parseFloat(document.getElementById('inbody-muscle-mass').value) || null,
-                water: parseFloat(document.getElementById('inbody-water').value) || null,
-                bmr: parseInt(document.getElementById('inbody-bmr').value) || null,
-                visceralFat: parseInt(document.getElementById('inbody-visceral-fat').value) || null,
-                timestamp: new Date()
-            };
-            
-            currentData.inbodyData.push(inbodyData);
-            closeModal('inbody-modal');
-            showToast('인바디 데이터가 저장되었습니다!');
-            updateBodyComposition(inbodyData);
-            addToRecentActivities('📊', '인바디 측정', `체중 ${inbodyData.weight}kg`);
-        }
-
-        function saveProfile(event) {
-            event.preventDefault();
-            showToast('프로필이 저장되었습니다!');
-            closeModal('profile-modal');
-        }
 
         function handleChatEnter(event) {
             if (event.key === 'Enter') {
@@ -1308,22 +1139,55 @@
             }
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
             const message = input.value.trim();
             
             if (!message) return;
             
             addChatMessage(message, 'user');
             input.value = '';
+            sendBtn.disabled = true;
             
             showTypingIndicator();
             
-            setTimeout(() => {
+            try {
+                const response = await fetch('/api/chat/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: message
+                    }),
+                    credentials: 'include'
+                });
+                
                 hideTypingIndicator();
-                const response = generateAIResponse(message);
-                addChatMessage(response, 'ai');
-            }, 1500);
+                
+                if (response.status === 302 || response.status === 401) {
+                    addChatMessage('채팅을 사용하려면 로그인이 필요합니다.', 'ai');
+                    return;
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.answer) {
+                        addChatMessage(data.answer, 'ai');
+                    } else {
+                        addChatMessage('죄송합니다. 현재 응답을 생성할 수 없습니다.', 'ai');
+                    }
+                } else {
+                    addChatMessage('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.', 'ai');
+                }
+            } catch (error) {
+                console.error('AI 채팅 오류:', error);
+                hideTypingIndicator();
+                addChatMessage('연결 오류가 발생했습니다. 인터넷 연결을 확인해주세요.', 'ai');
+            } finally {
+                sendBtn.disabled = false;
+            }
         }
 
         function addChatMessage(text, sender) {
@@ -1362,19 +1226,244 @@
             }
         }
 
-        function generateAIResponse(message) {
-            const responses = [
-                "좋은 질문이에요! 건강한 다이어트를 위해서는 균형잡힌 식단과 꾸준한 운동이 중요합니다. 💪",
-                "오늘도 열심히 기록하고 계시는군요! 이런 노력이 분명 좋은 결과로 이어질 거예요. 🌟",
-                "식단 관리를 잘 하고 계시네요! 단백질 섭취도 잊지 마세요. 🥗",
-                "운동 기록을 보니 정말 대단해요! 꾸준함이 성공의 열쇠입니다. 🏃‍♂️",
-                "감정 관리도 다이어트에 중요한 요소예요. 스트레스 받지 마시고 천천히 해보세요! 😊",
-                "물 섭취량도 체크해보세요! 하루 2L 정도가 적당합니다. 💧",
-                "수면도 중요해요! 충분한 잠은 신진대사에 도움이 됩니다. 😴",
-                "목표까지 얼마 남지 않았어요! 조금만 더 힘내세요! 🎯"
-            ];
+        async function saveMeal(event) {
+            event.preventDefault();
             
-            return responses[Math.floor(Math.random() * responses.length)];
+            const description = document.getElementById('meal-description').value;
+            const calories = document.getElementById('meal-calories').value;
+            
+            if (!description || !calories) {
+                showToast('모든 필드를 입력해주세요!', 'error');
+                return;
+            }
+            
+            const mealData = {
+                description: description,
+                caloriesEstimate: parseInt(calories)
+            };
+            
+            try {
+                const response = await fetch('/api/integrated-save/meal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(mealData),
+                    credentials: 'include'
+                });
+
+                if (response.status === 302 || response.status === 401) {
+                    showToast('로그인이 필요합니다. 로그인 페이지로 이동합니다.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/auth.html';
+                    }, 2000);
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeModal('meal-modal');
+                    showToast('식단이 기록되었습니다! 🍽️');
+                    refreshDashboard();
+                    addToRecentActivities('🍽️', mealData.description, `${mealData.caloriesEstimate}kcal`);
+                    document.getElementById('meal-modal').querySelector('form').reset();
+                } else {
+                    showToast('식단 저장에 실패했습니다: ' + (result.error || result.message), 'error');
+                }
+            } catch (error) {
+                console.error('식단 저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        async function saveWorkout(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('workout-type').value;
+            const duration = document.getElementById('workout-duration').value;
+            const calories = document.getElementById('workout-calories').value;
+            
+            if (!type || !duration) {
+                showToast('모든 필드를 입력해주세요!', 'error');
+                return;
+            }
+            
+            const workoutData = {
+                type: type,
+                duration: parseInt(duration),
+                caloriesBurned: parseInt(calories) || Math.round(parseInt(duration) * 5)
+            };
+            
+            try {
+                const response = await fetch('/api/integrated-save/workout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(workoutData),
+                    credentials: 'include'
+                });
+
+                if (response.status === 302 || response.status === 401) {
+                    showToast('로그인이 필요합니다. 로그인 페이지로 이동합니다.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/auth.html';
+                    }, 2000);
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeModal('workout-modal');
+                    showToast('운동이 기록되었습니다! 🏃‍♂️');
+                    refreshDashboard();
+                    addToRecentActivities('🏃‍♂️', `${workoutData.type} ${workoutData.duration}분`, `${workoutData.caloriesBurned}kcal 소모`);
+                    document.getElementById('workout-modal').querySelector('form').reset();
+                } else {
+                    showToast('운동 저장에 실패했습니다: ' + (result.error || result.message), 'error');
+                }
+            } catch (error) {
+                console.error('운동 저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        async function saveEmotion(event) {
+            event.preventDefault();
+            
+            const mood = document.getElementById('emotion-mood').value;
+            const note = document.getElementById('emotion-note').value;
+            
+            if (!mood) {
+                showToast('기분을 선택해주세요!', 'error');
+                return;
+            }
+            
+            const emotionData = {
+                mood: mood,
+                note: note || ''
+            };
+            
+            try {
+                const response = await fetch('/api/integrated-save/emotion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(emotionData),
+                    credentials: 'include'
+                });
+
+                if (response.status === 302 || response.status === 401) {
+                    showToast('로그인이 필요합니다. 로그인 페이지로 이동합니다.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/auth.html';
+                    }, 2000);
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeModal('emotion-modal');
+                    showToast('감정이 기록되었습니다! 😊');
+                    refreshDashboard();
+                    addToRecentActivities('😊', '감정 기록', emotionData.mood);
+                    document.getElementById('emotion-modal').querySelector('form').reset();
+                } else {
+                    showToast('감정 저장에 실패했습니다: ' + (result.error || result.message), 'error');
+                }
+            } catch (error) {
+                console.error('감정 저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        async function saveProfile(event) {
+            event.preventDefault();
+            
+            const nickname = document.getElementById('profile-nickname').value;
+            const weight = document.getElementById('profile-weight').value;
+            const coaching = document.getElementById('profile-coaching').value;
+            
+            if (!nickname) {
+                showToast('닉네임을 입력해주세요!', 'error');
+                return;
+            }
+            
+            const profileData = {
+                nickname: nickname,
+                weightGoal: weight ? parseFloat(weight) : null,
+                emotionMode: coaching
+            };
+            
+            try {
+                const response = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(profileData),
+                    credentials: 'include'
+                });
+
+                if (response.status === 302 || response.status === 401) {
+                    showToast('로그인이 필요합니다. 로그인 페이지로 이동합니다.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/auth.html';
+                    }, 2000);
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeModal('profile-modal');
+                    showToast('프로필이 저장되었습니다! ⚙️');
+                    loadUserProfile();
+                } else {
+                    showToast('프로필 저장에 실패했습니다: ' + (result.error || result.message), 'error');
+                }
+            } catch (error) {
+                console.error('프로필 저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile', {
+                    credentials: 'include'
+                });
+                
+                if (response.status === 302 || response.status === 401) {
+                    console.log('로그인이 필요함');
+                    return;
+                }
+                
+                if (response.ok) {
+                    const profile = await response.json();
+                    
+                    if (profile.nickname) {
+                        document.getElementById('user-name').textContent = profile.nickname + '님';
+                        document.getElementById('user-avatar').textContent = profile.nickname.charAt(0).toUpperCase();
+                    }
+                    
+                    if (document.getElementById('profile-nickname')) {
+                        document.getElementById('profile-nickname').value = profile.nickname || '';
+                        document.getElementById('profile-weight').value = profile.weightGoal || '';
+                        document.getElementById('profile-coaching').value = profile.emotionMode || '다정함';
+                    }
+                    
+                    if (profile.weightGoal) {
+                        document.getElementById('target-weight').textContent = profile.weightGoal.toFixed(1);
+                    }
+                }
+            } catch (error) {
+                console.log('프로필 로드 오류:', error);
+            }
         }
 
         function showToast(message, type = 'success') {
@@ -1409,64 +1498,72 @@
             container.insertBefore(activityDiv, container.firstChild);
         }
 
-        function updateDashboard() {
-            const totalMeals = currentData.meals.length;
-            const totalWorkouts = currentData.workouts.length;
-            const totalCaloriesConsumed = currentData.meals.reduce((sum, meal) => sum + meal.calories, 0);
-            const totalCaloriesBurned = currentData.workouts.reduce((sum, workout) => sum + workout.calories, 0);
-            const totalWorkoutMinutes = currentData.workouts.reduce((sum, workout) => sum + workout.duration, 0);
-
-            document.getElementById('meal-count').textContent = totalMeals;
-            document.getElementById('workout-minutes').textContent = totalWorkoutMinutes + '분';
-            document.getElementById('calories-consumed').textContent = totalCaloriesConsumed;
-            document.getElementById('calories-burned').textContent = totalCaloriesBurned;
-
-            document.getElementById('total-workouts').textContent = totalWorkouts;
-            document.getElementById('total-duration').textContent = totalWorkoutMinutes + '분';
-            document.getElementById('total-meals').textContent = totalMeals;
-            document.getElementById('total-calories').textContent = totalCaloriesConsumed;
-
-            const calorieProgress = Math.min((totalCaloriesConsumed / 2000) * 100, 100);
-            document.getElementById('calorie-progress').textContent = `${totalCaloriesConsumed} / 2000 kcal`;
-            document.getElementById('calorie-progress-bar').style.width = calorieProgress + '%';
-
-            if (currentData.emotions.length > 0) {
-                const lastEmotion = currentData.emotions[currentData.emotions.length - 1];
-                document.getElementById('mood-score').textContent = lastEmotion.mood.split(' ')[0];
-            }
+        function openBodyTracking() {
+            window.open('body-tracking.html', '_blank', 'width=1200,height=800');
         }
 
-        function updateBodyComposition(data) {
-            if (data.weight) {
-                document.getElementById('current-weight').textContent = data.weight.toFixed(1);
-                const height = 170;
-                const bmi = (data.weight / ((height / 100) ** 2)).toFixed(1);
-                document.getElementById('bmi-value').textContent = bmi;
-            }
-            
-            if (data.bodyFat) {
-                document.querySelector('.composition-item:nth-child(1) .composition-value').textContent = data.bodyFat + '%';
-            }
-            
-            if (data.muscleMass) {
-                document.querySelector('.composition-item:nth-child(2) .composition-value').textContent = data.muscleMass + 'kg';
-            }
-            
-            if (data.water) {
-                document.querySelector('.composition-item:nth-child(3) .composition-value').textContent = data.water + '%';
+        async function refreshDashboard() {
+            try {
+                const [mealsResponse, workoutsResponse, emotionsResponse] = await Promise.all([
+                    fetch(`/api/integrated-save/meal/today`).catch(() => ({ ok: false })),
+                    fetch(`/api/integrated-save/workout/today`).catch(() => ({ ok: false })),
+                    fetch(`/api/integrated-save/emotion/today`).catch(() => ({ ok: false }))
+                ]);
+
+                let totalMeals = 0, totalWorkouts = 0, totalCaloriesConsumed = 0, totalCaloriesBurned = 0, totalWorkoutMinutes = 0;
+
+                if (mealsResponse.ok) {
+                    try {
+                        const mealsData = await mealsResponse.json();
+                        const meals = mealsData.data || [];
+                        totalMeals = meals.length;
+                        totalCaloriesConsumed = meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0);
+                    } catch (e) {
+                        console.log('식단 데이터 파싱 실패');
+                    }
+                }
+
+                if (workoutsResponse.ok) {
+                    try {
+                        const workoutsData = await workoutsResponse.json();
+                        const workouts = workoutsData.data || [];
+                        totalWorkouts = workouts.length;
+                        totalCaloriesBurned = workouts.reduce((sum, workout) => sum + (workout.caloriesBurned || 0), 0);
+                        totalWorkoutMinutes = workouts.reduce((sum, workout) => sum + (workout.duration || 0), 0);
+                    } catch (e) {
+                        console.log('운동 데이터 파싱 실패');
+                    }
+                }
+
+                document.getElementById('meal-count').textContent = totalMeals;
+                document.getElementById('workout-minutes').textContent = totalWorkoutMinutes + '분';
+                document.getElementById('calories-consumed').textContent = totalCaloriesConsumed;
+                document.getElementById('calories-burned').textContent = totalCaloriesBurned;
+
+                document.getElementById('total-workouts').textContent = totalWorkouts;
+                document.getElementById('total-duration').textContent = totalWorkoutMinutes + '분';
+                document.getElementById('total-meals').textContent = totalMeals;
+                document.getElementById('total-calories').textContent = totalCaloriesConsumed;
+
+                const calorieProgress = Math.min((totalCaloriesConsumed / 2000) * 100, 100);
+                document.getElementById('calorie-progress').textContent = `${totalCaloriesConsumed} / 2000 kcal`;
+                document.getElementById('calorie-progress-bar').style.width = calorieProgress + '%';
+
+                document.getElementById('body-photos').textContent = '0';
+                document.getElementById('inbody-records').textContent = '0';
+
+            } catch (error) {
+                console.log('대시보드 새로고침 중 오류:', error);
             }
         }
 
         function loadDashboardData() {
-            const savedData = localStorage.getItem('mydiet-data');
-            if (savedData) {
-                currentData = JSON.parse(savedData);
-                updateDashboard();
+            const savedTheme = localStorage.getItem('mydiet-theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
             }
-        }
-
-        function saveDashboardData() {
-            localStorage.setItem('mydiet-data', JSON.stringify(currentData));
+            
+            refreshDashboard();
         }
 
         window.onclick = function(event) {
@@ -1474,10 +1571,20 @@
             modals.forEach(modal => {
                 if (event.target === modal) {
                     modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
                 }
             });
         }
 
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal[style*="block"]');
+                if (openModal) {
+                    openModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
     </script>
 </body>
 </html>
