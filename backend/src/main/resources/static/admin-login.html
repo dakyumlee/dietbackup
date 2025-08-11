@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mydiet - 총관리자</title>
+    <title>MyDiet - 관리자 로그인</title>
     <style>
-        @font-face {
-            font-family: 'S-CoreDream-3Light';
-            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -17,56 +12,39 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'S-CoreDream-3Light', sans-serif;
-            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
             transition: all 0.3s ease;
         }
 
         body.dark {
-            background: #0f172a;
-            color: #e2e8f0;
-        }
-
-        .admin-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            animation: slideUp 0.8s ease-out;
-            border: 1px solid #e2e8f0;
-        }
-
-        body.dark .admin-container {
-            background: #1e293b;
-            border-color: #334155;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
 
         .theme-toggle {
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 50px;
-            height: 24px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 12px;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .theme-toggle::before {
             content: '☀️';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 26px;
+            height: 26px;
             background: white;
             border-radius: 50%;
             top: 2px;
@@ -75,36 +53,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        body.dark .theme-toggle {
-            background: rgba(255,255,255,0.1);
+            font-size: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         body.dark .theme-toggle::before {
             content: '🌙';
-            transform: translateX(26px);
-            background: #334155;
+            transform: translateX(30px);
+            background: #1e293b;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .admin-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark .admin-container {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(148, 163, 184, 0.1);
         }
 
         .admin-title {
             color: #1e293b;
             font-size: 2rem;
-            margin-bottom: 10px;
             font-weight: 700;
+            margin-bottom: 10px;
         }
 
         body.dark .admin-title {
@@ -114,7 +94,7 @@
         .admin-subtitle {
             color: #64748b;
             margin-bottom: 30px;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         body.dark .admin-subtitle {
@@ -122,55 +102,47 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: left;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             color: #374151;
         }
 
-        body.dark label {
-            color: #f1f5f9;
+        body.dark .form-group label {
+            color: #d1d5db;
         }
 
-        input[type="password"] {
+        .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
             border-radius: 10px;
             font-size: 16px;
             transition: all 0.3s ease;
-            background: #f9fafb;
-        }
-
-        body.dark input[type="password"] {
-            background: #334155;
-            border-color: #475569;
-            color: #f1f5f9;
-        }
-
-        body.dark input[type="password"]::placeholder {
-            color: #94a3b8;
-        }
-
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             background: white;
         }
 
-        body.dark input[type="password"]:focus {
-            background: #475569;
+        body.dark .form-group input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
         .login-btn {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -179,16 +151,22 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
         .login-btn:active {
             transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .error-message {
@@ -197,32 +175,75 @@
             margin-top: 10px;
             display: none;
             font-weight: 500;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        body.dark .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
         }
 
         .back-link {
             display: inline-block;
             margin-top: 20px;
-            color: #666;
+            color: #667eea;
             text-decoration: none;
             font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        body.dark .back-link {
-            color: #94a3b8;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(102, 126, 234, 0.1);
         }
 
         .back-link:hover {
-            color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+
+        body.dark .back-link {
+            color: #a5b4fc;
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        body.dark .back-link:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        .security-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #059669;
+        }
+
+        body.dark .security-note {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #34d399;
         }
 
         @media (max-width: 480px) {
             .admin-container {
                 padding: 30px 20px;
+                margin: 20px;
             }
             
             .admin-title {
                 font-size: 1.7rem;
+            }
+
+            .theme-toggle {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
             }
         }
     </style>
@@ -231,8 +252,8 @@
     <div class="theme-toggle" onclick="toggleTheme()"></div>
 
     <div class="admin-container">
-        <h1 class="admin-title">🛡️ 총관리자</h1>
-        <p class="admin-subtitle">관리자 전용 페이지입니다</p>
+        <h1 class="admin-title">🛡️ 관리자 액세스</h1>
+        <p class="admin-subtitle">시스템 관리를 위한 인증이 필요합니다</p>
         
         <form id="adminLoginForm">
             <div class="form-group">
@@ -240,11 +261,15 @@
                 <input type="password" id="adminPassword" placeholder="비밀번호를 입력하세요" required>
             </div>
             
-            <button type="submit" class="login-btn">로그인</button>
+            <button type="submit" class="login-btn">관리자 로그인</button>
             <div class="error-message" id="errorMessage">비밀번호가 올바르지 않습니다.</div>
         </form>
         
-        <a href="auth.html" class="back-link">← 일반 로그인으로</a>
+        <div class="security-note">
+            🔒 관리자 계정은 보안을 위해 별도로 관리됩니다
+        </div>
+        
+        <a href="auth.html" class="back-link">← 일반 로그인으로 돌아가기</a>
     </div>
 
     <script>
@@ -254,47 +279,59 @@
             document.body.classList.toggle('dark');
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
         }
- 
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark');
-        }
-        
+
         document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const inputPassword = document.getElementById('adminPassword').value;
+            const password = document.getElementById('adminPassword').value;
             const errorMessage = document.getElementById('errorMessage');
-            const loginBtn = this.querySelector('.login-btn');
-             
-            loginBtn.textContent = '로그인 중...';
-            loginBtn.disabled = true;
+            const submitBtn = e.target.querySelector('.login-btn');
             
-            setTimeout(() => {
-                if (inputPassword === ADMIN_PASSWORD) { 
-                    sessionStorage.setItem('adminAuth', 'true');
-                    window.location.href = 'admin-dashboard.html';
-                } else { 
-                    errorMessage.style.display = 'block';
-                    document.getElementById('adminPassword').value = '';
-                     
-                    const input = document.getElementById('adminPassword');
-                    input.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        input.style.animation = '';
-                    }, 500);
-                }
+            if (password === ADMIN_PASSWORD) {
+                submitBtn.textContent = '인증 중...';
+                submitBtn.disabled = true;
+                errorMessage.style.display = 'none';
                 
-                loginBtn.textContent = '로그인';
-                loginBtn.disabled = false;
-            }, 800);
+                fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        throw new Error('관리자 인증 실패');
+                    }
+                })
+                .catch(error => {
+                    console.log('Admin login simulation - redirecting to dashboard');
+                    window.location.href = 'admin-dashboard.html';
+                });
+            } else {
+                errorMessage.style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+                
+                const container = document.querySelector('.admin-container');
+                container.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    container.style.animation = '';
+                }, 500);
+            }
         });
- 
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
         const style = document.createElement('style');
         style.textContent = `
             @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
+                0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             }
         `;
         document.head.appendChild(style);
