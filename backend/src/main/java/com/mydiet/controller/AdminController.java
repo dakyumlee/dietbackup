@@ -1,7 +1,7 @@
 package com.mydiet.controller;
 
 import com.mydiet.service.AdminService;
-import com.mydiet.repository.UserRepository;
+import com.mydiet.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,9 @@ public class AdminController {
 
     private final AdminService adminService;
     private final UserRepository userRepository;
+    private final MealLogRepository mealLogRepository;
+    private final WorkoutLogRepository workoutLogRepository;
+    private final EmotionLogRepository emotionLogRepository;
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
@@ -78,13 +81,33 @@ public class AdminController {
                 ));
             }
 
+            log.info("사용자 관련 데이터 삭제 시작: userId={}", userId);
+            
+            int deletedMeals = mealLogRepository.findByUserId(userId).size();
+            mealLogRepository.deleteByUserId(userId);
+            log.info("식단 기록 {}개 삭제", deletedMeals);
+            
+            int deletedWorkouts = workoutLogRepository.findByUserId(userId).size();
+            workoutLogRepository.deleteByUserId(userId);
+            log.info("운동 기록 {}개 삭제", deletedWorkouts);
+            
+            int deletedEmotions = emotionLogRepository.findByUserId(userId).size();
+            emotionLogRepository.deleteByUserId(userId);
+            log.info("감정 기록 {}개 삭제", deletedEmotions);
+            
             userRepository.deleteById(userId);
             
-            log.info("관리자에 의한 사용자 삭제 완료: userId={}", userId);
+            log.info("사용자 삭제 완료: userId={}, 관련 데이터 - 식단:{}, 운동:{}, 감정:{}", 
+                    userId, deletedMeals, deletedWorkouts, deletedEmotions);
             
             return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "사용자가 성공적으로 삭제되었습니다"
+                "message", "사용자가 성공적으로 삭제되었습니다",
+                "deletedData", Map.of(
+                    "meals", deletedMeals,
+                    "workouts", deletedWorkouts,
+                    "emotions", deletedEmotions
+                )
             ));
             
         } catch (Exception e) {

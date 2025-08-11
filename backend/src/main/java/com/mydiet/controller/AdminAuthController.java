@@ -47,16 +47,33 @@ public class AdminAuthController {
 
     @GetMapping("/check")
     public ResponseEntity<Map<String, Object>> checkAdminAuth(HttpSession session) {
-        Boolean adminAuth = (Boolean) session.getAttribute("adminAuth");
+        log.info("=== 관리자 권한 확인 요청 ===");
         
-        if (adminAuth != null && adminAuth) {
-            return ResponseEntity.ok(Map.of(
-                "authenticated", true,
-                "role", "ADMIN"
-            ));
-        } else {
-            return ResponseEntity.ok(Map.of(
-                "authenticated", false
+        try {
+            Boolean adminAuth = (Boolean) session.getAttribute("adminAuth");
+            String userRole = (String) session.getAttribute("userRole");
+            
+            log.info("세션 adminAuth: {}, userRole: {}", adminAuth, userRole);
+            
+            if (adminAuth != null && adminAuth && "ADMIN".equals(userRole)) {
+                log.info("관리자 권한 확인됨");
+                return ResponseEntity.ok(Map.of(
+                    "authenticated", true,
+                    "role", "ADMIN",
+                    "sessionId", session.getId()
+                ));
+            } else {
+                log.info("관리자 권한 없음");
+                return ResponseEntity.ok(Map.of(
+                    "authenticated", false,
+                    "sessionId", session.getId()
+                ));
+            }
+        } catch (Exception e) {
+            log.error("관리자 권한 확인 중 오류", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "authenticated", false,
+                "error", e.getMessage()
             ));
         }
     }
