@@ -20,24 +20,52 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                       Authentication authentication) throws IOException, ServletException {
         
-        OAuth2UserPrincipal principal = (OAuth2UserPrincipal) authentication.getPrincipal();
-        
-        HttpSession session = request.getSession(true);
-        session.setAttribute("userId", principal.getUser().getId());
-        session.setAttribute("userEmail", principal.getUser().getEmail());
-        session.setAttribute("userNickname", principal.getUser().getNickname());
-        session.setAttribute("userRole", principal.getUser().getRole());
-        session.setAttribute("authenticated", true);
-        
-        log.info("OAuth2 로그인 성공: {} (ID: {}, Role: {})", 
-                principal.getUser().getEmail(), 
-                principal.getUser().getId(),
-                principal.getUser().getRole());
-        
-        if ("ADMIN".equals(principal.getUser().getRole())) {
-            response.sendRedirect("/admin.html");
-        } else {
-            response.sendRedirect("/dashboard.html");
+        try {
+            log.info("=== OAuth2 로그인 성공 핸들러 시작 ===");
+            
+            if (authentication == null || authentication.getPrincipal() == null) {
+                log.error("Authentication 또는 Principal이 null입니다");
+                response.sendRedirect("/auth.html?error=auth_failed");
+                return;
+            }
+            
+            Object principal = authentication.getPrincipal();
+            log.info("Principal 타입: {}", principal.getClass().getName());
+            
+            if (!(principal instanceof OAuth2UserPrincipal)) {
+                log.error("예상되지 않은 Principal 타입: {}", principal.getClass().getName());
+                response.sendRedirect("/auth.html?error=auth_failed");
+                return;
+            }
+            
+            OAuth2UserPrincipal oauth2Principal = (OAuth2UserPrincipal) principal;
+            
+            if (oauth2Principal.getUser() == null) {
+                log.error("OAuth2UserPrincipal의 User가 null입니다");
+                response.sendRedirect("/auth.html?error=auth_failed");
+                return;
+            }
+            
+            HttpSession session = request.getSession(true);
+            session.setAttribute("userId", oauth2Principal.getUser().getId());
+            session.setAttribute("userEmail", oauth2Principal.getUser().getEmail());
+            session.setAttribute("userNickname", oauth2Principal.getUser().getNickname());
+            session.setAttribute("userRole", oauth2Principal.getUser().getRole());
+            session.setAttribute("authenticated", true);
+            
+            log.info("OAuth2 로그인 성공: {} ({})", 
+                    oauth2Principal.getUser().getEmail(), 
+                    oauth2Principal.getUser().getRole());
+            
+            if ("ADMIN".equals(oauth2Principal.getUser().getRole())) {
+                response.sendRedirect("/admin-dashboard.html");
+            } else {
+                response.sendRedirect("/dashboard.html");
+            }
+            
+        } catch (Exception e) {
+            log.error("OAuth2 로그인 성공 핸들러에서 오류 발생", e);
+            response.sendRedirect("/auth.html?error=auth_failed");
         }
     }
 }

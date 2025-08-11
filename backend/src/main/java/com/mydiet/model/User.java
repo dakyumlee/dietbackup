@@ -1,6 +1,9 @@
 package com.mydiet.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,34 +11,36 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
-    @Id 
+    
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String nickname;
     
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
     
+    private String nickname;
     private String password;
-    private String provider;  
-    private String providerId;  
-
+    private String role = "USER";
+    
     @Column(name = "weight_goal")
-    private Double weightGoal;
+    private Double weightGoal = 70.0;
+    
+    @Column(name = "current_weight")
+    private Double currentWeight = 70.0;
     
     @Column(name = "emotion_mode")
-    private String emotionMode;  
+    private String emotionMode = "다정함";
     
-    @Column(name = "role")
-    @Builder.Default
-    private String role = "USER";  
-
+    private String provider;
+    
+    @Column(name = "provider_id")
+    private String providerId;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -44,32 +49,28 @@ public class User {
     
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
         if (role == null) {
             role = "USER";
+        }
+        if (weightGoal == null) {
+            weightGoal = 70.0;
+        }
+        if (currentWeight == null) {
+            currentWeight = 70.0;
+        }
+        if (emotionMode == null) {
+            emotionMode = "다정함";
         }
     }
     
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-    
-    public void setRole(String role) {
-        this.role = role;
-    }
-    
-    public String getRole() {
-        return this.role != null ? this.role : "USER";
-    }
-    
-    public boolean isAdmin() {
-        return "ADMIN".equals(this.role);
-    }
-    
-    public boolean isUser() {
-        return "USER".equals(this.role);
     }
 }

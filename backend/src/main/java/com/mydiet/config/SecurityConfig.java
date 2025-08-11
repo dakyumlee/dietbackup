@@ -2,6 +2,7 @@ package com.mydiet.config;
 
 import com.mydiet.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final OAuth2UserService oAuth2UserService;
@@ -29,22 +31,36 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
+            .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .antMatchers("/", "/index.html", "/auth.html", 
-            "/api/auth/**", "/api/session/**", "/css/**", "/js/**", "/images/**").permitAll()
-                .antMatchers("/api/auth/register", "/api/auth/login", "/api/test/simple").permitAll()
-                .antMatchers("/admin/**", "/api/admin/**").permitAll()
-                .antMatchers("/login/oauth2/**", "/oauth2/**").permitAll()
+                .antMatchers("/", "/index.html", "/auth.html", "/css/**", "/js/**", "/images/**").permitAll()
+                
+                .antMatchers("/api/auth/**", "/api/session/**", "/api/test/**", "/api/user-setup/**").permitAll()
+                
+                .antMatchers("/admin.html", "/admin-dashboard.html", "/api/admin/**").permitAll()
+                
                 .anyRequest().authenticated()
                 .and()
-            .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .oauth2Login()
                 .loginPage("/auth.html")
                 .userInfoEndpoint()
                     .userService(oAuth2UserService)
                     .and()
                 .successHandler(oAuth2LoginSuccessHandler)
-                .failureUrl("/auth.html?error=oauth_failed")
+                .failureHandler((request, response, exception) -> {
+                    log.error("OAuth2 로그인 실패", exception);
+                    
+                    String errorMessage = "oauth_failed";
+                    if (exception.getMessage() != null) {
+                        if (exception.getMessage().contains("email")) {
+                            errorMessage = "email_required";
+                        } else if (exception.getMessage().contains("access_denied")) {
+                            errorMessage = "access_denied";
+                        }
+                    }
+                    
+                    response.sendRedirect("/auth.html?error=" + errorMessage);
+                })
                 .and()
             .formLogin()
                 .loginPage("/auth.html")
@@ -53,6 +69,7 @@ public class SecurityConfig {
                     response.sendRedirect("/dashboard.html");
                 })
                 .failureHandler((request, response, exception) -> {
+                    exception.printStackTrace();
                     response.sendRedirect("/auth.html?error=login_failed");
                 })
                 .permitAll()
@@ -62,20 +79,17 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/auth.html")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .permitAll();
-
-        http.exceptionHandling()
-            .authenticationEntryPoint((request, response, authException) -> {
-                String requestURI = request.getRequestURI();
-                
-                if (requestURI.startsWith("/api/")) {
-                    response.setStatus(401);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\": \"인증이 필요합니다.\"}");
-                } else {
-                    response.sendRedirect("/auth.html");
-                }
-            });
+                .permitAll()
+                .and()
+            .exceptionHandling()
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    accessDeniedException.printStackTrace();
+                    response.sendRedirect("/auth.html?error=access_denied");
+                })
+                .and()
+            .sessionManagement()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false);
 
         return http.build();
     }
