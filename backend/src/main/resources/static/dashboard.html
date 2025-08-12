@@ -1329,6 +1329,15 @@
             </div>
 
             <div id="inbody-content" class="tracking-content">
+                <div style="margin-bottom: 20px;">
+                    <h4>📊 저장된 인바디 기록</h4>
+                    <div id="saved-inbody-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
+                        <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                            저장된 인바디 기록이 없습니다.
+                        </div>
+                    </div>
+                </div>
+
                 <form onsubmit="saveInbodyData(event)">
                     <div class="inbody-grid">
                         <div class="form-group">
@@ -1384,6 +1393,8 @@
             setupBMICalculation();
             loadUserProfile();
             loadDashboardData();
+            loadBodyTrackingStats();
+            updateBodyStats();
         });
 
         function setupBMICalculation() {
@@ -1730,68 +1741,50 @@
             event.preventDefault();
             
             const nickname = document.getElementById('profile-nickname').value;
-            const height = parseFloat(document.getElementById('profile-height').value) || null;
-            const currentWeight = parseFloat(document.getElementById('profile-current-weight').value) || null;
-            const weightGoal = parseFloat(document.getElementById('profile-weight').value) || null;
+            const height = document.getElementById('profile-height').value;
+            const currentWeight = document.getElementById('profile-current-weight').value;
+            const weightGoal = document.getElementById('profile-weight').value;
             const emotionMode = document.getElementById('profile-coaching').value;
             
-            if (!nickname || nickname.trim() === '') {
-                showToast('닉네임을 입력해주세요!', 'error');
-                return;
-            }
-            
             const profileData = {
-                nickname: nickname.trim(),
-                emotionMode: emotionMode
+                nickname: nickname || '사용자',
+                emotionMode: emotionMode || '다정함'
             };
             
-            if (weightGoal && weightGoal > 0) {
-                profileData.weightGoal = weightGoal;
-            }
+            if (height) profileData.height = parseFloat(height);
+            if (currentWeight) profileData.currentWeight = parseFloat(currentWeight);
+            if (weightGoal) profileData.weightGoal = parseFloat(weightGoal);
             
-            if (height && height > 0) {
-                profileData.height = height;
-            }
-            
-            if (currentWeight && currentWeight > 0) {
-                profileData.currentWeight = currentWeight;
-            }
-            
-            console.log('저장할 프로필 데이터:', profileData);
+            console.log('저장할 데이터:', profileData);
             
             try {
-                const response = await fetch('/api/profile/update', {
-                    method: 'PUT',
+                const response = await fetch('/api/profile/save', {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(profileData),
-                    credentials: 'include'
+                    body: JSON.stringify(profileData)
                 });
 
                 const result = await response.json();
+                console.log('저장 결과:', result);
                 
-                if (response.ok && result.success) {
-                    closeModal('profile-modal');
+                if (result.success !== false) {
                     showToast('프로필이 저장되었습니다! ⚙️');
-                    
-                    setTimeout(() => {
-                        loadUserProfile();
-                    }, 500);
+                    closeModal('profile-modal');
+                    setTimeout(() => loadUserProfile(), 300);
                 } else {
-                    showToast('프로필 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
+                    showToast('저장 실패: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
-                console.error('프로필 저장 오류:', error);
-                showToast('네트워크 오류가 발생했습니다.', 'error');
+                console.error('저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다', 'error');
             }
         }
 
         async function loadCurrentProfile() {
             try {
-                const response = await fetch('/api/profile/user', {
-                    credentials: 'include'
-                });
+                const response = await fetch('/api/simple/profile');
                 
                 if (response.ok) {
                     const profile = await response.json();
@@ -1811,6 +1804,17 @@
                 console.error('프로필 로드 오류:', error);
                 setDefaultModalProfile();
             }
+        }
+
+        function setDefaultProfile() {
+            const defaultProfile = {
+                nickname: '사용자',
+                weightGoal: null,
+                height: null,
+                currentWeight: null,
+                emotionMode: '다정함'
+            };
+            updateProfileDisplay(defaultProfile);
         }
 
         function setDefaultModalProfile() {
@@ -1885,15 +1889,20 @@
                     credentials: 'include'
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success) {
-                        updateBodyStats();
-                        showToast('바디 분석이 완료되었습니다! 📸');
-                    }
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    updateBodyStats();
+                    showToast('바디 분석이 완료되고 저장되었습니다! 📸');
+                    
+                    let currentPhotos = parseInt(localStorage.getItem('mydiet-body-photos') || '0');
+                    localStorage.setItem('mydiet-body-photos', (currentPhotos + 1).toString());
+                } else {
+                    showToast('바디 분석 저장에 실패했습니다.', 'error');
                 }
             } catch (error) {
                 console.error('바디 사진 저장 오류:', error);
+                showToast('네트워크 오류가 발생했습니다.', 'error');
             }
         }
 
@@ -1905,6 +1914,7 @@
             document.getElementById('body-photo-preview').style.display = 'none';
             document.getElementById('body-analysis-results').style.display = 'none';
             document.getElementById('body-photo-input').value = '';
+            showToast('사진이 삭제되었습니다.', 'info');
         }
 
         async function saveInbodyData(event) {
@@ -1944,38 +1954,43 @@
                     credentials: 'include'
                 });
 
-                if (response.status === 302 || response.status === 401) {
-                    showToast('로그인이 필요합니다.', 'error');
-                    return;
-                }
-
                 const result = await response.json();
                 
-                if (result.success) {
+                if (response.ok && result.success) {
                     updateBodyComposition(inbodyData);
                     updateBodyStats();
                     showToast('인바디 데이터가 저장되었습니다! 📊');
+                    
+                    let savedRecords = JSON.parse(localStorage.getItem('mydiet-inbody-data') || '[]');
+                    inbodyData.id = Date.now();
+                    savedRecords.push(inbodyData);
+                    localStorage.setItem('mydiet-inbody-data', JSON.stringify(savedRecords));
+                    
+                    let currentInbody = parseInt(localStorage.getItem('mydiet-inbody-records') || '0');
+                    localStorage.setItem('mydiet-inbody-records', (currentInbody + 1).toString());
+                    
+                    loadSavedInbodyRecords();
                     event.target.reset();
+                    
+                    setTimeout(() => {
+                        closeModal('body-tracking-modal');
+                    }, 1000);
                 } else {
-                    showToast('인바디 데이터 저장에 실패했습니다.', 'error');
+                    showToast('인바디 데이터 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
+                console.error('인바디 저장 오류:', error);
                 showToast('네트워크 오류가 발생했습니다.', 'error');
             }
         }
 
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/profile/user', {
-                    credentials: 'include'
-                });
+                const response = await fetch('/api/simple/profile');
                 
                 if (response.ok) {
                     const user = await response.json();
                     updateProfileDisplay(user);
-                } else if (response.status === 401) {
-                    console.log('인증 필요, 기본 프로필 사용');
-                    setDefaultProfile();
                 } else {
                     console.log('프로필 로드 실패, 기본값 사용');
                     setDefaultProfile();
@@ -1996,6 +2011,8 @@
         }
 
         function updateProfileDisplay(profile) {
+            console.log('UI 업데이트:', profile);
+            
             if (profile.nickname) {
                 document.getElementById('user-name').textContent = profile.nickname + '님';
                 document.getElementById('user-avatar').textContent = profile.nickname.charAt(0).toUpperCase();
@@ -2003,8 +2020,6 @@
             
             if (profile.currentWeight) {
                 document.getElementById('current-weight').textContent = profile.currentWeight.toFixed(1);
-            } else {
-                document.getElementById('current-weight').textContent = '65.0';
             }
             
             if (profile.height) {
@@ -2014,49 +2029,11 @@
                     const heightM = profile.height / 100;
                     const bmi = profile.currentWeight / (heightM * heightM);
                     document.getElementById('bmi-value').textContent = bmi.toFixed(1);
-                    
-                    let statusClass = 'status-good';
-                    let statusText = '정상 범위';
-                    
-                    if (bmi < 18.5) {
-                        statusClass = 'status-info';
-                        statusText = '저체중';
-                    } else if (bmi >= 25 && bmi < 30) {
-                        statusClass = 'status-warning';
-                        statusText = '과체중';
-                    } else if (bmi >= 30) {
-                        statusClass = 'status-warning';
-                        statusText = '비만';
-                    }
-                    
-                    const bmiCard = document.getElementById('bmi-value').parentElement.parentElement;
-                    const statusElement = bmiCard.querySelector('.profile-status');
-                    statusElement.className = `profile-status ${statusClass}`;
-                    statusElement.textContent = statusText;
-                } else {
-                    document.getElementById('bmi-value').textContent = '22.5';
                 }
-            } else {
-                document.getElementById('height-value').textContent = '170';
             }
             
             if (profile.weightGoal) {
                 document.getElementById('target-weight').textContent = profile.weightGoal.toFixed(1);
-                
-                if (profile.currentWeight && profile.weightGoal) {
-                    const difference = profile.weightGoal - profile.currentWeight;
-                    const targetCard = document.getElementById('current-weight').parentElement.parentElement;
-                    const statusElement = targetCard.querySelector('.profile-status');
-                    if (Math.abs(difference) <= 1) {
-                        statusElement.textContent = '목표 달성!';
-                        statusElement.className = 'profile-status status-good';
-                    } else {
-                        statusElement.textContent = `목표까지 ${difference > 0 ? '+' : ''}${difference.toFixed(1)}kg`;
-                        statusElement.className = 'profile-status status-info';
-                    }
-                }
-            } else {
-                document.getElementById('target-weight').textContent = '62.0';
             }
         }
 
@@ -2078,6 +2055,43 @@
             
             document.getElementById('body-photos').textContent = currentPhotos;
             document.getElementById('inbody-records').textContent = currentInbody;
+        }
+
+        async function loadBodyTrackingStats() {
+            try {
+                loadSavedInbodyRecords();
+                updateBodyStats();
+            } catch (error) {
+                console.log('바디트래킹 통계 로드 실패:', error);
+            }
+        }
+
+        function loadSavedInbodyRecords() {
+            const savedRecords = JSON.parse(localStorage.getItem('mydiet-inbody-data') || '[]');
+            const container = document.getElementById('saved-inbody-list');
+            
+            if (savedRecords.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        저장된 인바디 기록이 없습니다.
+                    </div>
+                `;
+                return;
+            }
+
+            savedRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            container.innerHTML = savedRecords.slice(0, 5).map((record, index) => `
+                <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: var(--primary-color);">${record.weight}kg</strong>
+                        <small style="color: var(--text-secondary);">${new Date(record.date).toLocaleDateString('ko-KR')}</small>
+                    </div>
+                    ${record.bodyFat ? `<div style="font-size: 12px; margin-top: 5px;">체지방률: ${record.bodyFat}%</div>` : ''}
+                    ${record.muscleMass ? `<div style="font-size: 12px;">골격근량: ${record.muscleMass}kg</div>` : ''}
+                    ${record.memo ? `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">${record.memo}</div>` : ''}
+                </div>
+            `).join('');
         }
 
         function updateRecentActivities(meals, workouts, emotions) {
