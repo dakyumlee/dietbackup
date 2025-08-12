@@ -28,10 +28,9 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeRequests()
-                .antMatchers("/", "/index.html", "/auth.html", 
-                    "/admin-login.html", "/admin-dashboard.html",
-                    "/api/auth/**", "/api/admin/**", "/api/debug/**",
-                    "/css/**", "/js/**", "/images/**").permitAll()
+                .antMatchers("/", "/index.html", "/auth.html",
+                    "/api/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .antMatchers("/admin/**", "/api/admin/**", "/api/debug/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .oauth2Login()
