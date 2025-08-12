@@ -1641,6 +1641,8 @@
             
             const profileData = {
                 nickname: nickname,
+                currentWeight: currentWeight ? parseFloat(currentWeight) : null,
+                height: height ? parseFloat(height) : null,
                 weightGoal: weight ? parseFloat(weight) : null,
                 emotionMode: coaching
             };
@@ -1661,6 +1663,7 @@
                         closeModal('profile-modal');
                         showToast('프로필이 저장되었습니다! ⚙️');
                         updateProfileDisplay(result.user || profileData);
+                        loadUserProfile();
                     } else {
                         showToast('프로필 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                     }
@@ -1816,10 +1819,9 @@
                 showToast('네트워크 오류가 발생했습니다.', 'error');
             }
         }
-
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/auth/current-user', {
+                const response = await fetch('/api/user/profile', {
                     credentials: 'include'
                 });
                 

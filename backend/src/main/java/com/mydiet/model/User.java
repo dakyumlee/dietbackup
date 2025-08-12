@@ -49,6 +49,21 @@ public class User {
     
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "height")
+private Double height;
+
+public Double getHeight() {
+    return height;
+}
+
+public void setHeight(Double height) {
+    this.height = height;
+}
+
+public void setHeight(Double height) {
+    this.height = height;
+}
     
     @PrePersist
     protected void onCreate() {

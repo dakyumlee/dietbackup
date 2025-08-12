@@ -22,23 +22,46 @@ public class IntegratedSaveController {
     private final WorkoutLogRepository workoutLogRepository;
     private final EmotionLogRepository emotionLogRepository;
 
-
     private Long getCurrentUserId(HttpSession session) {
+        log.info("=== 세션 정보 디버그 ===");
+        
+        if (session == null) {
+            log.warn("세션이 null입니다");
+            return null;
+        }
+        
+        log.info("세션 ID: {}", session.getId());
+        log.info("세션 속성들:");
+        
+        Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String name = attributeNames.nextElement();
+            Object value = session.getAttribute(name);
+            log.info("  {} = {}", name, value);
+        }
+        
         Long userId = (Long) session.getAttribute("userId");
+        log.info("추출된 userId: {}", userId);
         
         if (userId != null) {
             Optional<User> userOpt = userRepository.findById(userId);
             if (userOpt.isPresent()) {
+                log.info("사용자 찾음: {}", userOpt.get().getNickname());
                 return userId;
+            } else {
+                log.warn("userId {}에 해당하는 사용자를 찾을 수 없음", userId);
             }
         }
 
+        log.warn("세션에 userId가 없음. 대체 로직 실행");
         List<User> users = userRepository.findAll();
         if (users.isEmpty()) {
+            log.error("시스템에 사용자가 없음");
             return null;
         }
 
         User firstUser = users.get(0);
+        log.info("첫 번째 사용자 사용: {}", firstUser.getNickname());
         session.setAttribute("userId", firstUser.getId());
         return firstUser.getId();
     }
@@ -143,7 +166,6 @@ public class IntegratedSaveController {
         }
     }
 
-
     @PostMapping("/emotion")
     public ResponseEntity<Map<String, Object>> saveEmotion(@RequestBody Map<String, Object> request, HttpSession session) {
         log.info("=== 감정 저장 시작 ===");
@@ -183,6 +205,63 @@ public class IntegratedSaveController {
 
         } catch (Exception e) {
             log.error("감정 저장 실패", e);
+            return ResponseEntity.internalServerError().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/all-test")
+    public ResponseEntity<Map<String, Object>> saveAllTest(HttpSession session) {
+        log.info("=== 전체 저장 테스트 ===");
+
+        Map<String, Object> results = new HashMap<>();
+
+        try {
+            Long userId = getCurrentUserId(session);
+            if (userId == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "사용자 인증이 필요합니다"));
+            }
+
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "사용자를 찾을 수 없습니다"));
+            }
+
+            MealLog meal = new MealLog();
+            meal.setUser(user);
+            meal.setDescription("전체 테스트 식단");
+            meal.setCaloriesEstimate(400);
+            meal.setDate(LocalDate.now());
+            MealLog savedMeal = mealLogRepository.save(meal);
+            results.put("meal", savedMeal);
+
+            WorkoutLog workout = new WorkoutLog();
+            workout.setUser(user);
+            workout.setType("전체 테스트 운동");
+            workout.setDuration(25);
+            workout.setCaloriesBurned(120);
+            workout.setDate(LocalDate.now());
+            WorkoutLog savedWorkout = workoutLogRepository.save(workout);
+            results.put("workout", savedWorkout);
+
+            EmotionLog emotion = new EmotionLog();
+            emotion.setUser(user);
+            emotion.setMood("기쁨");
+            emotion.setNote("전체 테스트 감정");
+            emotion.setDate(LocalDate.now());
+            EmotionLog savedEmotion = emotionLogRepository.save(emotion);
+            results.put("emotion", savedEmotion);
+
+            results.put("success", true);
+            results.put("message", "모든 데이터가 성공적으로 저장되었습니다!");
+
+            log.info("전체 저장 테스트 완료");
+            return ResponseEntity.ok(results);
+
+        } catch (Exception e) {
+            log.error("전체 저장 테스트 실패", e);
             return ResponseEntity.internalServerError().body(Map.of(
                 "success", false,
                 "error", e.getMessage()
