@@ -1073,6 +1073,25 @@
                 </div>
             </div>
 
+            <!-- 🆕 오늘의 활동 요약 섹션 추가 -->
+            <div style="margin-top: 25px;">
+                <h4 style="margin-bottom: 15px; color: var(--text-primary);">📈 오늘의 활동 요약</h4>
+                <div class="body-composition">
+                    <div class="composition-item">
+                        <div class="composition-value" id="today-meals-summary">0건</div>
+                        <div class="composition-label">식단 기록</div>
+                    </div>
+                    <div class="composition-item">
+                        <div class="composition-value" id="today-workouts-summary">0분</div>
+                        <div class="composition-label">운동 시간</div>
+                    </div>
+                    <div class="composition-item">
+                        <div class="composition-value" id="today-emotions-summary">0건</div>
+                        <div class="composition-label">감정 기록</div>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-top: 25px;">
                 <h4 style="margin-bottom: 15px; color: var(--text-primary);">📷 눈바디 & 체성분 기록</h4>
                 <div class="body-composition">
@@ -1588,7 +1607,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(mealData),
+                    body: JSON.stringify({
+                        description: description,
+                        calories: parseInt(calories)
+                    }),
                     credentials: 'include'
                 });
 
@@ -1598,7 +1620,7 @@
                     closeModal('meal-modal');
                     showToast('식단이 기록되었습니다! 🍽️');
                     refreshDashboard();
-                    addToRecentActivities('🍽️', mealData.description, `${mealData.caloriesEstimate}kcal`);
+                    addToRecentActivities('🍽️', description, `${parseInt(calories)}kcal`);
                     event.target.reset();
                 } else {
                     showToast('식단 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
@@ -1633,7 +1655,11 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(workoutData),
+                    body: JSON.stringify({
+                        type: type,
+                        duration: parseInt(duration),
+                        calories: parseInt(calories) || Math.round(parseInt(duration) * 5)
+                    }),
                     credentials: 'include'
                 });
 
@@ -1643,7 +1669,7 @@
                     closeModal('workout-modal');
                     showToast('운동이 기록되었습니다! 🏃‍♂️');
                     refreshDashboard();
-                    addToRecentActivities('🏃‍♂️', `${workoutData.type} ${workoutData.duration}분`, `${workoutData.caloriesBurned}kcal 소모`);
+                    addToRecentActivities('🏃‍♂️', `${type} ${duration}분`, `${parseInt(calories) || Math.round(parseInt(duration) * 5)}kcal 소모`);
                     event.target.reset();
                 } else {
                     showToast('운동 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
@@ -1676,7 +1702,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(emotionData),
+                    body: JSON.stringify({
+                        mood: mood,
+                        note: note || ''
+                    }),
                     credentials: 'include'
                 });
 
@@ -1686,7 +1715,7 @@
                     closeModal('emotion-modal');
                     showToast('감정이 기록되었습니다! 😊');
                     refreshDashboard();
-                    addToRecentActivities('😊', '감정 기록', emotionData.mood);
+                    addToRecentActivities('😊', '감정 기록', mood);
                     event.target.reset();
                 } else {
                     showToast('감정 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
@@ -1706,21 +1735,19 @@
             const weightGoal = parseFloat(document.getElementById('profile-weight').value) || null;
             const emotionMode = document.getElementById('profile-coaching').value;
             
-            if (!nickname) {
+            if (!nickname || nickname.trim() === '') {
                 showToast('닉네임을 입력해주세요!', 'error');
                 return;
             }
             
-            if (!weightGoal || weightGoal <= 0) {
-                showToast('목표 체중을 정확히 입력해주세요!', 'error');
-                return;
-            }
-            
             const profileData = {
-                nickname: nickname,
-                weightGoal: weightGoal,
+                nickname: nickname.trim(),
                 emotionMode: emotionMode
             };
+            
+            if (weightGoal && weightGoal > 0) {
+                profileData.weightGoal = weightGoal;
+            }
             
             if (height && height > 0) {
                 profileData.height = height;
@@ -1733,7 +1760,7 @@
             console.log('저장할 프로필 데이터:', profileData);
             
             try {
-                const response = await fetch('/api/users/profile?v=123', {
+                const response = await fetch('/api/profile/update', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1742,19 +1769,17 @@
                     credentials: 'include'
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success) {
-                        closeModal('profile-modal');
-                        showToast('프로필이 저장되었습니다! ⚙️');
-                        updateProfileDisplay(result.user || profileData);
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    closeModal('profile-modal');
+                    showToast('프로필이 저장되었습니다! ⚙️');
+                    
+                    setTimeout(() => {
                         loadUserProfile();
-                    } else {
-                        showToast('프로필 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
-                    }
+                    }, 500);
                 } else {
-                    const result = await response.json();
-                    showToast('프로필 저장에 실패했습니다: ' + (result.error || response.statusText), 'error');
+                    showToast('프로필 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
                 console.error('프로필 저장 오류:', error);
@@ -1764,7 +1789,7 @@
 
         async function loadCurrentProfile() {
             try {
-                const response = await fetch('/api/users/me', {
+                const response = await fetch('/api/profile/user', {
                     credentials: 'include'
                 });
                 
@@ -1778,10 +1803,22 @@
                     document.getElementById('profile-coaching').value = profile.emotionMode || '다정함';
                     
                     calculateBMI();
+                } else {
+                    console.log('프로필 로드 실패, 기본값 사용');
+                    setDefaultModalProfile();
                 }
             } catch (error) {
                 console.error('프로필 로드 오류:', error);
+                setDefaultModalProfile();
             }
+        }
+
+        function setDefaultModalProfile() {
+            document.getElementById('profile-nickname').value = '사용자';
+            document.getElementById('profile-height').value = '';
+            document.getElementById('profile-current-weight').value = '';
+            document.getElementById('profile-weight').value = '';
+            document.getElementById('profile-coaching').value = '다정함';
         }
 
         function triggerFileInput(inputId) {
@@ -1929,13 +1966,16 @@
 
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/users/me', {
+                const response = await fetch('/api/profile/user', {
                     credentials: 'include'
                 });
                 
                 if (response.ok) {
                     const user = await response.json();
                     updateProfileDisplay(user);
+                } else if (response.status === 401) {
+                    console.log('인증 필요, 기본 프로필 사용');
+                    setDefaultProfile();
                 } else {
                     console.log('프로필 로드 실패, 기본값 사용');
                     setDefaultProfile();
@@ -2046,7 +2086,7 @@
 
         async function refreshDashboard() {
             try {
-                const response = await fetch('/api/debug/today-only', {
+                const response = await fetch('/api/data/today', {
                     credentials: 'include'
                 });
 
@@ -2056,6 +2096,12 @@
                     const workouts = data.workouts || [];
                     const emotions = data.emotions || [];
 
+                    window.currentData = {
+                        meals: meals,
+                        workouts: workouts,
+                        emotions: emotions
+                    };
+
                     const totalMeals = meals.length;
                     const totalWorkouts = workouts.length;
                     const totalCaloriesConsumed = meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0);
@@ -2064,11 +2110,17 @@
 
                     updateDashboardStats(totalMeals, totalWorkouts, totalCaloriesConsumed, totalCaloriesBurned, totalWorkoutMinutes);
                     updateRecentActivitiesFromData(meals, workouts, emotions);
+                    
+                    displayDetailedMeals(meals);
+                    displayDetailedWorkouts(workouts);
+                    displayDetailedEmotions(emotions);
                 } else {
                     console.log('오늘 데이터 조회 실패');
+                    window.currentData = { meals: [], workouts: [], emotions: [] };
                 }
             } catch (error) {
                 console.log('대시보드 새로고침 중 오류:', error);
+                window.currentData = { meals: [], workouts: [], emotions: [] };
             }
         }
 
@@ -2081,9 +2133,9 @@
                     id: meal.id || `meal-${index}`,
                     type: 'meal',
                     icon: '🍽️',
-                    title: meal.description,
-                    details: `${meal.caloriesEstimate}kcal`,
-                    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+                    title: meal.description || '식단',
+                    details: `${meal.caloriesEstimate || 0}kcal`,
+                    time: formatTime(meal.createdAt) || new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
                     data: meal
                 });
             });
@@ -2093,9 +2145,9 @@
                     id: workout.id || `workout-${index}`,
                     type: 'workout',
                     icon: '🏃‍♂️',
-                    title: `${workout.type} ${workout.duration}분`,
-                    details: `${workout.caloriesBurned}kcal 소모`,
-                    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+                    title: `${workout.type || '운동'} ${workout.duration || 0}분`,
+                    details: `${workout.caloriesBurned || 0}kcal 소모`,
+                    time: formatTime(workout.createdAt) || new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
                     data: workout
                 });
             });
@@ -2106,8 +2158,8 @@
                     type: 'emotion',
                     icon: '😊',
                     title: '감정 기록',
-                    details: emotion.mood,
-                    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+                    details: emotion.mood || '기분 기록',
+                    time: formatTime(emotion.createdAt) || new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
                     data: emotion
                 });
             });
@@ -2125,7 +2177,14 @@
                 return;
             }
             
-            const recentActivities = allActivities.slice(0, 5);
+            const sortedActivities = allActivities.sort((a, b) => {
+                if (a.data.id && b.data.id) {
+                    return b.data.id - a.data.id;
+                }
+                return 0;
+            });
+            
+            const recentActivities = sortedActivities.slice(0, 5);
             
             container.innerHTML = recentActivities.map(activity => `
                 <div class="activity-item">
@@ -2140,6 +2199,16 @@
             `).join('');
         }
 
+        function formatTime(dateString) {
+            if (!dateString) return null;
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return null;
+            }
+        }
+
         async function deleteActivityById(type, id) {
             if (confirm('이 기록을 삭제하시겠습니까?')) {
                 try {
@@ -2150,7 +2219,9 @@
 
                     if (response.ok) {
                         showToast('기록이 삭제되었습니다.', 'info');
-                        refreshDashboard();
+                        setTimeout(() => {
+                            refreshDashboard();
+                        }, 500);
                     } else {
                         showToast('삭제에 실패했습니다.', 'error');
                     }
@@ -2177,6 +2248,45 @@
 
             updateBodyStats();
         }
+
+        function displayDetailedMeals(meals) {
+            const mealCount = meals.length;
+            const totalCalories = meals.reduce((sum, meal) => sum + (meal.caloriesEstimate || 0), 0);
+            
+            document.getElementById('today-meals-summary').textContent = `${mealCount}건`;
+            
+            if (mealCount > 0) {
+                console.log(`오늘 식단: ${mealCount}건, 총 ${totalCalories}kcal`);
+            }
+        }
+
+        function displayDetailedWorkouts(workouts) {
+            const workoutCount = workouts.length;
+            const totalMinutes = workouts.reduce((sum, workout) => sum + (workout.duration || 0), 0);
+            const totalBurned = workouts.reduce((sum, workout) => sum + (workout.caloriesBurned || 0), 0);
+            
+            document.getElementById('today-workouts-summary').textContent = `${totalMinutes}분`;
+            
+            if (workoutCount > 0) {
+                console.log(`오늘 운동: ${workoutCount}건, ${totalMinutes}분, ${totalBurned}kcal 소모`);
+            }
+        }
+
+        function displayDetailedEmotions(emotions) {
+            const emotionCount = emotions.length;
+            
+            document.getElementById('today-emotions-summary').textContent = `${emotionCount}건`;
+            
+            if (emotionCount > 0) {
+                console.log(`오늘 감정 기록: ${emotionCount}건`);
+            }
+        }
+
+        window.currentData = {
+            meals: [],
+            workouts: [],
+            emotions: []
+        };
 
         function loadDashboardData() {
             refreshDashboard();
@@ -2247,8 +2357,11 @@
                     });
 
                     if (response.ok) {
-                        showToast('모든 데이터가 삭제되었습니다.', 'info');
-                        refreshDashboard();
+                        const result = await response.json();
+                        showToast(result.message || '모든 데이터가 삭제되었습니다.', 'info');
+                        
+                        window.currentData = { meals: [], workouts: [], emotions: [] };
+                        updateDashboardStats(0, 0, 0, 0, 0);
                         
                         const container = document.getElementById('recent-activities-list');
                         container.innerHTML = `
@@ -2260,6 +2373,10 @@
                                 </div>
                             </div>
                         `;
+                        
+                        setTimeout(() => {
+                            refreshDashboard();
+                        }, 1000);
                     } else {
                         showToast('데이터 삭제에 실패했습니다.', 'error');
                     }
