@@ -654,7 +654,7 @@
             background: var(--bg-secondary);
             border-radius: 25px;
             padding: 30px;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -888,6 +888,97 @@
             text-align: center;
         }
 
+        .profile-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .profile-tab {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .profile-tab-content {
+            display: none;
+        }
+
+        .profile-tab-content.active {
+            display: block;
+        }
+
+        .personality-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .personality-card {
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .personality-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .personality-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .personality-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .personality-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .personality-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
         @keyframes messageSlide {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -943,6 +1034,14 @@
             .inbody-grid {
                 grid-template-columns: 1fr;
             }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .personality-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -957,7 +1056,7 @@
                 <div class="user-info">
                     <div class="user-avatar" id="user-avatar">👤</div>
                     <span id="user-name">사용자님</span>
-                    <button class="profile-btn" onclick="openProfileModal()">⚙️ 프로필</button>
+                    <button class="profile-btn" onclick="openProfileModal()">⚙️ 프로필 설정</button>
                 </div>
                 <div class="theme-toggle" onclick="toggleTheme()" id="theme-toggle"></div>
             </div>
@@ -1052,28 +1151,27 @@
             <h3 class="card-title">👤 내 건강 프로필</h3>
             <div class="profile-grid">
                 <div class="profile-card">
-                    <div class="profile-value" id="current-weight">65.0</div>
+                    <div class="profile-value" id="current-weight">-</div>
                     <div class="profile-label">현재 체중 (kg)</div>
-                    <div class="profile-status status-info">목표까지 -3kg</div>
+                    <div class="profile-status status-info" id="weight-difference">설정되지 않음</div>
                 </div>
                 <div class="profile-card">
-                    <div class="profile-value" id="height-value">170</div>
+                    <div class="profile-value" id="height-value">-</div>
                     <div class="profile-label">키 (cm)</div>
-                    <div class="profile-status status-good">등록 완료</div>
+                    <div class="profile-status status-good" id="height-status">설정이 필요합니다</div>
                 </div>
                 <div class="profile-card">
-                    <div class="profile-value" id="bmi-value">22.5</div>
+                    <div class="profile-value" id="bmi-value">-</div>
                     <div class="profile-label">BMI</div>
-                    <div class="profile-status status-good">정상 범위</div>
+                    <div class="profile-status status-good" id="bmi-status">계산 불가</div>
                 </div>
                 <div class="profile-card">
-                    <div class="profile-value" id="target-weight">62.0</div>
+                    <div class="profile-value" id="target-weight">-</div>
                     <div class="profile-label">목표 체중 (kg)</div>
-                    <div class="profile-status status-info">2개월 목표</div>
+                    <div class="profile-status status-info" id="target-status">설정이 필요합니다</div>
                 </div>
             </div>
 
-            <!-- 🆕 오늘의 활동 요약 섹션 추가 -->
             <div style="margin-top: 25px;">
                 <h4 style="margin-bottom: 15px; color: var(--text-primary);">📈 오늘의 활동 요약</h4>
                 <div class="body-composition">
@@ -1096,15 +1194,15 @@
                 <h4 style="margin-bottom: 15px; color: var(--text-primary);">📷 눈바디 & 체성분 기록</h4>
                 <div class="body-composition">
                     <div class="composition-item">
-                        <div class="composition-value" id="body-fat-percent">18%</div>
+                        <div class="composition-value" id="body-fat-percent">-</div>
                         <div class="composition-label">체지방률</div>
                     </div>
                     <div class="composition-item">
-                        <div class="composition-value" id="muscle-mass-value">42kg</div>
+                        <div class="composition-value" id="muscle-mass-value">-</div>
                         <div class="composition-label">골격근량</div>
                     </div>
                     <div class="composition-item">
-                        <div class="composition-value" id="water-content-percent">60%</div>
+                        <div class="composition-value" id="water-content-percent">-</div>
                         <div class="composition-label">수분량</div>
                     </div>
                 </div>
@@ -1255,40 +1353,131 @@
                 <h2 class="modal-title">⚙️ 프로필 설정</h2>
                 <button class="close-btn" onclick="closeModal('profile-modal')">&times;</button>
             </div>
-            <form onsubmit="saveProfile(event)">
-                <div class="form-group">
-                    <label class="form-label">닉네임</label>
-                    <input type="text" id="profile-nickname" class="form-input" required>
+            
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchProfileTab('basic')">기본 정보</button>
+                <button class="profile-tab" onclick="switchProfileTab('goals')">목표 설정</button>
+                <button class="profile-tab" onclick="switchProfileTab('ai')">AI 코치</button>
+            </div>
+
+            <div id="basic-content" class="profile-tab-content active">
+                <div class="profile-section">
+                    <h3 class="section-title">👤 개인 정보</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">닉네임</label>
+                            <input type="text" id="user-nickname" class="form-input" placeholder="닉네임을 입력하세요" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이메일</label>
+                            <input type="email" id="user-email" class="form-input" placeholder="이메일 주소" readonly>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">키 (cm)</label>
-                    <input type="number" id="profile-height" class="form-input" min="100" max="250" step="0.1" placeholder="예: 170">
-                    <div class="form-help">BMI 계산을 위해 필요합니다</div>
+
+                <div class="profile-section">
+                    <h3 class="section-title">📏 신체 정보</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">키 (cm)</label>
+                            <input type="number" id="profile-height" class="form-input" min="100" max="250" step="0.1" placeholder="예: 170">
+                            <div class="form-help">BMI 계산을 위해 필요합니다</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">현재 체중 (kg)</label>
+                            <input type="number" id="profile-current-weight" class="form-input" min="30" max="200" step="0.1" placeholder="예: 65.0">
+                            <div class="form-help">BMI 계산을 위해 필요합니다</div>
+                        </div>
+                    </div>
+                    
+                    <div id="bmi-display" class="bmi-display" style="display: none;">
+                        <strong>BMI: <span id="bmi-value-modal">-</span></strong>
+                        <span id="bmi-status-modal" style="margin-left: 10px; font-size: 0.9rem;"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">현재 체중 (kg)</label>
-                    <input type="number" id="profile-current-weight" class="form-input" min="30" max="200" step="0.1" placeholder="예: 65.0">
-                    <div class="form-help">BMI 계산을 위해 필요합니다</div>
+            </div>
+
+            <div id="goals-content" class="profile-tab-content">
+                <div class="profile-section">
+                    <h3 class="section-title">🎯 다이어트 목표</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">목표 체중 (kg)</label>
+                            <input type="number" id="weight-goal" class="form-input" min="30" max="200" step="0.1" placeholder="예: 62.0" required>
+                            <div class="form-help">건강한 감량 속도는 주당 0.5-1kg입니다</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">일일 칼로리 목표</label>
+                            <input type="number" id="calorie-goal" class="form-input" min="1000" max="5000" placeholder="예: 2000">
+                            <div class="form-help">권장: 1800-2200 칼로리</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">주간 운동 목표 (일)</label>
+                            <select id="weekly-workout-goal" class="form-select">
+                                <option value="1">주 1회</option>
+                                <option value="2">주 2회</option>
+                                <option value="3" selected>주 3회</option>
+                                <option value="4">주 4회</option>
+                                <option value="5">주 5회</option>
+                                <option value="6">주 6회</option>
+                                <option value="7">매일</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">목표 달성 기간</label>
+                            <select id="target-period" class="form-select">
+                                <option value="1">1개월</option>
+                                <option value="2" selected>2개월</option>
+                                <option value="3">3개월</option>
+                                <option value="6">6개월</option>
+                                <option value="12">1년</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">목표 체중 (kg)</label>
-                    <input type="number" id="profile-weight" class="form-input" min="30" max="200" step="0.1" placeholder="예: 62.0" required>
+            </div>
+
+            <div id="ai-content" class="profile-tab-content">
+                <div class="profile-section">
+                    <h3 class="section-title">🤖 AI 코칭 스타일</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">당신에게 맞는 코칭 스타일을 선택하세요</p>
+                    
+                    <div class="personality-grid">
+                        <div class="personality-card" data-personality="다정함" onclick="selectPersonality(this)">
+                            <div class="personality-emoji">🌟</div>
+                            <div class="personality-name">다정함</div>
+                            <div class="personality-desc">친근하고 격려하는 톤으로 응원</div>
+                        </div>
+                        
+                        <div class="personality-card" data-personality="츤데레" onclick="selectPersonality(this)">
+                            <div class="personality-emoji">😤</div>
+                            <div class="personality-name">츤데레</div>
+                            <div class="personality-desc">까칠하지만 따뜻한 마음</div>
+                        </div>
+                        
+                        <div class="personality-card" data-personality="무자비" onclick="selectPersonality(this)">
+                            <div class="personality-emoji">💪</div>
+                            <div class="personality-name">무자비</div>
+                            <div class="personality-desc">강한 동기부여와 직설적 조언</div>
+                        </div>
+                        
+                        <div class="personality-card" data-personality="격려" onclick="selectPersonality(this)">
+                            <div class="personality-emoji">🎉</div>
+                            <div class="personality-name">격려</div>
+                            <div class="personality-desc">긍정적이고 응원하는 스타일</div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="emotion-mode" value="다정함">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">AI 코칭 스타일</label>
-                    <select id="profile-coaching" class="form-select">
-                        <option value="다정함">다정함</option>
-                        <option value="츤데레">츤데레</option>
-                        <option value="무자비">무자비</option>
-                        <option value="격려">격려</option>
-                    </select>
-                </div>
-                <div id="bmi-display" class="bmi-display" style="display: none;">
-                    <strong>BMI: <span id="bmi-value-modal">-</span></strong>
-                    <span id="bmi-status" style="margin-left: 10px; font-size: 0.9rem;"></span>
-                </div>
-                <button type="submit" class="submit-btn">프로필 저장</button>
-            </form>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button type="button" class="submit-btn" onclick="saveProfile()">프로필 저장</button>
+            </div>
         </div>
     </div>
 
@@ -1386,6 +1575,7 @@
 
     <script>
         let currentTheme = localStorage.getItem('mydiet-theme') || 'light';
+        let selectedPersonality = '다정함';
 
         document.addEventListener('DOMContentLoaded', function() {
             setTheme(currentTheme);
@@ -1434,29 +1624,13 @@
                     color = '#e53e3e';
                 }
                 
-                const statusElement = document.getElementById('bmi-status');
+                const statusElement = document.getElementById('bmi-status-modal');
                 statusElement.textContent = `(${status})`;
                 statusElement.style.color = color;
                 
                 document.getElementById('bmi-display').style.display = 'block';
             } else {
                 document.getElementById('bmi-display').style.display = 'none';
-            }
-        }
-
-        async function initializeTestSession() {
-            try {
-                const response = await fetch('/api/user-check/create-default', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('기본 사용자 초기화:', data);
-                }
-            } catch (error) {
-                console.log('세션 초기화 실패:', error);
             }
         }
 
@@ -1496,12 +1670,27 @@
         function openProfileModal() { openModal('profile-modal'); }
         function openBodyTrackingModal() { openModal('body-tracking-modal'); }
 
+        function switchProfileTab(tab) {
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchProfileTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-content`).classList.add('active');
+        }
+
         function switchTrackingTab(tab) {
             document.querySelectorAll('.tracking-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tracking-content').forEach(c => c.classList.remove('active'));
             
             document.querySelector(`[onclick="switchTrackingTab('${tab}')"]`).classList.add('active');
             document.getElementById(`${tab}-content`).classList.add('active');
+        }
+
+        function selectPersonality(card) {
+            document.querySelectorAll('.personality-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedPersonality = card.dataset.personality;
+            document.getElementById('emotion-mode').value = selectedPersonality;
         }
 
         function handleChatEnter(event) {
@@ -1607,11 +1796,6 @@
                 return;
             }
             
-            const mealData = {
-                description: description,
-                caloriesEstimate: parseInt(calories)
-            };
-            
             try {
                 const response = await fetch('/api/save/meal', {
                     method: 'POST',
@@ -1653,12 +1837,6 @@
                 showToast('모든 필드를 입력해주세요!', 'error');
                 return;
             }
-            
-            const workoutData = {
-                type: type,
-                duration: parseInt(duration),
-                caloriesBurned: parseInt(calories) || Math.round(parseInt(duration) * 5)
-            };
             
             try {
                 const response = await fetch('/api/save/workout', {
@@ -1702,11 +1880,6 @@
                 return;
             }
             
-            const emotionData = {
-                mood: mood,
-                note: note || ''
-            };
-            
             try {
                 const response = await fetch('/api/save/emotion', {
                     method: 'POST',
@@ -1737,63 +1910,73 @@
             }
         }
 
-        async function saveProfile(event) {
-            event.preventDefault();
+        async function saveProfile() {
+            const nickname = document.getElementById('user-nickname').value.trim();
+            const email = document.getElementById('user-email').value.trim();
+            const height = parseFloat(document.getElementById('profile-height').value) || null;
+            const currentWeight = parseFloat(document.getElementById('profile-current-weight').value) || null;
+            const weightGoal = parseFloat(document.getElementById('weight-goal').value) || 0;
+            const emotionMode = selectedPersonality || '다정함';
             
-            const nickname = document.getElementById('profile-nickname').value;
-            const height = document.getElementById('profile-height').value;
-            const currentWeight = document.getElementById('profile-current-weight').value;
-            const weightGoal = document.getElementById('profile-weight').value;
-            const emotionMode = document.getElementById('profile-coaching').value;
+            if (!nickname) {
+                showToast('닉네임을 입력해주세요', 'error');
+                return;
+            }
             
-            const profileData = {
-                nickname: nickname || '사용자',
-                emotionMode: emotionMode || '다정함'
-            };
-            
-            if (height) profileData.height = parseFloat(height);
-            if (currentWeight) profileData.currentWeight = parseFloat(currentWeight);
-            if (weightGoal) profileData.weightGoal = parseFloat(weightGoal);
-            
-            console.log('저장할 데이터:', profileData);
-            
+            if (weightGoal <= 0) {
+                showToast('목표 체중을 정확히 입력해주세요', 'error');
+                return;
+            }
+
             try {
-                const response = await fetch('/api/profile/save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(profileData)
+                const response = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        nickname: nickname,
+                        email: email,
+                        height: height,
+                        currentWeight: currentWeight,
+                        weightGoal: weightGoal,
+                        emotionMode: emotionMode
+                    })
                 });
 
                 const result = await response.json();
-                console.log('저장 결과:', result);
                 
-                if (result.success !== false) {
-                    showToast('프로필이 저장되었습니다! ⚙️');
+                if (result.success) {
+                    showToast('프로필이 업데이트되었습니다! ⚙️');
                     closeModal('profile-modal');
-                    setTimeout(() => loadUserProfile(), 300);
+                    loadUserProfile();
                 } else {
-                    showToast('저장 실패: ' + (result.error || '알 수 없는 오류'), 'error');
+                    showToast('저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'), 'error');
                 }
             } catch (error) {
-                console.error('저장 오류:', error);
                 showToast('네트워크 오류가 발생했습니다', 'error');
+                console.error('Error:', error);
             }
         }
 
         async function loadCurrentProfile() {
             try {
-                const response = await fetch('/api/simple/profile');
-                
+                const response = await fetch('/api/user/profile');
                 if (response.ok) {
                     const profile = await response.json();
                     
-                    document.getElementById('profile-nickname').value = profile.nickname || '';
+                    document.getElementById('user-nickname').value = profile.nickname || '';
+                    document.getElementById('user-email').value = profile.email || '';
                     document.getElementById('profile-height').value = profile.height || '';
                     document.getElementById('profile-current-weight').value = profile.currentWeight || '';
-                    document.getElementById('profile-weight').value = profile.weightGoal || '';
-                    document.getElementById('profile-coaching').value = profile.emotionMode || '다정함';
+                    document.getElementById('weight-goal').value = profile.weightGoal || '';
+                    
+                    const emotionMode = profile.emotionMode || '다정함';
+                    selectedPersonality = emotionMode;
+                    document.getElementById('emotion-mode').value = emotionMode;
+                    
+                    const personalityCard = document.querySelector(`[data-personality="${emotionMode}"]`);
+                    if (personalityCard) {
+                        selectPersonality(personalityCard);
+                    }
                     
                     calculateBMI();
                 } else {
@@ -1806,23 +1989,19 @@
             }
         }
 
-        function setDefaultProfile() {
-            const defaultProfile = {
-                nickname: '사용자',
-                weightGoal: null,
-                height: null,
-                currentWeight: null,
-                emotionMode: '다정함'
-            };
-            updateProfileDisplay(defaultProfile);
-        }
-
         function setDefaultModalProfile() {
-            document.getElementById('profile-nickname').value = '사용자';
+            document.getElementById('user-nickname').value = '사용자';
+            document.getElementById('user-email').value = '';
             document.getElementById('profile-height').value = '';
             document.getElementById('profile-current-weight').value = '';
-            document.getElementById('profile-weight').value = '';
-            document.getElementById('profile-coaching').value = '다정함';
+            document.getElementById('weight-goal').value = '';
+            selectedPersonality = '다정함';
+            document.getElementById('emotion-mode').value = '다정함';
+            
+            const defaultCard = document.querySelector(`[data-personality="다정함"]`);
+            if (defaultCard) {
+                selectPersonality(defaultCard);
+            }
         }
 
         function triggerFileInput(inputId) {
@@ -1872,14 +2051,14 @@
             
             analysisResults.style.display = 'block';
             
-            const bodyPhotoData = {
-                image: document.getElementById('preview-img').src,
-                analysis: analysisContent.innerHTML,
-                date: new Date().toISOString(),
-                id: Date.now()
-            };
-            
             try {
+                const bodyPhotoData = {
+                    image: document.getElementById('preview-img').src,
+                    analysis: analysisContent.innerHTML,
+                    date: new Date().toISOString(),
+                    id: Date.now()
+                };
+
                 const response = await fetch('/api/save/body-photo', {
                     method: 'POST',
                     headers: {
@@ -1986,7 +2165,7 @@
 
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/simple/profile');
+                const response = await fetch('/api/user/profile');
                 
                 if (response.ok) {
                     const user = await response.json();
@@ -2004,7 +2183,9 @@
         function setDefaultProfile() {
             const defaultProfile = {
                 nickname: '사용자',
-                weightGoal: 62.0,
+                weightGoal: null,
+                height: null,
+                currentWeight: null,
                 emotionMode: '다정함'
             };
             updateProfileDisplay(defaultProfile);
@@ -2020,20 +2201,66 @@
             
             if (profile.currentWeight) {
                 document.getElementById('current-weight').textContent = profile.currentWeight.toFixed(1);
+                document.getElementById('weight-difference').textContent = profile.weightGoal ? 
+                    `목표까지 ${(profile.weightGoal - profile.currentWeight).toFixed(1)}kg` : '목표 설정 필요';
+                document.getElementById('weight-difference').className = 'profile-status status-info';
+            } else {
+                document.getElementById('current-weight').textContent = '-';
+                document.getElementById('weight-difference').textContent = '체중 입력 필요';
+                document.getElementById('weight-difference').className = 'profile-status status-warning';
             }
             
             if (profile.height) {
                 document.getElementById('height-value').textContent = profile.height;
+                document.getElementById('height-status').textContent = '등록 완료';
+                document.getElementById('height-status').className = 'profile-status status-good';
                 
                 if (profile.currentWeight && profile.height) {
                     const heightM = profile.height / 100;
                     const bmi = profile.currentWeight / (heightM * heightM);
                     document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+                    
+                    let bmiStatus = '';
+                    let bmiClass = 'profile-status ';
+                    
+                    if (bmi < 18.5) {
+                        bmiStatus = '저체중';
+                        bmiClass += 'status-warning';
+                    } else if (bmi < 25) {
+                        bmiStatus = '정상 범위';
+                        bmiClass += 'status-good';
+                    } else if (bmi < 30) {
+                        bmiStatus = '과체중';
+                        bmiClass += 'status-warning';
+                    } else {
+                        bmiStatus = '비만';
+                        bmiClass += 'status-warning';
+                    }
+                    
+                    document.getElementById('bmi-status').textContent = bmiStatus;
+                    document.getElementById('bmi-status').className = bmiClass;
+                } else {
+                    document.getElementById('bmi-value').textContent = '-';
+                    document.getElementById('bmi-status').textContent = '계산 불가';
+                    document.getElementById('bmi-status').className = 'profile-status status-warning';
                 }
+            } else {
+                document.getElementById('height-value').textContent = '-';
+                document.getElementById('height-status').textContent = '설정이 필요합니다';
+                document.getElementById('height-status').className = 'profile-status status-warning';
+                document.getElementById('bmi-value').textContent = '-';
+                document.getElementById('bmi-status').textContent = '계산 불가';
+                document.getElementById('bmi-status').className = 'profile-status status-warning';
             }
             
             if (profile.weightGoal) {
                 document.getElementById('target-weight').textContent = profile.weightGoal.toFixed(1);
+                document.getElementById('target-status').textContent = '목표 설정됨';
+                document.getElementById('target-status').className = 'profile-status status-good';
+            } else {
+                document.getElementById('target-weight').textContent = '-';
+                document.getElementById('target-status').textContent = '설정이 필요합니다';
+                document.getElementById('target-status').className = 'profile-status status-warning';
             }
         }
 
@@ -2092,10 +2319,6 @@
                     ${record.memo ? `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">${record.memo}</div>` : ''}
                 </div>
             `).join('');
-        }
-
-        function updateRecentActivities(meals, workouts, emotions) {
-            updateRecentActivitiesFromData(meals, workouts, emotions);
         }
 
         async function refreshDashboard() {
