@@ -718,6 +718,12 @@
             border-color: var(--primary-color);
         }
 
+        .form-help {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
         .submit-btn {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -872,6 +878,14 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 20px;
+        }
+
+        .bmi-display {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+            text-align: center;
         }
 
         @keyframes messageSlide {
@@ -1228,16 +1242,18 @@
                     <input type="text" id="profile-nickname" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">현재 체중 (kg)</label>
-                    <input type="number" id="profile-current-weight" class="form-input" step="0.1" placeholder="65.0">
+                    <label class="form-label">키 (cm)</label>
+                    <input type="number" id="profile-height" class="form-input" min="100" max="250" step="0.1" placeholder="예: 170">
+                    <div class="form-help">BMI 계산을 위해 필요합니다</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">키 (cm)</label>
-                    <input type="number" id="profile-height" class="form-input" placeholder="170">
+                    <label class="form-label">현재 체중 (kg)</label>
+                    <input type="number" id="profile-current-weight" class="form-input" min="30" max="200" step="0.1" placeholder="예: 65.0">
+                    <div class="form-help">BMI 계산을 위해 필요합니다</div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">목표 체중 (kg)</label>
-                    <input type="number" id="profile-weight" class="form-input" step="0.1" placeholder="62.0">
+                    <input type="number" id="profile-weight" class="form-input" min="30" max="200" step="0.1" placeholder="예: 62.0" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">AI 코칭 스타일</label>
@@ -1247,6 +1263,10 @@
                         <option value="무자비">무자비</option>
                         <option value="격려">격려</option>
                     </select>
+                </div>
+                <div id="bmi-display" class="bmi-display" style="display: none;">
+                    <strong>BMI: <span id="bmi-value-modal">-</span></strong>
+                    <span id="bmi-status" style="margin-left: 10px; font-size: 0.9rem;"></span>
                 </div>
                 <button type="submit" class="submit-btn">프로필 저장</button>
             </form>
@@ -1342,9 +1362,57 @@
         document.addEventListener('DOMContentLoaded', function() {
             setTheme(currentTheme);
             setupBodyPhotoUpload();
+            setupBMICalculation();
             loadUserProfile();
             loadDashboardData();
         });
+
+        function setupBMICalculation() {
+            const heightInput = document.getElementById('profile-height');
+            const weightInput = document.getElementById('profile-current-weight');
+            
+            if (heightInput && weightInput) {
+                heightInput.addEventListener('input', calculateBMI);
+                weightInput.addEventListener('input', calculateBMI);
+            }
+        }
+
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('profile-height').value);
+            const currentWeight = parseFloat(document.getElementById('profile-current-weight').value);
+            
+            if (height && currentWeight && height > 0 && currentWeight > 0) {
+                const heightInM = height / 100;
+                const bmi = currentWeight / (heightInM * heightInM);
+                
+                document.getElementById('bmi-value-modal').textContent = bmi.toFixed(1);
+                
+                let status = '';
+                let color = '';
+                
+                if (bmi < 18.5) {
+                    status = '저체중';
+                    color = '#3182ce';
+                } else if (bmi < 25) {
+                    status = '정상체중';
+                    color = '#38a169';
+                } else if (bmi < 30) {
+                    status = '과체중';
+                    color = '#d69e2e';
+                } else {
+                    status = '비만';
+                    color = '#e53e3e';
+                }
+                
+                const statusElement = document.getElementById('bmi-status');
+                statusElement.textContent = `(${status})`;
+                statusElement.style.color = color;
+                
+                document.getElementById('bmi-display').style.display = 'block';
+            } else {
+                document.getElementById('bmi-display').style.display = 'none';
+            }
+        }
 
         async function initializeTestSession() {
             try {
@@ -1377,6 +1445,10 @@
             if (modal) {
                 modal.style.display = 'block';
                 document.body.style.overflow = 'hidden';
+                
+                if (modalId === 'profile-modal') {
+                    loadCurrentProfile();
+                }
             }
         }
 
@@ -1629,26 +1701,39 @@
             event.preventDefault();
             
             const nickname = document.getElementById('profile-nickname').value;
-            const currentWeight = document.getElementById('profile-current-weight').value;
-            const height = document.getElementById('profile-height').value;
-            const weight = document.getElementById('profile-weight').value;
-            const coaching = document.getElementById('profile-coaching').value;
+            const height = parseFloat(document.getElementById('profile-height').value) || null;
+            const currentWeight = parseFloat(document.getElementById('profile-current-weight').value) || null;
+            const weightGoal = parseFloat(document.getElementById('profile-weight').value) || null;
+            const emotionMode = document.getElementById('profile-coaching').value;
             
             if (!nickname) {
                 showToast('닉네임을 입력해주세요!', 'error');
                 return;
             }
             
+            if (!weightGoal || weightGoal <= 0) {
+                showToast('목표 체중을 정확히 입력해주세요!', 'error');
+                return;
+            }
+            
             const profileData = {
                 nickname: nickname,
-                currentWeight: currentWeight ? parseFloat(currentWeight) : null,
-                height: height ? parseFloat(height) : null,
-                weightGoal: weight ? parseFloat(weight) : null,
-                emotionMode: coaching
+                weightGoal: weightGoal,
+                emotionMode: emotionMode
             };
             
+            if (height && height > 0) {
+                profileData.height = height;
+            }
+            
+            if (currentWeight && currentWeight > 0) {
+                profileData.currentWeight = currentWeight;
+            }
+            
+            console.log('저장할 프로필 데이터:', profileData);
+            
             try {
-                const response = await fetch('/api/user/profile', {
+                const response = await fetch('/api/users/profile?v=123', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1674,6 +1759,28 @@
             } catch (error) {
                 console.error('프로필 저장 오류:', error);
                 showToast('네트워크 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        async function loadCurrentProfile() {
+            try {
+                const response = await fetch('/api/users/me', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const profile = await response.json();
+                    
+                    document.getElementById('profile-nickname').value = profile.nickname || '';
+                    document.getElementById('profile-height').value = profile.height || '';
+                    document.getElementById('profile-current-weight').value = profile.currentWeight || '';
+                    document.getElementById('profile-weight').value = profile.weightGoal || '';
+                    document.getElementById('profile-coaching').value = profile.emotionMode || '다정함';
+                    
+                    calculateBMI();
+                }
+            } catch (error) {
+                console.error('프로필 로드 오류:', error);
             }
         }
 
@@ -1819,9 +1926,10 @@
                 showToast('네트워크 오류가 발생했습니다.', 'error');
             }
         }
+
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/user/profile', {
+                const response = await fetch('/api/users/me', {
                     credentials: 'include'
                 });
                 
@@ -1853,14 +1961,6 @@
                 document.getElementById('user-avatar').textContent = profile.nickname.charAt(0).toUpperCase();
             }
             
-            if (document.getElementById('profile-nickname')) {
-                document.getElementById('profile-nickname').value = profile.nickname || '';
-                document.getElementById('profile-current-weight').value = profile.currentWeight || '';
-                document.getElementById('profile-height').value = profile.height || '';
-                document.getElementById('profile-weight').value = profile.weightGoal || '';
-                document.getElementById('profile-coaching').value = profile.emotionMode || '다정함';
-            }
-            
             if (profile.currentWeight) {
                 document.getElementById('current-weight').textContent = profile.currentWeight.toFixed(1);
             } else {
@@ -1874,6 +1974,25 @@
                     const heightM = profile.height / 100;
                     const bmi = profile.currentWeight / (heightM * heightM);
                     document.getElementById('bmi-value').textContent = bmi.toFixed(1);
+                    
+                    let statusClass = 'status-good';
+                    let statusText = '정상 범위';
+                    
+                    if (bmi < 18.5) {
+                        statusClass = 'status-info';
+                        statusText = '저체중';
+                    } else if (bmi >= 25 && bmi < 30) {
+                        statusClass = 'status-warning';
+                        statusText = '과체중';
+                    } else if (bmi >= 30) {
+                        statusClass = 'status-warning';
+                        statusText = '비만';
+                    }
+                    
+                    const bmiCard = document.getElementById('bmi-value').parentElement.parentElement;
+                    const statusElement = bmiCard.querySelector('.profile-status');
+                    statusElement.className = `profile-status ${statusClass}`;
+                    statusElement.textContent = statusText;
                 } else {
                     document.getElementById('bmi-value').textContent = '22.5';
                 }
@@ -1883,6 +2002,19 @@
             
             if (profile.weightGoal) {
                 document.getElementById('target-weight').textContent = profile.weightGoal.toFixed(1);
+                
+                if (profile.currentWeight && profile.weightGoal) {
+                    const difference = profile.weightGoal - profile.currentWeight;
+                    const targetCard = document.getElementById('current-weight').parentElement.parentElement;
+                    const statusElement = targetCard.querySelector('.profile-status');
+                    if (Math.abs(difference) <= 1) {
+                        statusElement.textContent = '목표 달성!';
+                        statusElement.className = 'profile-status status-good';
+                    } else {
+                        statusElement.textContent = `목표까지 ${difference > 0 ? '+' : ''}${difference.toFixed(1)}kg`;
+                        statusElement.className = 'profile-status status-info';
+                    }
+                }
             } else {
                 document.getElementById('target-weight').textContent = '62.0';
             }
@@ -1898,6 +2030,14 @@
             if (data.water) {
                 document.getElementById('water-content-percent').textContent = data.water + '%';
             }
+        }
+
+        function updateBodyStats() {
+            const currentPhotos = parseInt(localStorage.getItem('mydiet-body-photos') || '0');
+            const currentInbody = parseInt(localStorage.getItem('mydiet-inbody-records') || '0');
+            
+            document.getElementById('body-photos').textContent = currentPhotos;
+            document.getElementById('inbody-records').textContent = currentInbody;
         }
 
         function updateRecentActivities(meals, workouts, emotions) {
